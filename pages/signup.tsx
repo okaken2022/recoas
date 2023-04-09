@@ -1,4 +1,8 @@
+import { useAuth, useUser } from '@/hooks/firebase';
 import { Button, FormLabel, Input, VStack } from '@chakra-ui/react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 type Inputs = {
@@ -13,10 +17,32 @@ export default function Signup() {
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
-  return(
-  <>
-    <VStack>
-      <VStack w='30vw'>
+
+  const auth = useAuth();
+  const currentUser = useUser();
+
+  const signup = async (email: string, password: string) => {
+    try {
+      const UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('ユーザー登録成功');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onSubmit: SubmitHandler<Inputs> = ({ email, password }) => {
+    signup(email, password);
+  };
+
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (currentUser) router.push("/");
+  }, [currentUser, router])
+
+  return (
+    <>
+      <VStack w='30vw' mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
         <Input id='name' placeholder='name' {...register('email', { required: true })} />
         <FormLabel htmlFor='password'>パスワード</FormLabel>
@@ -26,12 +52,10 @@ export default function Signup() {
           type='password'
           {...register('password', { required: true })}
         />
-        <Button mt={4} colorScheme='teal'>
+        <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           アカウント作成
         </Button>
       </VStack>
-    </VStack>
-  </>
-  )
-};
-
+    </>
+  );
+}
