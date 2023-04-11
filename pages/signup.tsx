@@ -1,5 +1,5 @@
 import { useAuth, useUser } from '@/hooks/firebase';
-import { Button, FormLabel, Input, VStack } from '@chakra-ui/react';
+import { Button, FormLabel, Input, VStack, Box, Text } from '@chakra-ui/react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -24,6 +24,8 @@ export default function Signup() {
   const signup = async (email: string, password: string) => {
     try {
       const UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+      //データベースのusers.userに入れる
+      // user.todo
       console.log('ユーザー登録成功');
     } catch (e) {
       console.error(e);
@@ -35,13 +37,18 @@ export default function Signup() {
   };
 
   const router = useRouter();
-  
+
   useEffect(() => {
-    if (currentUser) router.push("/");
-  }, [currentUser, router])
+    if (currentUser) router.push('/');
+  }, [currentUser, router]);
 
   return (
     <>
+      <Box bg='#3778B8' w='100%' p={4} color='white' mb={100}>
+        <Text fontSize='2xl'>
+          Todo List
+        </Text>
+      </Box>
       <VStack w='30vw' mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
         <Input id='name' placeholder='name' {...register('email', { required: true })} />
