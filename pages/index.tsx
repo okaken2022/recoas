@@ -3,25 +3,24 @@ import Image from 'next/image';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
 import { FormLabel, Input, Button, VStack } from '@chakra-ui/react';
-
-const inter = Inter({ subsets: ['latin'] });
+import { useUser, useAuth, useLogout } from '@/hooks/firebase';
+import { getAuth } from 'firebase/auth';
+import { NextRouter, useRouter } from 'next/router';
 
 export default function Home() {
+  const auth = useAuth();
+  const user = auth.currentUser;
+  console.log(user);
+  const router: NextRouter = useRouter();
+  const {logout} = useLogout(router);
+
   return (
     <>
-      <VStack>
-        <VStack w='30vw'>
-          <FormLabel htmlFor='name'>First name</FormLabel>
-          <Input id='name' placeholder='name' />
-
-          <FormLabel htmlFor='password'>Password</FormLabel>
-          <Input id='password' placeholder='password' type='password' />
-
-          <Button mt={4} colorScheme='teal'>
-            Submit
-          </Button>
-        </VStack>
-      </VStack>
+      <p>ユーザー情報:{user?.email}</p>
+      <p>todoリストコンポーネントがはいります</p>
+      <Button mt={4} colorScheme='teal' onClick={logout}>
+        ログアウト
+      </Button>
     </>
   );
 }
