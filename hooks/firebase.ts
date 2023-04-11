@@ -1,6 +1,7 @@
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { useState } from 'react';
+import { NextRouter, useRouter } from 'next/router';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_APIKEY,
@@ -25,3 +26,19 @@ export function useUser() {
   });
   return user;
 }
+
+//ログアウト
+export const useLogout = (router: NextRouter) => {
+  const logout = () => {
+    signOut(auth)
+      .then(() => {
+        console.log("Sign-out successful.");
+        router.push('/login');
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  return { logout };
+};
