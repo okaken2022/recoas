@@ -12,7 +12,7 @@ export default function Home() {
   const user = auth.currentUser;
   console.log(user);
   const router: NextRouter = useRouter();
-  const {logout} = useLogout(router);
+  const { logout } = useLogout(router);
 
   return (
     <>

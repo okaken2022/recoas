@@ -44,9 +44,7 @@ export default function Login() {
   return (
     <>
       <Box bg='#3778B8' w='100%' p={4} color='white' mb={100}>
-        <Text fontSize='2xl'>
-          Todo List
-        </Text>
+        <Text fontSize='2xl'>Todo List</Text>
       </Box>
       <VStack w='30vw' mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>

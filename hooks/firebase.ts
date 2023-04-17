@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from "firebase/firestore";
+import { getFirestore } from 'firebase/firestore';
 import { useState } from 'react';
 import { NextRouter, useRouter } from 'next/router';
 
@@ -35,7 +35,7 @@ export const useLogout = (router: NextRouter) => {
   const logout = () => {
     signOut(auth)
       .then(() => {
-        console.log("Sign-out successful.");
+        console.log('Sign-out successful.');
         router.push('/login');
       })
       .catch((err) => {
