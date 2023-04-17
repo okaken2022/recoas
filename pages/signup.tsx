@@ -31,7 +31,7 @@ export default function Signup() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user
       //データベースのusersコレクションに入れる
-      await setDoc(doc(db, "users", user.uid), { email:"email", password:"password" })
+      await setDoc(doc(db, "users", user.uid), { email:email, password:password })
       // user.todo
       console.log('ユーザー登録成功');
     } catch (e) {
