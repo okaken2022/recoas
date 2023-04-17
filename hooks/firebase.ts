@@ -1,5 +1,6 @@
 import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore } from "firebase/firestore";
 import { useState } from 'react';
 import { NextRouter, useRouter } from 'next/router';
 
@@ -14,6 +15,8 @@ export const firebaseConfig = {
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
+
+export const db = getFirestore(app);
 
 export function useAuth() {
   return auth;

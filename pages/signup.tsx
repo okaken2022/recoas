@@ -1,9 +1,13 @@
-import { useAuth, useUser } from '@/hooks/firebase';
-import { Button, FormLabel, Input, VStack, Box, Text } from '@chakra-ui/react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { Button, FormLabel, Input, VStack, Box, Text } from '@chakra-ui/react';
+
+import { useAuth, useUser, db } from '@/hooks/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, doc, setDoc } from "firebase/firestore";
+import firebase from 'firebase/app'
+import 'firebase/firestore'
 
 type Inputs = {
   email: string;
@@ -20,11 +24,14 @@ export default function Signup() {
 
   const auth = useAuth();
   const currentUser = useUser();
+  const usersRef = collection(db, "users");
 
   const signup = async (email: string, password: string) => {
     try {
-      const UserCredential = await createUserWithEmailAndPassword(auth, email, password);
-      //データベースのusers.userに入れる
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user
+      //データベースのusersコレクションに入れる
+      await setDoc(doc(db, "users", user.uid), { email:"email", password:"password" })
       // user.todo
       console.log('ユーザー登録成功');
     } catch (e) {
