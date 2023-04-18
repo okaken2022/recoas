@@ -1,13 +1,14 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Button, FormLabel, Input, VStack, Box, Text } from '@chakra-ui/react';
+import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
 
 import { useAuth, useUser, db } from '@/hooks/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
-import firebase from 'firebase/app';
 import 'firebase/firestore';
+import NextLink from 'next/link'
+
 
 type Inputs = {
   email: string;
@@ -67,6 +68,7 @@ export default function Signup() {
         <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           アカウント作成
         </Button>
+        <Link as={NextLink} href='/login'>ログインはこちら</Link>
       </VStack>
     </>
   );
