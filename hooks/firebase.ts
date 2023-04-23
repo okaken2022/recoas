@@ -1,8 +1,9 @@
-import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { useState } from 'react';
+import { useState, createContext } from 'react';
 import { NextRouter, useRouter } from 'next/router';
+import { User } from "../types/user";
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_APIKEY,
@@ -22,8 +23,13 @@ export function useAuth() {
   return auth;
 }
 
+// コンテクスト用の型を定義
+type UserContextType = User | null | undefined;
+
+const AuthContext = createContext<UserContextType>(undefined);
+
 export function useUser() {
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<UserContextType>();
   onAuthStateChanged(auth, (user) => {
     if (user) setUser(user);
   });
