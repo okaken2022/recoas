@@ -2,13 +2,12 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
-
-import { useAuth, useUser, db } from '@/hooks/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import 'firebase/firestore';
 import NextLink from 'next/link'
 
+import { useAuth, useUser, db } from '@/hooks/firebase';
 
 type Inputs = {
   email: string;
