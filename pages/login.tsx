@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
 import NextLink from 'next/link'
 
-import { useAuth, useUser } from '@/hooks/firebase';
+import { useAuth } from '@/hooks/firebase';
 
 type Inputs = {
   email: string;

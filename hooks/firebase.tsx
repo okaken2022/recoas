@@ -1,7 +1,8 @@
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { initializeApp, getApps, getApp } from 'firebase/app';
+import { doc, getDoc, setDoc } from '@firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, ReactNode, useContext } from 'react';
 import { NextRouter } from 'next/router';
 import { User } from "../types/user";
 
@@ -19,37 +20,58 @@ const auth = getAuth(app);
 
 export const db = getFirestore(app);
 
-export function useAuth() {
-  return auth;
-}
 
 // コンテクスト用の型を定義
-type UserContextType = User | null ;
+type UserContextType = User | null | undefined;
 
-const AuthContext = createContext<UserContextType>(null);
+const AuthContext = createContext<UserContextType>(undefined);
 
-export function useAuthContext() {
-  return useContext(AuthContext);
-}
-export function AuthProvider({children}) {
-  const [user, setUser] = useState('');
-  const value = {
-    user,
-  };
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) setUser(user);
-  // });
-  // return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<UserContextType>();
+
   useEffect(() => {
-    const unsubscribed = auth.onAuthStateChanged((user) => {
-      setUser(user);
+    // ログイン状態を監視し、変化があったら発動
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // ログインしていた場合、ユーザーコレクションからユーザーデータを参照
+        const ref = doc(db, `users/${firebaseUser.uid}`);
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          // ユーザーデータを取得して格納
+          const appUser = (await getDoc(ref)).data() as User;
+          setUser(appUser);
+        } else {
+          // ユーザーが未作成の場合、新規作成して格納
+          const appUser: User = {
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName!,
+            email: firebaseUser.email!
+          };
+
+          // Firestoreにユーザーデータを保存
+          setDoc(ref, appUser).then(() => {
+            // 保存に成功したらコンテクストにユーザーデータを格納
+            setUser(appUser);
+          });
+        }
+      } else {
+        // ログインしていない場合、ユーザー情報を空にする
+        setUser(null);
+      }
+
+      // このコンポーネントが不要になったら監視を終了する
+      return unsubscribe;
     });
-    return () => {
-      unsubscribed();
-    };
   }, []);
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+
+  // プロバイダーを作成し、配布物を格納する
+  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+};
+// 最後の行に追加
+
+// コンテクストを受け取るメソッドを定義
+export const useAuth = () => useContext(AuthContext);
 
 //ログアウト
 export const useLogout = (router: NextRouter) => {
