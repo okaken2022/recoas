@@ -6,6 +6,7 @@ import { FormLabel, Input, Button, VStack } from '@chakra-ui/react';
 import { useUser, useAuth, useLogout } from '@/hooks/firebase';
 import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
+import { Header } from '@/components/Header';
 
 export default function Home() {
   const auth = useAuth();
@@ -16,11 +17,14 @@ export default function Home() {
 
   return (
     <>
-      <p>ユーザー情報:{user?.email}</p>
-      <p>todoリストコンポーネントがはいります</p>
-      <Button mt={4} colorScheme='teal' onClick={logout}>
-        ログアウト
-      </Button>
+      <Header />
+      <VStack w='30vw' mx='auto'>
+        <p>ユーザー情報:{user?.email}</p>
+        <p>todoリストコンポーネントがはいります</p>
+        <Button mt={4} colorScheme='teal' onClick={logout}>
+          ログアウト
+        </Button>
+      </VStack>
     </>
   );
 }

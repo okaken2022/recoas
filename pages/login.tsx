@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
 import NextLink from 'next/link'
+import { Header } from '@/components/Header';
 
 import { useAuth, useUser } from '@/hooks/firebase';
 
@@ -45,9 +46,7 @@ export default function Login() {
   
   return (
     <>
-      <Box bg='#3778B8' w='100%' p={4} color='white' mb={100}>
-        <Text fontSize='2xl'>Todo List</Text>
-      </Box>
+      <Header />
       <VStack w='30vw' mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
         <Input id='name' placeholder='name' {...register('email', { required: true })} />
