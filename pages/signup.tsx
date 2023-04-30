@@ -5,7 +5,7 @@ import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/re
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import 'firebase/firestore';
-import NextLink from 'next/link'
+import NextLink from 'next/link';
 
 import { useAuth, useUser, db } from '@/hooks/firebase';
 
@@ -67,7 +67,9 @@ export default function Signup() {
         <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           アカウント作成
         </Button>
-        <Link as={NextLink} href='/login'>ログインはこちら</Link>
+        <Link as={NextLink} href='/login'>
+          ログインはこちら
+        </Link>
       </VStack>
     </>
   );

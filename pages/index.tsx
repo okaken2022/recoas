@@ -2,7 +2,21 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
-import { FormLabel, Input, Button, VStack } from '@chakra-ui/react';
+import {
+  FormLabel,
+  Input,
+  Button,
+  VStack,
+  UnorderedList,
+  ListItem,
+  Box,
+  Divider,
+  Text,
+  Flex,
+  Heading,
+  Spacer,
+  ButtonGroup,
+} from '@chakra-ui/react';
 import { useUser, useAuth, useLogout } from '@/hooks/firebase';
 import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
@@ -18,13 +32,62 @@ export default function Home() {
   return (
     <>
       <Header />
-      <VStack w='30vw' mx='auto'>
+      <Box p={4}>
         <p>ユーザー情報:{user?.email}</p>
-        <p>todoリストコンポーネントがはいります</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
-      </VStack>
+      </Box>
+      <Box p='2'>
+        <Flex minWidth='max-content' alignItems='center' gap='2'>
+          <FormLabel htmlFor='name'>Todo追加</FormLabel>
+          <Input width='100%' id='name' placeholder='Todoの追加'/>
+          <ButtonGroup gap='2'>
+            <Button colorScheme='teal'>追加</Button>
+          </ButtonGroup>
+        </Flex>
+      </Box>
+      <UnorderedList listStyleType='none'>
+        <ListItem p={4}>
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Box p='2'>
+              <Heading size='md'>Chakra App</Heading>
+            </Box>
+            <Spacer />
+            <ButtonGroup gap='2'>
+              <Button colorScheme='teal'>完了</Button>
+              <Button colorScheme='blue'>編集</Button>
+            </ButtonGroup>
+          </Flex>
+          <Divider orientation='horizontal' mt='4'/>
+        </ListItem>
+        <ListItem p={4}>
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Box p='2'>
+              <Heading size='md'>Chakra App</Heading>
+            </Box>
+            <Spacer />
+            <ButtonGroup gap='2'>
+              <Button colorScheme='teal'>完了</Button>
+              <Button colorScheme='blue'>編集</Button>
+            </ButtonGroup>
+          </Flex>
+          <Divider orientation='horizontal' mt='4'/>
+        </ListItem>
+        <ListItem p={4}>
+          <Flex minWidth='max-content' alignItems='center' gap='2'>
+            <Box p='2'>
+              <Heading size='md'>Chakra App</Heading>
+            </Box>
+            <Spacer />
+            <ButtonGroup gap='2'>
+              <Button colorScheme='teal'>完了</Button>
+              <Button colorScheme='blue'>編集</Button>
+            </ButtonGroup>
+          </Flex>
+          <Divider orientation='horizontal' mt='4'/>
+        </ListItem>
+      </UnorderedList>
     </>
   );
 }
