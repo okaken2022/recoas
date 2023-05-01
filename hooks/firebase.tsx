@@ -22,12 +22,17 @@ export const db = getFirestore(app);
 
 
 // コンテクスト用の型を定義
-type UserContextType = User | null | undefined;
+interface UserContextType {
+  user: User | null | undefined;
+}
 
-const AuthContext = createContext<UserContextType>(undefined);
+type UserStateType = User | null | undefined;
+
+
+export const AuthContext = createContext<UserStateType>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserContextType>();
+  const [user, setUser] = useState<UserStateType>(null);
 
   useEffect(() => {
     // ログイン状態を監視し、変化があったら発動
