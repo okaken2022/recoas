@@ -17,10 +17,12 @@ import {
   Spacer,
   ButtonGroup,
 } from '@chakra-ui/react';
-import { useUser, useAuth, useLogout } from '@/hooks/firebase';
+import { useUser, useAuth, useLogout, db } from '@/hooks/firebase';
 import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
 export default function Home() {
   const auth = useAuth();
@@ -29,15 +31,38 @@ export default function Home() {
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
 
+  type Todo = {
+    id: number;
+    title: string;
+    status: string;
+  };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Todo>();
+
+  const createTodo = async (id: number, title: string, status: string) => {
+    await setDoc(doc(db, 'users', "todos"), { id: id, title: title, status: string});
+  }
+
+  const onSubmit: SubmitHandler<Todo> = ({ id, title, stauts }) => {
+    createTodo(id, title, status);
+  };
+
   return (
     <>
       <Header />
+      {/* ユーザー情報 */}
       <Box p={4}>
         <p>ユーザー情報:{user?.email}</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
       </Box>
+
+      {/* Todoの追加フォーム */}
       <Box p='2'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
           <FormLabel htmlFor='name'>Todo追加</FormLabel>
@@ -47,6 +72,8 @@ export default function Home() {
           </ButtonGroup>
         </Flex>
       </Box>
+
+      {/* Todoリスト */}
       <UnorderedList listStyleType='none'>
         <ListItem p={4}>
           <Flex minWidth='max-content' alignItems='center' gap='2'>

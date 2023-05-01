@@ -9,7 +9,7 @@ import NextLink from 'next/link';
 
 import { useAuth, useUser, db } from '@/hooks/firebase';
 
-type Inputs = {
+type Signup = {
   email: string;
   password: string;
   confirmationPassword: string;
@@ -20,7 +20,7 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Signup>();
 
   const auth = useAuth();
   const currentUser = useUser();
@@ -39,7 +39,7 @@ export default function Signup() {
     }
   };
 
-  const onSubmit: SubmitHandler<Inputs> = ({ email, password }) => {
+  const onSubmit: SubmitHandler<Signup> = ({ email, password }) => {
     signup(email, password);
   };
 
