@@ -44,10 +44,10 @@ export default function Home() {
   } = useForm<Todo>();
 
   const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', "todos"), { id: id, title: title, status: string});
+    await setDoc(doc(db, 'users', "todos"), { id: id, title: title, status: status});
   }
 
-  const onSubmit: SubmitHandler<Todo> = ({ id, title, stauts }) => {
+  const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
     createTodo(id, title, status);
   };
 
@@ -68,7 +68,7 @@ export default function Home() {
           <FormLabel htmlFor='name'>Todo追加</FormLabel>
           <Input width='100%' id='name' placeholder='Todoの追加'/>
           <ButtonGroup gap='2'>
-            <Button colorScheme='teal'>追加</Button>
+            <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>追加</Button>
           </ButtonGroup>
         </Flex>
       </Box>
