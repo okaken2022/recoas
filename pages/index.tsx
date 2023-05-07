@@ -44,7 +44,7 @@ export default function Home() {
   } = useForm<Todo>();
 
   const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', "todos"), { id: id, title: title, status: status});
+    await setDoc(doc(db, 'users', 'kenji', 'todos', 'todo'), { id: 3, title: title, status: 'status'});
   }
 
   const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
@@ -66,7 +66,17 @@ export default function Home() {
       <Box p='2'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
           <FormLabel htmlFor='name'>Todo追加</FormLabel>
-          <Input width='100%' id='name' placeholder='Todoの追加'/>
+          <Input type="text" width='100%' id='name' placeholder='Todoの追加'
+                              {...register(
+                                "title",
+                                {
+                                    required: '必須項目です',
+                                    maxLength: {
+                                        value: 20,
+                                        message: '20文字以内で入力してください',
+                                    },
+                                }
+                            )}/>
           <ButtonGroup gap='2'>
             <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>追加</Button>
           </ButtonGroup>
