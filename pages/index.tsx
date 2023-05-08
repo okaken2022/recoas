@@ -23,20 +23,19 @@ import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, QuerySnapshot } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export default function Home() {
   const auth = useAuth();
   const user = auth.currentUser;
-  console.log(user);
+  // console.log(user);
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
 
   type Todo = {
-    id: number;
     title: string;
     status: string;
   };
@@ -49,26 +48,53 @@ export default function Home() {
 
   {/* todoにuidをつける */}
   const todoId = uuidv4();
+  const [todos, setTodos] = useState<QuerySnapshot>();
 
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
-  const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), { id: 4, title: title, status: status});
+  const createTodo = async ( title: string, status: string) => {
+    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), {title: title, status: status});
   }
 
   {/* ドキュメントを取得する */}
-  // const docRef = doc(db, "users", "todos");
-  // const docSnap = await getDoc(docRef);
+  //第二引数の配列が変化した時のみ実行される。
+  // const getTodos = useCallback(() => {
 
-  // if (docSnap.exists()) {
-  //   console.log("Document data:", docSnap.data());
-  // } else {
-  //   // docSnap.data() will be undefined in this case
-  //   console.log("No such document!");
-  // }
+  //   if (!user) return 
+  //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
+  //   // reactHooksと同時に非同期処理ができない。
+
+  //   (async() => {
+  //         const docRef = collection(db, "users", user.uid, "todos");
+  //         const docSnap = await getDocs(docRef);
+  //         console.log(docSnap);
+  //     setTodos(docSnap);
+  //   })
+  //   console.log('test')
+  // }, [todos])
+
+  const getTodos = () => {
+
+    if (!user) return 
+    // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
+    // reactHooksと同時に非同期処理ができない。
+
+    async() => {
+          const docRef = collection(db, "users", user.uid, "todos");
+          const docSnap = await getDocs(docRef);
+          console.log(docSnap);
+      setTodos(docSnap);
+    }
+
+    console.log('test')
+  }
+
+  getTodos();
+
+  // console.log(todos);
 
   {/* フォームの内容をfirestoreに保存 */}
-  const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
-    createTodo(id, title, status);
+  const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
+    createTodo( title, status);
   };
 
   return (
