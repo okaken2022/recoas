@@ -16,6 +16,7 @@ import {
   Heading,
   Spacer,
   ButtonGroup,
+  Select,
 } from '@chakra-ui/react';
 import { useUser, useAuth, useLogout, db } from '@/hooks/firebase';
 import { getAuth } from 'firebase/auth';
@@ -50,7 +51,7 @@ export default function Home() {
 
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', user.uid, 'todos', 'todo'), { id: 3, title: title, status: 'status'});
+    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), { id: 3, title: title, status: 'status'});
   }
 
   const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
@@ -62,7 +63,7 @@ export default function Home() {
       <Header />
       {/* ユーザー情報 */}
       <Box p={4}>
-        <p>ユーザー情報:{user?.uid}</p>
+        <p>ユーザー情報:{user?.email}</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
@@ -83,6 +84,10 @@ export default function Home() {
                                     },
                                 }
                             )}/>
+          <Select width='140px' placeholder='未完了'>
+            <option value='option2'>着手</option>
+            <option value='option3'>完了</option>
+          </Select>
           <ButtonGroup gap='2'>
             <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>追加</Button>
           </ButtonGroup>
