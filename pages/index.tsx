@@ -23,9 +23,10 @@ import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc, getDoc } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
+import { useState } from 'react';
 
 export default function Home() {
   const auth = useAuth();
@@ -51,9 +52,21 @@ export default function Home() {
 
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), { id: 3, title: title, status: 'status'});
+    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), { id: 4, title: title, status: status});
   }
 
+  {/* ドキュメントを取得する */}
+  // const docRef = doc(db, "users", "todos");
+  // const docSnap = await getDoc(docRef);
+
+  // if (docSnap.exists()) {
+  //   console.log("Document data:", docSnap.data());
+  // } else {
+  //   // docSnap.data() will be undefined in this case
+  //   console.log("No such document!");
+  // }
+
+  {/* フォームの内容をfirestoreに保存 */}
   const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
     createTodo(id, title, status);
   };
@@ -84,9 +97,10 @@ export default function Home() {
                                     },
                                 }
                             )}/>
-          <Select width='140px' placeholder='未完了'>
-            <option value='option2'>着手</option>
-            <option value='option3'>完了</option>
+          <Select width='140px'{...register("status")}>
+            <option value='未完了'>未完了</option>
+            <option value='着手'>着手</option>
+            <option value='完了'>完了</option>
           </Select>
           <ButtonGroup gap='2'>
             <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>追加</Button>
