@@ -24,6 +24,8 @@ import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { collection, doc, setDoc } from 'firebase/firestore';
 
+import { v4 as uuidv4 } from 'uuid';
+
 export default function Home() {
   const auth = useAuth();
   const user = auth.currentUser;
@@ -43,8 +45,12 @@ export default function Home() {
     formState: { errors },
   } = useForm<Todo>();
 
+  {/* todoにuidをつける */}
+  const todoId = uuidv4();
+
+  {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async (id: number, title: string, status: string) => {
-    await setDoc(doc(db, 'users', 'kenji', 'todos', 'todo'), { id: 3, title: title, status: 'status'});
+    await setDoc(doc(db, 'users', user.uid, 'todos', 'todo'), { id: 3, title: title, status: 'status'});
   }
 
   const onSubmit: SubmitHandler<Todo> = ({ id, title, status }) => {
@@ -56,7 +62,7 @@ export default function Home() {
       <Header />
       {/* ユーザー情報 */}
       <Box p={4}>
-        <p>ユーザー情報:{user?.email}</p>
+        <p>ユーザー情報:{user?.uid}</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
