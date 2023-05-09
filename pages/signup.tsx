@@ -5,11 +5,11 @@ import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/re
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, doc, setDoc } from 'firebase/firestore';
 import 'firebase/firestore';
-import NextLink from 'next/link'
+import NextLink from 'next/link';
 
 import { useAuth, useUser, db } from '@/hooks/firebase';
 
-type Inputs = {
+type Signup = {
   email: string;
   password: string;
   confirmationPassword: string;
@@ -20,7 +20,7 @@ export default function Signup() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Inputs>();
+  } = useForm<Signup>();
 
   const auth = useAuth();
   const currentUser = useUser();
@@ -39,7 +39,7 @@ export default function Signup() {
     }
   };
 
-  const onSubmit: SubmitHandler<Inputs> = ({ email, password }) => {
+  const onSubmit: SubmitHandler<Signup> = ({ email, password }) => {
     signup(email, password);
   };
 
@@ -67,7 +67,9 @@ export default function Signup() {
         <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           アカウント作成
         </Button>
-        <Link as={NextLink} href='/login'>ログインはこちら</Link>
+        <Link as={NextLink} href='/login'>
+          ログインはこちら
+        </Link>
       </VStack>
     </>
   );

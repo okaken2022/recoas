@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
-import NextLink from 'next/link'
+import NextLink from 'next/link';
+import { Header } from '@/components/Header';
 
 import { useAuth, useUser } from '@/hooks/firebase';
 
@@ -42,12 +43,10 @@ export default function Login() {
   useEffect(() => {
     if (currentUser) router.push('/');
   }, [currentUser, router]);
-  
+
   return (
     <>
-      <Box bg='#3778B8' w='100%' p={4} color='white' mb={100}>
-        <Text fontSize='2xl'>Todo List</Text>
-      </Box>
+      <Header />
       <VStack w='30vw' mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
         <Input id='name' placeholder='name' {...register('email', { required: true })} />
@@ -61,7 +60,9 @@ export default function Login() {
         <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           ログイン
         </Button>
-        <Link as={NextLink} href='/signup'>アカウント作成はこちら</Link>
+        <Link as={NextLink} href='/signup'>
+          アカウント作成はこちら
+        </Link>
       </VStack>
     </>
   );
