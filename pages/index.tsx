@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { Inter } from '@next/font/google';
 import styles from '@/styles/Home.module.css';
+
 import {
   FormLabel,
   Input,
@@ -26,12 +27,15 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { collection, doc, setDoc, getDocs, QuerySnapshot } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
 
 export default function Home() {
+
   const auth = useAuth();
-  const user = auth.currentUser;
-  // console.log(user);
+
+  const user = useContext(AuthContext);
+  console.log(user);
+
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
 
