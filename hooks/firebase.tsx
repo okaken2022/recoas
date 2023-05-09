@@ -18,6 +18,10 @@ export const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 
+export function useAuth() {
+  return auth;
+}
+
 export const db = getFirestore(app);
 
 
@@ -76,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 // 最後の行に追加
 
 // コンテクストを受け取るメソッドを定義
-export const useAuth = () => useContext(AuthContext);
+export const useUser = () => useContext(AuthContext);
 
 //ログアウト
 export const useLogout = (router: NextRouter) => {
