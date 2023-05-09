@@ -19,7 +19,7 @@ import {
   ButtonGroup,
   Select,
 } from '@chakra-ui/react';
-import { useUser, useAuth, useLogout, db } from '@/hooks/firebase';
+import { useUser, useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
 import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
@@ -32,8 +32,10 @@ import { useState, useCallback, useContext } from 'react';
 export default function Home() {
 
   const auth = useAuth();
+  const currentUser = auth.currentUser;
 
   const user = useContext(AuthContext);
+
   console.log(user);
 
   const router: NextRouter = useRouter();
@@ -56,7 +58,7 @@ export default function Home() {
 
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async ( title: string, status: string) => {
-    await setDoc(doc(db, 'users', user.uid, 'todos', todoId), {title: title, status: status});
+    await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {title: title, status: status});
   }
 
   {/* ドキュメントを取得する */}
