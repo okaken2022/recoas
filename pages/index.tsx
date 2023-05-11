@@ -1,8 +1,3 @@
-import Head from 'next/head';
-import Image from 'next/image';
-import { Inter } from '@next/font/google';
-import styles from '@/styles/Home.module.css';
-
 import {
   FormLabel,
   Input,
@@ -24,16 +19,16 @@ import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { collection, doc, setDoc, getDocs, QuerySnapshot } from 'firebase/firestore';
+import { collection, doc, setDoc, getDocs, QuerySnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useState, useCallback, useContext } from 'react';
+import { useState, useCallback, useContext, useEffect } from 'react';
 
 export default function Home() {
 
   const auth = useAuth();
   const currentUser = auth.currentUser;
-
+  
   const user = useContext(AuthContext);
 
   console.log(user);
@@ -54,7 +49,6 @@ export default function Home() {
 
   {/* todoにuidをつける */}
   const todoId = uuidv4();
-  const [todos, setTodos] = useState<QuerySnapshot>();
 
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async ( title: string, status: string) => {
@@ -78,23 +72,23 @@ export default function Home() {
   //   console.log('test')
   // }, [todos])
 
-  const getTodos = () => {
+  // const getTodos = () => {
+  //   const [todos, setTodos] = useState<Todo[]>([
+  //     { title: '', status: '' },
+  //   ]);
 
-    if (!user) return 
-    // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
-    // reactHooksと同時に非同期処理ができない。
+  //   if (!user) return 
+  //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
+  //   // reactHooksと同時に非同期処理ができない。
 
-    async() => {
-          const docRef = collection(db, "users", user.uid, "todos");
-          const docSnap = await getDocs(docRef);
-          console.log(docSnap);
-      setTodos(docSnap);
-    }
+  //   useEffect(() => {
+  //     const todoRef = collection(db, "users", currentUser.uid, "todos");
+  //     console.log(todoRef);
+  //   }, []);
 
-    console.log('test')
-  }
+  // }
 
-  getTodos();
+  // getTodos();
 
   // console.log(todos);
 
@@ -102,6 +96,23 @@ export default function Home() {
   const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
     createTodo( title, status);
   };
+
+  {/* firestoreに保存されている特定のドキュメントを削除 */}
+  const deleteTodo = async(todoId) => {
+    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
+    await deleteDoc(todoRef);
+  }
+
+  {/* firestoreに保存されている特定のドキュメントを編集 */}
+  const editTodo = async({todoId, title, status}) => {
+    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
+    await updateDoc(todoRef, {
+      title: title, 
+      status: status
+    });
+  }
+
+
 
   return (
     <>
@@ -149,8 +160,8 @@ export default function Home() {
             </Box>
             <Spacer />
             <ButtonGroup gap='2'>
-              <Button colorScheme='teal'>完了</Button>
-              <Button colorScheme='blue'>編集</Button>
+              <Button colorScheme='red' onClick={deleteTodo}>削除</Button>
+              <Button colorScheme='blue' onClick={editTodo}>編集</Button>
             </ButtonGroup>
           </Flex>
           <Divider orientation='horizontal' mt='4'/>
@@ -162,8 +173,8 @@ export default function Home() {
             </Box>
             <Spacer />
             <ButtonGroup gap='2'>
-              <Button colorScheme='teal'>完了</Button>
-              <Button colorScheme='blue'>編集</Button>
+              <Button colorScheme='red' onClick={deleteTodo}>削除</Button>
+              <Button colorScheme='blue' onClick={editTodo}>編集</Button>            
             </ButtonGroup>
           </Flex>
           <Divider orientation='horizontal' mt='4'/>
@@ -175,8 +186,8 @@ export default function Home() {
             </Box>
             <Spacer />
             <ButtonGroup gap='2'>
-              <Button colorScheme='teal'>完了</Button>
-              <Button colorScheme='blue'>編集</Button>
+              <Button colorScheme='red' onClick={deleteTodo}>削除</Button>
+              <Button colorScheme='blue' onClick={editTodo}>編集</Button>            
             </ButtonGroup>
           </Flex>
           <Divider orientation='horizontal' mt='4'/>
