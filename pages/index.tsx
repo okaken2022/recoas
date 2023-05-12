@@ -79,8 +79,8 @@ export default function Home() {
     // reactHooksと同時に非同期処理ができない。
   useEffect(() => {
     (async () => {
-      if (!auth.currentUser) return
-      const docRef = collection(db, "users", auth.currentUser.uid, "todos");
+      if (!currentUser) return
+      const docRef = collection(db, "users", currentUser.uid, "todos");
       const docSnap = await getDocs(docRef);
       const todosData = docSnap.docs.map((doc) => doc.data())
       setTodos(todosData);
