@@ -19,7 +19,8 @@ import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { collection, doc, setDoc, getDocs, QuerySnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
+
+import { collection, doc, setDoc, getDocs, QuerySnapshot, deleteDoc, updateDoc, DocumentData } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useCallback, useContext, useEffect } from 'react';
@@ -28,11 +29,9 @@ export default function Home() {
 
   const auth = useAuth();
   const currentUser = auth.currentUser;
-  
+
+
   const user = useContext(AuthContext);
-
-  console.log(user);
-
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
 
@@ -50,8 +49,11 @@ export default function Home() {
   {/* todoにuidをつける */}
   const todoId = uuidv4();
 
+  const [todos, setTodos] = useState<DocumentData[]>([]);
+
   {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
   const createTodo = async ( title: string, status: string) => {
+    if(!currentUser) return
     await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {title: title, status: status});
   }
 
@@ -59,7 +61,7 @@ export default function Home() {
   //第二引数の配列が変化した時のみ実行される。
   // const getTodos = useCallback(() => {
 
-  //   if (!user) return 
+  //   if (!user) return
   //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
   //   // reactHooksと同時に非同期処理ができない。
 
@@ -71,7 +73,6 @@ export default function Home() {
   //   })
   //   console.log('test')
   // }, [todos])
-
   // const getTodos = () => {
   //   const [todos, setTodos] = useState<Todo[]>([
   //     { title: '', status: '' },
@@ -91,6 +92,19 @@ export default function Home() {
   // getTodos();
 
   // console.log(todos);
+
+    // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
+    // reactHooksと同時に非同期処理ができない。
+  useEffect(() => {
+    (async () => {
+      if (!currentUser) return
+      const docRef = collection(db, "users", currentUser.uid, "todos");
+      const docSnap = await getDocs(docRef);
+      const todosData = docSnap.docs.map((doc) => doc.data())
+      setTodos(todosData);
+    })()
+  }, [auth.currentUser])
+  console.log(todos);
 
   {/* フォームの内容をfirestoreに保存 */}
   const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
