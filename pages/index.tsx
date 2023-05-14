@@ -19,16 +19,23 @@ import { getAuth } from 'firebase/auth';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { collection, doc, setDoc, getDocs, QuerySnapshot, deleteDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  setDoc,
+  getDocs,
+  QuerySnapshot,
+  deleteDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useCallback, useContext, useEffect } from 'react';
 
 export default function Home() {
-
   const auth = useAuth();
   const currentUser = auth.currentUser;
-  
+
   const user = useContext(AuthContext);
 
   console.log(user);
@@ -47,21 +54,30 @@ export default function Home() {
     formState: { errors },
   } = useForm<Todo>();
 
-  {/* todoにuidをつける */}
+  {
+    /* todoにuidをつける */
+  }
   const todoId = uuidv4();
   const [todos, setTodos] = useState<DocumentData[]>([]);
 
-  {/* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/}
-  const createTodo = async ( title: string, status: string) => {
-    if(!currentUser) return
-    await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {title: title, status: status});
+  {
+    /* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/
   }
+  const createTodo = async (title: string, status: string) => {
+    if (!currentUser) return;
+    await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
+      title: title,
+      status: status,
+    });
+  };
 
-  {/* ドキュメントを取得する */}
+  {
+    /* ドキュメントを取得する */
+  }
   //第二引数の配列が変化した時のみ実行される。
   // const getTodos = useCallback(() => {
 
-  //   if (!user) return 
+  //   if (!user) return
   //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
   //   // reactHooksと同時に非同期処理ができない。
 
@@ -79,7 +95,7 @@ export default function Home() {
   //     { title: '', status: '' },
   //   ]);
 
-  //   if (!user) return 
+  //   if (!user) return
   //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
   //   // reactHooksと同時に非同期処理ができない。
 
@@ -95,38 +111,42 @@ export default function Home() {
   // console.log(todos);
   useEffect(() => {
     (async () => {
-      if (!auth.currentUser) return
-      const docRef = collection(db, "users", auth.currentUser.uid, "todos");
+      if (!auth.currentUser) return;
+      const docRef = collection(db, 'users', auth.currentUser.uid, 'todos');
       const docSnap = await getDocs(docRef);
-      const todosData = docSnap.docs.map((doc) => doc.data())
+      const todosData = docSnap.docs.map((doc) => doc.data());
       setTodos(todosData);
-    })()
-  }, [auth.currentUser])
+    })();
+  }, [auth.currentUser]);
   console.log(todos);
 
-  {/* フォームの内容をfirestoreに保存 */}
+  {
+    /* フォームの内容をfirestoreに保存 */
+  }
   const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
-    createTodo( title, status);
+    createTodo(title, status);
   };
 
-  {/* firestoreに保存されている特定のドキュメントを削除 */}
-  const deleteTodo = async(todoId) => {
-    if(!currentUser) return
+  {
+    /* firestoreに保存されている特定のドキュメントを削除 */
+  }
+  const deleteTodo = async (todoId) => {
+    if (!currentUser) return;
     const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
     await deleteDoc(todoRef);
-  }
+  };
 
-  {/* firestoreに保存されている特定のドキュメントを編集 */}
-  const editTodo = async({todoId, title, status}) => {
-    if(!currentUser) return
+  {
+    /* firestoreに保存されている特定のドキュメントを編集 */
+  }
+  const editTodo = async ({ todoId, title, status }) => {
+    if (!currentUser) return;
     const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
     await updateDoc(todoRef, {
-      title: title, 
-      status: status
+      title: title,
+      status: status,
     });
-  }
-
-
+  };
 
   return (
     <>
@@ -143,24 +163,28 @@ export default function Home() {
       <Box p='2'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
           <FormLabel htmlFor='name'>Todo追加</FormLabel>
-          <Input type="text" width='100%' id='name' placeholder='Todoの追加'
-                              {...register(
-                                "title",
-                                {
-                                    required: '必須項目です',
-                                    maxLength: {
-                                        value: 20,
-                                        message: '20文字以内で入力してください',
-                                    },
-                                }
-                            )}/>
-          <Select width='140px'{...register("status")}>
+          <Input
+            type='text'
+            width='100%'
+            id='name'
+            placeholder='Todoの追加'
+            {...register('title', {
+              required: '必須項目です',
+              maxLength: {
+                value: 20,
+                message: '20文字以内で入力してください',
+              },
+            })}
+          />
+          <Select width='140px' {...register('status')}>
             <option value='未完了'>未完了</option>
             <option value='着手'>着手</option>
             <option value='完了'>完了</option>
           </Select>
           <ButtonGroup gap='2'>
-            <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>追加</Button>
+            <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>
+              追加
+            </Button>
           </ButtonGroup>
         </Flex>
       </Box>
@@ -168,21 +192,25 @@ export default function Home() {
       {/* Todoリスト */}
 
       <UnorderedList listStyleType='none'>
-      {todos.map((todo) => (
-        <ListItem p={4}>
-          <Flex minWidth='max-content' alignItems='center' gap='2'>
-            <Box p='2'>
-              <Heading size='md'>{todo.title}</Heading>
-            </Box>
-            <Spacer />
-            <ButtonGroup gap='2'>
-              <Button colorScheme='red' onClick={deleteTodo}>削除</Button>
-              <Button colorScheme='blue' onClick={editTodo}>編集</Button>
-            </ButtonGroup>
-          </Flex>
-          <Divider orientation='horizontal' mt='4'/>
-        </ListItem>
-            ))}
+        {todos.map((todo) => (
+          <ListItem p={4}>
+            <Flex minWidth='max-content' alignItems='center' gap='2'>
+              <Box p='2'>
+                <Heading size='md'>{todo.title}</Heading>
+              </Box>
+              <Spacer />
+              <ButtonGroup gap='2'>
+                <Button colorScheme='red' onClick={deleteTodo}>
+                  削除
+                </Button>
+                <Button colorScheme='blue' onClick={editTodo}>
+                  編集
+                </Button>
+              </ButtonGroup>
+            </Flex>
+            <Divider orientation='horizontal' mt='4' />
+          </ListItem>
+        ))}
       </UnorderedList>
     </>
   );

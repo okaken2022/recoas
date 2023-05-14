@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc } from '@firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 import { useState, useEffect, createContext, ReactNode, useContext } from 'react';
 import { NextRouter } from 'next/router';
-import { User } from "../types/user";
+import { User } from '../types/user';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_APIKEY,
@@ -24,14 +24,12 @@ export function useAuth() {
 
 export const db = getFirestore(app);
 
-
 // コンテクスト用の型を定義
 interface UserContextType {
   user: User | null | undefined;
 }
 
 type UserStateType = User | null | undefined;
-
 
 export const AuthContext = createContext<UserStateType>(null);
 
@@ -55,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const appUser: User = {
             id: firebaseUser.uid,
             name: firebaseUser.displayName!,
-            email: firebaseUser.email!
+            email: firebaseUser.email!,
           };
 
           // Firestoreにユーザーデータを保存
@@ -76,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // プロバイダーを作成し、配布物を格納する
   return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
-};
+}
 // 最後の行に追加
 
 // コンテクストを受け取るメソッドを定義
