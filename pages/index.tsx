@@ -27,10 +27,12 @@ import {
   QuerySnapshot,
   deleteDoc,
   updateDoc,
+  serverTimestamp,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useCallback, useContext, useEffect } from 'react';
+import { idText } from 'typescript';
 
 export default function Home() {
   const auth = useAuth();
@@ -44,8 +46,10 @@ export default function Home() {
   const { logout } = useLogout(router);
 
   type Todo = {
+    id: string;
     title: string;
     status: string;
+    timestamp: string;
   };
 
   const {
@@ -66,49 +70,16 @@ export default function Home() {
   const createTodo = async (title: string, status: string) => {
     if (!currentUser) return;
     await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
+      id: todoId,
       title: title,
       status: status,
+      timestamp: serverTimestamp(),
     });
   };
 
   {
     /* ドキュメントを取得する */
   }
-  //第二引数の配列が変化した時のみ実行される。
-  // const getTodos = useCallback(() => {
-
-  //   if (!user) return
-  //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
-  //   // reactHooksと同時に非同期処理ができない。
-
-  //   (async() => {
-  //         const docRef = collection(db, "users", user.uid, "todos");
-  //         const docSnap = await getDocs(docRef);
-  //         console.log(docSnap);
-  //     setTodos(docSnap);
-  //   })
-  //   console.log('test')
-  // }, [todos])
-
-  // const getTodos = () => {
-  //   const [todos, setTodos] = useState<Todo[]>([
-  //     { title: '', status: '' },
-  //   ]);
-
-  //   if (!user) return
-  //   // 即時関数。宣言と実行を同時に行う。usecallbackの中に即時関数を描き、非同期処理を行う。
-  //   // reactHooksと同時に非同期処理ができない。
-
-  //   useEffect(() => {
-  //     const todoRef = collection(db, "users", currentUser.uid, "todos");
-  //     console.log(todoRef);
-  //   }, []);
-
-  // }
-
-  // getTodos();
-
-  // console.log(todos);
   useEffect(() => {
     (async () => {
       if (!auth.currentUser) return;
@@ -125,15 +96,24 @@ export default function Home() {
   }
   const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
     createTodo(title, status);
+    console.log(todos);
+    setTodos(todos);
   };
 
   {
     /* firestoreに保存されている特定のドキュメントを削除 */
   }
-  const deleteTodo = async (todoId) => {
+  const deleteTodo = async (todo: Todo) => {
+    console.log(todo);
     if (!currentUser) return;
-    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
-    await deleteDoc(todoRef);
+    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todo.id);
+    await deleteDoc(todoRef).then(() => {
+      console.log('success');
+    }).catch((e) => {
+      console.log(e.message)
+    })
+    // setTodosで対象のtodoを消す
+    setTodos(todos.filter(item => item.id !== todo.id));
   };
 
   {
@@ -193,14 +173,14 @@ export default function Home() {
 
       <UnorderedList listStyleType='none'>
         {todos.map((todo) => (
-          <ListItem p={4}>
+          <ListItem key={todo.id} p={4}>
             <Flex minWidth='max-content' alignItems='center' gap='2'>
               <Box p='2'>
                 <Heading size='md'>{todo.title}</Heading>
               </Box>
               <Spacer />
               <ButtonGroup gap='2'>
-                <Button colorScheme='red' onClick={deleteTodo}>
+                <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
                 </Button>
                 <Button colorScheme='blue' onClick={editTodo}>
