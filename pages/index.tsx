@@ -14,8 +14,7 @@ import {
   ButtonGroup,
   Select,
 } from '@chakra-ui/react';
-import { useUser, useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
-import { getAuth } from 'firebase/auth';
+import { useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -24,15 +23,13 @@ import {
   doc,
   setDoc,
   getDocs,
-  QuerySnapshot,
   deleteDoc,
   updateDoc,
   serverTimestamp,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useState, useCallback, useContext, useEffect } from 'react';
-import { idText } from 'typescript';
+import { useState, useContext, useEffect } from 'react';
 
 export default function Home() {
   const auth = useAuth();
@@ -75,6 +72,7 @@ export default function Home() {
       status: status,
       timestamp: serverTimestamp(),
     });
+    console.log(todos);
   };
 
   {
@@ -86,6 +84,10 @@ export default function Home() {
       const docRef = collection(db, 'users', auth.currentUser.uid, 'todos');
       const docSnap = await getDocs(docRef);
       const todosData = docSnap.docs.map((doc) => doc.data());
+      todosData.sort(function (x, y) {
+        return x.timestamp - y.timestamp;
+      });
+      console.log(todosData);
       setTodos(todosData);
     })();
   }, [auth.currentUser]);
@@ -107,13 +109,15 @@ export default function Home() {
     console.log(todo);
     if (!currentUser) return;
     const todoRef = doc(db, 'users', currentUser.uid, 'todos', todo.id);
-    await deleteDoc(todoRef).then(() => {
-      console.log('success');
-    }).catch((e) => {
-      console.log(e.message)
-    })
+    await deleteDoc(todoRef)
+      .then(() => {
+        console.log('success');
+      })
+      .catch((e) => {
+        console.log(e.message);
+      });
     // setTodosで対象のtodoを消す
-    setTodos(todos.filter(item => item.id !== todo.id));
+    setTodos(todos.filter((item) => item.id !== todo.id));
   };
 
   {
