@@ -82,8 +82,9 @@ export default function Home() {
   }
 
   useEffect(() => {
+    if (!currentUser) return;
     const q = query(
-      collection(db, 'users', currentUser.uid, 'todos'),
+      collection(db, 'users', auth.currentUser.uid, 'todos'),
       orderBy('timestamp', 'desc'),
     );
     const unSub = onSnapshot(q, async (snapshot) => {
