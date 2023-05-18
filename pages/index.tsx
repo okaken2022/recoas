@@ -30,6 +30,7 @@ import {
 
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const auth = useAuth();
@@ -143,6 +144,12 @@ export default function Home() {
     <>
       <Header />
       {/* ユーザー情報 */}
+      <Box p={4}>
+        <Flex>
+        <p>リポジトリ:</p><Link href="https://github.com/okaken2022/next-todo">https://github.com/okaken2022/next-todo</Link>
+        </Flex>
+      </Box>
+
       <Box p={4}>
         <p>ユーザー情報:{user?.email}</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
