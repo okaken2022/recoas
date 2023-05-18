@@ -2,12 +2,10 @@ import {
   FormLabel,
   Input,
   Button,
-  VStack,
   UnorderedList,
   ListItem,
   Box,
   Divider,
-  Text,
   Flex,
   Heading,
   Spacer,
@@ -19,17 +17,20 @@ import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import {
+  onSnapshot,
   collection,
   doc,
   setDoc,
-  getDocs,
   deleteDoc,
   updateDoc,
   serverTimestamp,
+  orderBy,
+  query,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const auth = useAuth();
@@ -77,21 +78,28 @@ export default function Home() {
 
   {
     /* ドキュメントを取得する */
+    /* orderByで並べ替えも行う */
   }
+
   useEffect(() => {
-    (async () => {
-      if (!auth.currentUser) return;
-      const docRef = collection(db, 'users', auth.currentUser.uid, 'todos');
-      const docSnap = await getDocs(docRef);
-      const todosData = docSnap.docs.map((doc) => doc.data());
-      todosData.sort(function (x, y) {
-        return x.timestamp - y.timestamp;
-      });
-      console.log(todosData);
-      setTodos(todosData);
-    })();
-  }, [auth.currentUser]);
-  console.log(todos);
+    const q = query(
+      collection(db, 'users', currentUser.uid, 'todos'),
+      orderBy('timestamp', 'desc'),
+    );
+    const unSub = onSnapshot(q, async (snapshot) => {
+      setTodos(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          title: doc.data().title,
+          timestamp: doc.data().timestamp,
+        })),
+      );
+    });
+
+    return () => {
+      unSub();
+    };
+  }, []);
 
   {
     /* フォームの内容をfirestoreに保存 */
@@ -136,6 +144,12 @@ export default function Home() {
     <>
       <Header />
       {/* ユーザー情報 */}
+      <Box p={4}>
+        <Flex>
+        <p>リポジトリ:</p><Link href="https://github.com/okaken2022/next-todo">https://github.com/okaken2022/next-todo</Link>
+        </Flex>
+      </Box>
+
       <Box p={4}>
         <p>ユーザー情報:{user?.email}</p>
         <Button mt={4} colorScheme='teal' onClick={logout}>
