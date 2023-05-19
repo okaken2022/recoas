@@ -67,6 +67,7 @@ export default function Home() {
   }
   const createTodo = async (title: string, status: string) => {
     if (!currentUser) return;
+    if (title === "") return;
     await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
       id: todoId,
       title: title,
@@ -141,6 +142,10 @@ export default function Home() {
     });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, {title, status}: Todo) => {
+    if (e.key === "Enter") onSubmit(title, status);
+  };
+
   return (
     <>
       <Header />
@@ -174,6 +179,7 @@ export default function Home() {
                 message: '20文字以内で入力してください',
               },
             })}
+            onKeyDown={handleKeyDown}
           />
           <Select width='140px' {...register('status')}>
             <option value='未完了'>未完了</option>
