@@ -142,7 +142,7 @@ export default function Home() {
     });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, {title, status}: Todo) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, {title, status}: {title: string ; status: string})=> {
     if (e.key === "Enter") onSubmit(title, status);
   };
 
