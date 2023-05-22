@@ -26,6 +26,7 @@ import {
   serverTimestamp,
   orderBy,
   query,
+  DocumentData,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -147,7 +148,10 @@ export default function Home() {
       {/* ユーザー情報 */}
       <Box p={4}>
         <Flex>
-        <p>リポジトリ:</p><Link href="https://github.com/okaken2022/next-todo">https://github.com/okaken2022/next-todo</Link>
+          <p>リポジトリ:</p>
+          <Link href='https://github.com/okaken2022/next-todo'>
+            https://github.com/okaken2022/next-todo
+          </Link>
         </Flex>
       </Box>
 
@@ -202,10 +206,8 @@ export default function Home() {
                 <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
                 </Button>
-                <Link as={`/${todo.id}`} href="/[id]">
-                  <Button colorScheme='blue'>
-                    編集
-                  </Button>
+                <Link as={`/${todo.id}`} href='/[id]'>
+                  <Button colorScheme='blue'>編集</Button>
                 </Link>
               </ButtonGroup>
             </Flex>
