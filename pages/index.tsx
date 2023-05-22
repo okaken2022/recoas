@@ -202,9 +202,11 @@ export default function Home() {
                 <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
                 </Button>
-                <Button colorScheme='blue' onClick={editTodo}>
-                  編集
-                </Button>
+                <Link as={`/${todo.id}`} href="/[id]">
+                  <Button colorScheme='blue'>
+                    編集
+                  </Button>
+                </Link>
               </ButtonGroup>
             </Flex>
             <Divider orientation='horizontal' mt='4' />
