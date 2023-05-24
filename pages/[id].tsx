@@ -4,7 +4,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 
+
+
 export default function detail(todo: DocumentData) {
+  const router = useRouter()
+  const { id } = router.query
+  console.log (id);
+
+  // idを使いコレクションからtodoのドキュメントを持ってくる
+  
   return (
     <>
     <Header />
