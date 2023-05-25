@@ -25,6 +25,7 @@ import {
   serverTimestamp,
   orderBy,
   query,
+  DocumentData,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -213,7 +214,9 @@ export default function Home() {
                 <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
                 </Button>
-                <Button colorScheme='blue'>編集</Button>
+                <Link as={`/${todo.id}`} href='/[id]'>
+                  <Button colorScheme='blue'>編集</Button>
+                </Link>
               </ButtonGroup>
             </Flex>
             <Divider orientation='horizontal' mt='4' />
