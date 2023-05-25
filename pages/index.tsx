@@ -15,7 +15,6 @@ import {
 import { useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import {
   onSnapshot,
   collection,
@@ -45,29 +44,32 @@ export default function Home() {
   const { logout } = useLogout(router);
 
   type Todo = {
+    id?: string;
+    title: string;
+    status: string;
+    timestamp?: string;
+  };
+
+  type firestoreTodo = {
     id: string;
     title: string;
     status: string;
     timestamp: string;
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Todo>();
-
   {
     /* todoにuidをつける */
   }
   const todoId = uuidv4();
   const [todos, setTodos] = useState<DocumentData[]>([]);
+  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
 
   {
     /* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/
   }
   const createTodo = async (title: string, status: string) => {
     if (!currentUser) return;
+    if (title === '') return;
     await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
       id: todoId,
       title: title,
@@ -75,6 +77,21 @@ export default function Home() {
       timestamp: serverTimestamp(),
     });
     console.log(todos);
+  };
+  {
+    /* フォームの内容をfirestoreに保存 */
+  }
+  const onSubmit = ({ title, status }: { title: string; status: string }) => {
+    createTodo(title, status);
+    console.log(todos);
+    setTodos(todos);
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    { title, status }: { title: string; status: string },
+  ) => {
+    if (e.key === 'Enter') onSubmit({ title, status });
   };
 
   {
@@ -104,18 +121,9 @@ export default function Home() {
   }, []);
 
   {
-    /* フォームの内容をfirestoreに保存 */
-  }
-  const onSubmit: SubmitHandler<Todo> = ({ title, status }) => {
-    createTodo(title, status);
-    console.log(todos);
-    setTodos(todos);
-  };
-
-  {
     /* firestoreに保存されている特定のドキュメントを削除 */
   }
-  const deleteTodo = async (todo: Todo) => {
+  const deleteTodo = async (todo: firestoreTodo) => {
     console.log(todo);
     if (!currentUser) return;
     const todoRef = doc(db, 'users', currentUser.uid, 'todos', todo.id);
@@ -133,14 +141,14 @@ export default function Home() {
   {
     /* firestoreに保存されている特定のドキュメントを編集 */
   }
-  const editTodo = async ({ todoId, title, status }) => {
-    if (!currentUser) return;
-    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
-    await updateDoc(todoRef, {
-      title: title,
-      status: status,
-    });
-  };
+  // const editTodo = async ({ todoId, title, status }: {todoId: string, title: string ; status: string}) => {
+  //   if (!currentUser) return;
+  //   const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
+  //   await updateDoc(todoRef, {
+  //     title: title,
+  //     status: status,
+  //   });
+  // };
 
   return (
     <>
@@ -167,25 +175,25 @@ export default function Home() {
         <Flex minWidth='max-content' alignItems='center' gap='2'>
           <FormLabel htmlFor='name'>Todo追加</FormLabel>
           <Input
+            onChange={(e) => setTodo({ ...todo, title: e.target.value })}
             type='text'
             width='100%'
             id='name'
             placeholder='Todoの追加'
-            {...register('title', {
-              required: '必須項目です',
-              maxLength: {
-                value: 20,
-                message: '20文字以内で入力してください',
-              },
-            })}
+            onKeyDown={(e) => handleKeyDown(e, todo)}
           />
-          <Select width='140px' {...register('status')}>
+          <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
             <option value='未完了'>未完了</option>
             <option value='着手'>着手</option>
             <option value='完了'>完了</option>
           </Select>
           <ButtonGroup gap='2'>
-            <Button colorScheme='teal' onClick={handleSubmit(onSubmit)}>
+            <Button
+              colorScheme='teal'
+              onClick={() => {
+                onSubmit(todo);
+              }}
+            >
               追加
             </Button>
           </ButtonGroup>
