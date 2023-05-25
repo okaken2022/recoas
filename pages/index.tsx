@@ -110,6 +110,7 @@ export default function Home() {
         snapshot.docs.map((doc) => ({
           id: doc.id,
           title: doc.data().title,
+          status: doc.data().status,
           timestamp: doc.data().timestamp,
         })),
       );
@@ -210,6 +211,9 @@ export default function Home() {
                 <Heading size='md'>{todo.title}</Heading>
               </Box>
               <Spacer />
+              <Select width='140px'>
+                <option value={todo.status}>{todo.status}</option>
+              </Select>
               <ButtonGroup gap='2'>
                 <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
