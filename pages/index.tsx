@@ -15,7 +15,6 @@ import {
 import { useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
-import { SubmitHandler, useForm } from 'react-hook-form';
 import {
   onSnapshot,
   collection,
@@ -50,25 +49,26 @@ export default function Home() {
     timestamp?: string;
   };
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Todo>();
+  type firestoreTodo = {
+    id: string;
+    title: string;
+    status: string;
+    timestamp: string;
+  };
 
   {
     /* todoにuidをつける */
   }
   const todoId = uuidv4();
   const [todos, setTodos] = useState<DocumentData[]>([]);
-  const [todo, setTodo] = useState<Todo>({title:'', status:''})
+  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
 
   {
     /* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/
   }
   const createTodo = async (title: string, status: string) => {
     if (!currentUser) return;
-    if (title === "") return;
+    if (title === '') return;
     await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
       id: todoId,
       title: title,
@@ -80,14 +80,17 @@ export default function Home() {
   {
     /* フォームの内容をfirestoreに保存 */
   }
-  const onSubmit = ({ title, status }: {title: string ; status: string}) => {
+  const onSubmit = ({ title, status }: { title: string; status: string }) => {
     createTodo(title, status);
     console.log(todos);
     setTodos(todos);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, {title, status}: {title: string ; status: string})=> {
-    if (e.key === "Enter") onSubmit({title, status});
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    { title, status }: { title: string; status: string },
+  ) => {
+    if (e.key === 'Enter') onSubmit({ title, status });
   };
 
   {
@@ -116,11 +119,10 @@ export default function Home() {
     };
   }, []);
 
-
   {
     /* firestoreに保存されている特定のドキュメントを削除 */
   }
-  const deleteTodo = async (todo: Todo) => {
+  const deleteTodo = async (todo: firestoreTodo) => {
     console.log(todo);
     if (!currentUser) return;
     const todoRef = doc(db, 'users', currentUser.uid, 'todos', todo.id);
@@ -138,16 +140,14 @@ export default function Home() {
   {
     /* firestoreに保存されている特定のドキュメントを編集 */
   }
-  const editTodo = async ({ todoId, title, status }) => {
-    if (!currentUser) return;
-    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
-    await updateDoc(todoRef, {
-      title: title,
-      status: status,
-    });
-  };
-
-
+  // const editTodo = async ({ todoId, title, status }: {todoId: string, title: string ; status: string}) => {
+  //   if (!currentUser) return;
+  //   const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
+  //   await updateDoc(todoRef, {
+  //     title: title,
+  //     status: status,
+  //   });
+  // };
 
   return (
     <>
@@ -155,7 +155,10 @@ export default function Home() {
       {/* ユーザー情報 */}
       <Box p={4}>
         <Flex>
-        <p>リポジトリ:</p><Link href="https://github.com/okaken2022/next-todo">https://github.com/okaken2022/next-todo</Link>
+          <p>リポジトリ:</p>
+          <Link href='https://github.com/okaken2022/next-todo'>
+            https://github.com/okaken2022/next-todo
+          </Link>
         </Flex>
       </Box>
 
@@ -184,7 +187,12 @@ export default function Home() {
             <option value='完了'>完了</option>
           </Select>
           <ButtonGroup gap='2'>
-            <Button colorScheme='teal' onClick={() => {onSubmit(todo)}}>
+            <Button
+              colorScheme='teal'
+              onClick={() => {
+                onSubmit(todo);
+              }}
+            >
               追加
             </Button>
           </ButtonGroup>
@@ -205,9 +213,7 @@ export default function Home() {
                 <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                   削除
                 </Button>
-                <Button colorScheme='blue' onClick={editTodo}>
-                  編集
-                </Button>
+                <Button colorScheme='blue'>編集</Button>
               </ButtonGroup>
             </Flex>
             <Divider orientation='horizontal' mt='4' />

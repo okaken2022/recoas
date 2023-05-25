@@ -5,7 +5,7 @@ import { NextRouter, useRouter } from 'next/router';
 
 export default function detail() {
   const router = useRouter;
-  const id = router.query.todoId
+  const { id } = router.query;
 
   return (
     <>
