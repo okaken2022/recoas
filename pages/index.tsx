@@ -31,31 +31,19 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect } from 'react';
 import Link from 'next/link';
+import { Todo, firestoreTodo } from '@/types/todo';
 
 export default function Home() {
+  {
+    /* ログインユーザーの取得 */
+  }
   const auth = useAuth();
   const currentUser = auth.currentUser;
-
   const user = useContext(AuthContext);
-
   console.log(user);
 
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
-
-  type Todo = {
-    id?: string;
-    title: string;
-    status: string;
-    timestamp?: string;
-  };
-
-  type firestoreTodo = {
-    id: string;
-    title: string;
-    status: string;
-    timestamp: string;
-  };
 
   {
     /* todoにuidをつける */
@@ -102,7 +90,7 @@ export default function Home() {
   useEffect(() => {
     if (!currentUser) return;
     const q = query(
-      collection(db, 'users', auth.currentUser.uid, 'todos'),
+      collection(db, 'users', currentUser.uid, 'todos'),
       orderBy('timestamp', 'desc'),
     );
     const unSub = onSnapshot(q, async (snapshot) => {
@@ -119,7 +107,7 @@ export default function Home() {
     return () => {
       unSub();
     };
-  }, []);
+  }, [currentUser]);
 
   {
     /* firestoreに保存されている特定のドキュメントを削除 */
