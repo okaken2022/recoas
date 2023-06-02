@@ -13,7 +13,7 @@ export const Header: React.FC = () => {
   const { logout } = useLogout(router);
 
   return (
-    <Box bg='#3778B8' w='100%' p={4}  mb={100}>
+    <Box bg='#3778B8' w='100%' p={4} mb={100}>
       <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
         <Link href='/'>
           <Text fontSize='2xl'>Todo List</Text>
