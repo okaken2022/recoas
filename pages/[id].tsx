@@ -6,6 +6,7 @@ import {
   FormLabel,
   Input,
   Select,
+  Text,
 } from '@chakra-ui/react';
 import { DocumentData, DocumentSnapshot, doc, getDoc, query } from 'firebase/firestore';
 import Link from 'next/link';
@@ -59,27 +60,10 @@ export default function detail() {
   return (
     <>
       <Header />
-      {/* ユーザー情報 */}
-      <Box p={4}>
-        <Flex>
-          <p>リポジトリ:</p>
-          <Link href='https://github.com/okaken2022/next-todo'>
-            https://github.com/okaken2022/next-todo
-          </Link>
-        </Flex>
-      </Box>
 
-      <Box p={4}>
-        <p>ユーザー情報:{user?.email}</p>
-        <Button mt={4} colorScheme='teal' onClick={logout}>
-          ログアウト
-        </Button>
-      </Box>
-
-      {/* Todoの追加フォーム */}
+      {/* Todoの編集フォーム */}
       <Box p='2'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
-          <FormLabel width="80px" htmlFor='name'>編集：</FormLabel>
           <Input
             onChange={(e) => setTodo({ ...todo, title: e.target.value })}
             type='text'
@@ -100,11 +84,14 @@ export default function detail() {
                 onSubmit(todo);
               }}
             >
-              追加
+              保存
             </Button>
           </ButtonGroup>
         </Flex>
       </Box>
+      <Link href='/'>
+        <Text fontSize='2xl'>リストへ戻る</Text>
+      </Link>
     </>
   );
 }

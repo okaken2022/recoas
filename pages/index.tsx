@@ -40,7 +40,6 @@ export default function Home() {
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
-  console.log(user);
 
   const router: NextRouter = useRouter();
   const { logout } = useLogout(router);
@@ -142,27 +141,10 @@ export default function Home() {
   return (
     <>
       <Header />
-      {/* ユーザー情報 */}
-      <Box p={4}>
-        <Flex>
-          <p>リポジトリ:</p>
-          <Link href='https://github.com/okaken2022/next-todo'>
-            https://github.com/okaken2022/next-todo
-          </Link>
-        </Flex>
-      </Box>
-
-      <Box p={4}>
-        <p>ユーザー情報:{user?.email}</p>
-        <Button mt={4} colorScheme='teal' onClick={logout}>
-          ログアウト
-        </Button>
-      </Box>
 
       {/* Todoの追加フォーム */}
-      <Box p='2'>
+      <Box p='2' mb='20'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
-          <FormLabel htmlFor='name'>Todo追加</FormLabel>
           <Input
             onChange={(e) => setTodo({ ...todo, title: e.target.value })}
             type='text'
