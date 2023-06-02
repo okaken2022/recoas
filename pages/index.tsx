@@ -1,5 +1,4 @@
 import {
-  FormLabel,
   Input,
   Button,
   UnorderedList,
@@ -21,7 +20,6 @@ import {
   doc,
   setDoc,
   deleteDoc,
-  updateDoc,
   serverTimestamp,
   orderBy,
   query,
@@ -34,25 +32,25 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 
 export default function Home() {
+
+  const [todos, setTodos] = useState<DocumentData[]>([]);
+  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
+
   {
-    /* ログインユーザーの取得 */
+    /* ログイン */
   }
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
-
   const router: NextRouter = useRouter();
-  const { logout } = useLogout(router);
 
   {
     /* todoにuidをつける */
   }
   const todoId = uuidv4();
-  const [todos, setTodos] = useState<DocumentData[]>([]);
-  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
 
   {
-    /* todosコレクションの中のドキュメントにはuidを設定してtodoを追加していく*/
+    /* todo追加 */
   }
   const createTodo = async (title: string, status: string) => {
     if (!currentUser) return;
@@ -65,9 +63,7 @@ export default function Home() {
     });
     console.log(todos);
   };
-  {
-    /* フォームの内容をfirestoreに保存 */
-  }
+
   const onSubmit = ({ title, status }: { title: string; status: string }) => {
     createTodo(title, status);
     console.log(todos);
@@ -83,9 +79,8 @@ export default function Home() {
 
   {
     /* ドキュメントを取得する */
-    /* orderByで並べ替えも行う */
+    /* orderByで並べ替え */
   }
-
   useEffect(() => {
     if (!currentUser) return;
     const q = query(
@@ -102,14 +97,13 @@ export default function Home() {
         })),
       );
     });
-
     return () => {
       unSub();
     };
   }, [currentUser]);
 
   {
-    /* firestoreに保存されている特定のドキュメントを削除 */
+    /* todo削除 */
   }
   const deleteTodo = async (todo: firestoreTodo) => {
     console.log(todo);
@@ -125,18 +119,6 @@ export default function Home() {
     // setTodosで対象のtodoを消す
     setTodos(todos.filter((item) => item.id !== todo.id));
   };
-
-  {
-    /* firestoreに保存されている特定のドキュメントを編集 */
-  }
-  // const editTodo = async ({ todoId, title, status }: {todoId: string, title: string ; status: string}) => {
-  //   if (!currentUser) return;
-  //   const todoRef = doc(db, 'users', currentUser.uid, 'todos', todoId);
-  //   await updateDoc(todoRef, {
-  //     title: title,
-  //     status: status,
-  //   });
-  // };
 
   return (
     <>
@@ -172,7 +154,6 @@ export default function Home() {
       </Box>
 
       {/* Todoリスト */}
-
       <UnorderedList listStyleType='none'>
         {todos.map((todo) => (
           <ListItem key={todo.id} p={4}>
