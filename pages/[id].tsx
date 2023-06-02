@@ -2,13 +2,24 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Center,
   Flex,
   FormLabel,
   Input,
   Select,
   Text,
 } from '@chakra-ui/react';
-import { DocumentData, DocumentSnapshot, doc, getDoc, query } from 'firebase/firestore';
+import {
+  DocumentData,
+  DocumentSnapshot,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  updateDoc,
+} from 'firebase/firestore';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Header } from '@/components/Header';
@@ -18,7 +29,6 @@ import { AuthContext, db, useAuth, useLogout } from '@/hooks/firebase';
 
 export default function detail() {
   const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
-  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
   const [todos, setTodos] = useState<DocumentData[]>([]);
 
   const auth = useAuth();
@@ -27,25 +37,69 @@ export default function detail() {
 
   const router = useRouter();
   const { id } = router.query;
-  const { logout } = useLogout(router);
 
   // idを使いコレクションからtodoのドキュメントを持ってくる
   // 画面が遷移する場合はglobalstateで管理するか、firestoreから取ってくるしかない
 
   {
+    /* ドキュメントを取得する */
+    /* orderByで並べ替えも行う */
+  }
+  useEffect(() => {
+    if (!currentUser) return;
+    const q = query(
+      collection(db, 'users', currentUser.uid, 'todos'),
+      orderBy('timestamp', 'desc'),
+    );
+    const unSub = onSnapshot(q, async (snapshot) => {
+      setTodos(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          title: doc.data().title,
+          status: doc.data().status,
+          timestamp: doc.data().timestamp,
+        })),
+      );
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [currentUser]);
+
+  {
     /* 編集するTodoを取得する */
   }
+  useEffect(() => {
+    const targetTodo = async () => {
+      if (!currentUser) return;
+      const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id);
+      getDoc(userDocumentRef).then((documentSnapshot: DocumentSnapshot<DocumentData>) => {
+        setEditTodo(documentSnapshot.data());
+      });
+    };
+    return () => {
+      targetTodo();
+    };
+  }, []);
 
-  const targetTodo = async () => {
+  {
+    /* 編集内容をfirestoreに保存*/
+  }
+  const updateTodo = async (title: string, status: string) => {
     if (!currentUser) return;
-    const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id);
-    getDoc(userDocumentRef).then((documentSnapshot: DocumentSnapshot<DocumentData>) => {
-      setEditTodo(documentSnapshot.data());
+    if (title === '') return;
+    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', id), {
+      title: title,
+      status: status,
     });
+    console.log(todos);
   };
-
+  {
+    /* フォームの内容をfirestoreに保存 */
+  }
   const onSubmit = ({ title, status }: { title: string; status: string }) => {
-    // createTodo(title, status);
+    updateTodo(title, status);
     console.log(todos);
     setTodos(todos);
   };
@@ -62,17 +116,21 @@ export default function detail() {
       <Header />
 
       {/* Todoの編集フォーム */}
-      <Box p='2'>
+      <Box p='2' mb='20'>
         <Flex minWidth='max-content' alignItems='center' gap='2'>
           <Input
-            onChange={(e) => setTodo({ ...todo, title: e.target.value })}
+            onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
             type='text'
             width='100%'
             id='name'
-            placeholder={editTodo.title}
-            onKeyDown={(e) => handleKeyDown(e, todo)}
+            value={editTodo.title}
+            onKeyDown={(e) => handleKeyDown(e, editTodo)}
           />
-          <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
+          <Select
+            width='140px'
+            value={editTodo.status}
+            onChange={(e) => setEditTodo({ ...editTodo, status: e.target.value })}
+          >
             <option value='未完了'>未完了</option>
             <option value='着手'>着手</option>
             <option value='完了'>完了</option>
@@ -81,7 +139,7 @@ export default function detail() {
             <Button
               colorScheme='teal'
               onClick={() => {
-                onSubmit(todo);
+                onSubmit(editTodo);
               }}
             >
               保存
@@ -89,9 +147,11 @@ export default function detail() {
           </ButtonGroup>
         </Flex>
       </Box>
-      <Link href='/'>
-        <Text fontSize='2xl'>リストへ戻る</Text>
-      </Link>
+      <Center>
+        <Link href='/'>
+          <Text fontSize='2xl'>＜リストへ戻る</Text>
+        </Link>
+      </Center>
     </>
   );
 }
