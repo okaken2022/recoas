@@ -32,7 +32,6 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 
 export default function Home() {
-
   const [todos, setTodos] = useState<DocumentData[]>([]);
   const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
 
