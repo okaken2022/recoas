@@ -72,16 +72,15 @@ export default function detail() {
   }
   useEffect(() => {
     const targetTodo = async () => {
-      if (!currentUser) return;
-      const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id);
-      getDoc(userDocumentRef).then((documentSnapshot: DocumentSnapshot<DocumentData>) => {
-        setEditTodo(documentSnapshot.data());
-      });
+    if (!currentUser || !id) return;
+    const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id as string);
+    const documentSnapshot = await getDoc(userDocumentRef);
+    if (documentSnapshot.exists()) {
+    setEditTodo(documentSnapshot.data() as Todo);
+    }
     };
-    return () => {
-      targetTodo();
-    };
-  }, []);
+    targetTodo();
+    }, [currentUser]);
 
   {
     /* 編集内容をfirestoreに保存*/
@@ -89,7 +88,7 @@ export default function detail() {
   const updateTodo = async (title: string, status: string) => {
     if (!currentUser) return;
     if (title === '') return;
-    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', id), {
+    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', id as string), {
       title: title,
       status: status,
     });

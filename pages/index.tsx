@@ -11,7 +11,7 @@ import {
   ButtonGroup,
   Select,
 } from '@chakra-ui/react';
-import { useAuth, useLogout, db, AuthContext } from '@/hooks/firebase';
+import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import {
@@ -32,7 +32,7 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 
 export default function Home() {
-  const [todos, setTodos] = useState<DocumentData[]>([]);
+  const [todos, setTodos] = useState<firestoreTodo[]>([]);
   const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
 
   {
