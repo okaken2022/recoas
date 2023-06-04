@@ -102,6 +102,7 @@ export default function detail() {
     updateTodo(title, status);
     console.log(todos);
     setTodos(todos);
+    router.push('/');
   };
 
   const handleKeyDown = (
