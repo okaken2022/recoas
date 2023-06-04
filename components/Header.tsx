@@ -20,11 +20,11 @@ export const Header: React.FC = () => {
         </Link>
         <Spacer />
         {user ? (
-          <Text fontSize='2xl'>ログイン中:{user?.email}</Text>
+          <Text fontSize='xl'>ログイン中:{user?.email}</Text>
         ) : (
-          <Text fontSize='2xl'>未ログイン</Text>
+          <Text fontSize='xl'>未ログイン</Text>
         )}
-        <Button colorScheme='teal' onClick={logout}>
+        <Button  ml='20px' colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
       </Flex>
