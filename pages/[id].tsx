@@ -27,7 +27,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Todo } from '@/types/todo';
 import { AuthContext, db, useAuth, useLogout } from '@/hooks/firebase';
 
-export default function detail() {
+export default function Detail() {
   const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
   const [todos, setTodos] = useState<DocumentData[]>([]);
 
