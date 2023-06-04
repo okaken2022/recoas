@@ -19,7 +19,11 @@ export const Header: React.FC = () => {
           <Text fontSize='2xl'>Todo List</Text>
         </Link>
         <Spacer />
-        <Text fontSize='2xl'>ログイン中:{user?.email}</Text>
+        {user ? (
+          <Text fontSize='2xl'>ログイン中:{user?.email}</Text>
+        ) : (
+          <Text fontSize='2xl'>未ログイン</Text>
+        )}
         <Button colorScheme='teal' onClick={logout}>
           ログアウト
         </Button>
