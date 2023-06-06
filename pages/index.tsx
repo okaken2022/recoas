@@ -10,6 +10,8 @@ import {
   Spacer,
   ButtonGroup,
   Select,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -30,10 +32,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect } from 'react';
 import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
+import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 
 export default function Home() {
   const [todos, setTodos] = useState<firestoreTodo[]>([]);
-  const [todo, setTodo] = useState<Todo>({ title: '', status: '' });
+  const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
 
   {
     /* ログイン */
@@ -122,57 +125,62 @@ export default function Home() {
   return (
     <>
       <Header />
-
+    
       {/* Todoの追加フォーム */}
-      <Box p='2' mb='20'>
-        <Flex minWidth='max-content' alignItems='center' gap='2'>
-          <Input
-            onChange={(e) => setTodo({ ...todo, title: e.target.value })}
-            type='text'
-            width='100%'
-            id='name'
-            placeholder='Todoの追加'
-            onKeyDown={(e) => handleKeyDown(e, todo)}
-          />
-          <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
-            <option value='未完了'>未完了</option>
-            <option value='着手'>着手</option>
-            <option value='完了'>完了</option>
-          </Select>
-          <ButtonGroup gap='2'>
-            <Button
-              colorScheme='teal'
-              onClick={() => {
-                onSubmit(todo);
-              }}
-            >
-              追加
-            </Button>
-          </ButtonGroup>
-        </Flex>
+      <Box p='4' mb='4'>
+        <Wrap minWidth='max-content' alignItems='center' gap='2'>
+          <WrapItem width={{ base: "100%", md: "80%"}} >
+            <Input
+              onChange={(e) => setTodo({ ...todo, title: e.target.value })}
+              type='text'
+              id='name'
+              placeholder='Todoの追加'
+              onKeyDown={(e) => handleKeyDown(e, todo)}
+            />
+          </WrapItem>
+          <WrapItem>
+            <Flex gap='2'>
+              <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
+                <option value='未完了'>未完了</option>
+                <option value='着手'>着手</option>
+                <option value='完了'>完了</option>
+              </Select>
+              <Button
+                colorScheme='teal'
+                onClick={() => {
+                  onSubmit(todo);
+                }}
+              >
+                <AddIcon />
+              </Button>
+            </Flex>
+          </WrapItem>
+        </Wrap>
       </Box>
 
       {/* Todoリスト */}
       <UnorderedList listStyleType='none'>
         {todos.map((todo) => (
           <ListItem key={todo.id} p={4}>
-            <Flex minWidth='max-content' alignItems='center' gap='2'>
-              <Box p='2'>
+            <Wrap minWidth='max-content' alignItems='center' gap='2'>
+              <WrapItem p='2' width="60%" >
                 <Heading size='md'>{todo.title}</Heading>
-              </Box>
+              </WrapItem>
               <Spacer />
-              <Select width='140px'>
-                <option value={todo.status}>{todo.status}</option>
-              </Select>
-              <ButtonGroup gap='2'>
-                <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
-                  削除
-                </Button>
-                <Link as={`/${todo.id}`} href='/[id]'>
-                  <Button colorScheme='blue'>編集</Button>
-                </Link>
-              </ButtonGroup>
-            </Flex>
+              <WrapItem>
+                <Select width='140px'>
+                  <option value={todo.status}>{todo.status}</option>
+                </Select>
+                <ButtonGroup gap='2' ml="4">
+                  <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
+                    <DeleteIcon />
+                  </Button>
+                  <Link as={`/${todo.id}`} href='/[id]'>
+                    <Button colorScheme='blue'><EditIcon /></Button>
+                  </Link>
+                </ButtonGroup>
+              </WrapItem>
+            </Wrap>
             <Divider orientation='horizontal' mt='4' />
           </ListItem>
         ))}

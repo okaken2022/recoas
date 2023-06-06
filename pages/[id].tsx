@@ -8,6 +8,8 @@ import {
   Input,
   Select,
   Text,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import {
   DocumentData,
@@ -26,6 +28,7 @@ import { Header } from '@/components/Header';
 import { useContext, useEffect, useState } from 'react';
 import { Todo } from '@/types/todo';
 import { AuthContext, db, useAuth, useLogout } from '@/hooks/firebase';
+import { CheckIcon } from '@chakra-ui/icons';
 
 export default function Detail() {
   const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
@@ -72,15 +75,15 @@ export default function Detail() {
   }
   useEffect(() => {
     const targetTodo = async () => {
-    if (!currentUser || !id) return;
-    const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id as string);
-    const documentSnapshot = await getDoc(userDocumentRef);
-    if (documentSnapshot.exists()) {
-    setEditTodo(documentSnapshot.data() as Todo);
-    }
+      if (!currentUser || !id) return;
+      const userDocumentRef = doc(db, 'users', currentUser.uid, 'todos', id as string);
+      const documentSnapshot = await getDoc(userDocumentRef);
+      if (documentSnapshot.exists()) {
+        setEditTodo(documentSnapshot.data() as Todo);
+      }
     };
     targetTodo();
-    }, [currentUser]);
+  }, [currentUser]);
 
   {
     /* 編集内容をfirestoreに保存*/
@@ -116,36 +119,40 @@ export default function Detail() {
       <Header />
 
       {/* Todoの編集フォーム */}
-      <Box p='2' mb='20'>
-        <Flex minWidth='max-content' alignItems='center' gap='2'>
-          <Input
-            onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
-            type='text'
-            width='100%'
-            id='name'
-            value={editTodo.title}
-            onKeyDown={(e) => handleKeyDown(e, editTodo)}
-          />
-          <Select
-            width='140px'
-            value={editTodo.status}
-            onChange={(e) => setEditTodo({ ...editTodo, status: e.target.value })}
-          >
-            <option value='未完了'>未完了</option>
-            <option value='着手'>着手</option>
-            <option value='完了'>完了</option>
-          </Select>
-          <ButtonGroup gap='2'>
-            <Button
-              colorScheme='teal'
-              onClick={() => {
-                onSubmit(editTodo);
-              }}
-            >
-              保存
-            </Button>
-          </ButtonGroup>
-        </Flex>
+      <Box p='4' mb='20'>
+        <Wrap minWidth='max-content' alignItems='center' gap='2'>
+          <WrapItem width={{ base: "100%", md: "80%"}} >
+            <Input
+              onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
+              type='text'
+              width='100%'
+              id='name'
+              value={editTodo.title}
+              onKeyDown={(e) => handleKeyDown(e, editTodo)}
+            />
+          </WrapItem>
+          <WrapItem>
+            <Flex gap='2'>
+              <Select
+                width='140px'
+                value={editTodo.status}
+                onChange={(e) => setEditTodo({ ...editTodo, status: e.target.value })}
+              >
+                <option value='未完了'>未完了</option>
+                <option value='着手'>着手</option>
+                <option value='完了'>完了</option>
+              </Select>
+              <Button
+                colorScheme='teal'
+                onClick={() => {
+                  onSubmit(editTodo);
+                }}
+              >
+                <CheckIcon />
+              </Button>
+            </Flex>
+          </WrapItem>
+        </Wrap>
       </Box>
       <Center>
         <Link href='/'>
