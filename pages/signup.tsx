@@ -54,9 +54,9 @@ export default function Signup() {
       <Box bg='#3778B8' w='100%' p={4} color='white' mb={100}>
         <Text fontSize='2xl'>Todo List</Text>
       </Box>
-      <VStack w='30vw' mx='auto'>
+      <VStack w={{ base: "90vw", md: "30vw"}} mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
-        <Input id='name' placeholder='name' {...register('email', { required: true })} />
+        <Input id='name' placeholder='email' {...register('email', { required: true })} />
         <FormLabel htmlFor='password'>パスワード</FormLabel>
         <Input
           id='password'

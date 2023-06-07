@@ -26,10 +26,11 @@ import {
   orderBy,
   query,
   DocumentData,
+  updateDoc,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
@@ -37,6 +38,7 @@ import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 export default function Home() {
   const [todos, setTodos] = useState<firestoreTodo[]>([]);
   const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
+  const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
 
   {
     /* ログイン */
@@ -122,6 +124,19 @@ export default function Home() {
     setTodos(todos.filter((item) => item.id !== todo.id));
   };
 
+  {
+    /* 進捗の更新 */
+  }
+
+  const updateTodo = async (todoId: string, newStatus: string) => {
+    if (!currentUser) return;
+    if (newStatus === '') return;
+    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
+      status: newStatus,
+    });
+    console.log(todos);
+  };
+
   return (
     <>
       <Header />
@@ -129,7 +144,7 @@ export default function Home() {
       {/* Todoの追加フォーム */}
       <Box p='4' mb='4'>
         <Wrap minWidth='max-content' alignItems='center' gap='2'>
-          <WrapItem width={{ base: "100%", md: "80%"}} >
+          <WrapItem w={{ base: "100%", md: "80%"}} >
             <Input
               onChange={(e) => setTodo({ ...todo, title: e.target.value })}
               type='text'
@@ -168,8 +183,15 @@ export default function Home() {
               </WrapItem>
               <Spacer />
               <WrapItem>
-                <Select width='140px'>
-                  <option value={todo.status}>{todo.status}</option>
+                <Select width='140px'
+                value={todo.status}
+                onChange={(e) => {
+                  const newStatus = e.target.value 
+                  updateTodo(todo.id, newStatus)
+                }}>
+                  <option value='未完了'>未完了</option>
+                  <option value='着手'>着手</option>
+                  <option value='完了'>完了</option>
                 </Select>
                 <ButtonGroup gap='2' ml="4">
                   <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
