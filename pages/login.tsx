@@ -47,7 +47,7 @@ export default function Login() {
   return (
     <>
       <Header />
-      <VStack w={{ base: "90vw", md: "30vw"}} mx='auto'>
+      <VStack w={{ base: '90vw', md: '30vw' }} mx='auto'>
         <FormLabel htmlFor='name'>メールアドレス</FormLabel>
         <Input id='name' placeholder='email' {...register('email', { required: true })} />
         <FormLabel htmlFor='password'>パスワード</FormLabel>

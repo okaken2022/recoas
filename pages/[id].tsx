@@ -107,11 +107,17 @@ export default function Detail() {
     router.push('/');
   };
 
+  const [composing, setComposition] = useState(false);
+  const startComposition = () => setComposition(true);
+  const endComposition = () => setComposition(false);
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     { title, status }: { title: string; status: string },
   ) => {
-    if (e.key === 'Enter') onSubmit({ title, status });
+    if (e.key === 'Enter') {
+      if (composing) return;
+      onSubmit({ title, status });
+    }
   };
 
   return (
@@ -121,8 +127,10 @@ export default function Detail() {
       {/* Todoの編集フォーム */}
       <Box p='4' mb='20'>
         <Wrap minWidth='max-content' alignItems='center' gap='2'>
-          <WrapItem width={{ base: "100%", md: "80%"}} >
+          <WrapItem width={{ base: '100%', md: '80%' }}>
             <Input
+              onCompositionStart={startComposition}
+              onCompositionEnd={endComposition}
               onChange={(e) => setEditTodo({ ...editTodo, title: e.target.value })}
               type='text'
               width='100%'

@@ -74,11 +74,21 @@ export default function Home() {
     setTodos(todos);
   };
 
+  {
+    /* Enter押下で送信 */
+    /* 日本語変換中は送信しない */
+  }
+  const [composing, setComposition] = useState(false);
+  const startComposition = () => setComposition(true);
+  const endComposition = () => setComposition(false);
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     { title, status }: { title: string; status: string },
   ) => {
-    if (e.key === 'Enter') onSubmit({ title, status });
+    if (e.key === 'Enter') {
+      if (composing) return;
+      onSubmit({ title, status });
+    }
   };
 
   {
@@ -127,7 +137,6 @@ export default function Home() {
   {
     /* 進捗の更新 */
   }
-
   const updateTodo = async (todoId: string, newStatus: string) => {
     if (!currentUser) return;
     if (newStatus === '') return;
@@ -140,12 +149,14 @@ export default function Home() {
   return (
     <>
       <Header />
-    
+
       {/* Todoの追加フォーム */}
       <Box p='4' mb='4'>
         <Wrap minWidth='max-content' alignItems='center' gap='2'>
-          <WrapItem w={{ base: "100%", md: "80%"}} >
+          <WrapItem w={{ base: '100%', md: '80%' }}>
             <Input
+              onCompositionStart={startComposition}
+              onCompositionEnd={endComposition}
               onChange={(e) => setTodo({ ...todo, title: e.target.value })}
               type='text'
               id='name'
@@ -178,27 +189,31 @@ export default function Home() {
         {todos.map((todo) => (
           <ListItem key={todo.id} p={4}>
             <Wrap minWidth='max-content' alignItems='center' gap='2'>
-              <WrapItem p='2' width="60%" >
+              <WrapItem p='2' width='60%'>
                 <Heading size='md'>{todo.title}</Heading>
               </WrapItem>
               <Spacer />
               <WrapItem>
-                <Select width='140px'
-                value={todo.status}
-                onChange={(e) => {
-                  const newStatus = e.target.value 
-                  updateTodo(todo.id, newStatus)
-                }}>
+                <Select
+                  width='140px'
+                  value={todo.status}
+                  onChange={(e) => {
+                    const newStatus = e.target.value;
+                    updateTodo(todo.id, newStatus);
+                  }}
+                >
                   <option value='未完了'>未完了</option>
                   <option value='着手'>着手</option>
                   <option value='完了'>完了</option>
                 </Select>
-                <ButtonGroup gap='2' ml="4">
+                <ButtonGroup gap='2' ml='4'>
                   <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
                     <DeleteIcon />
                   </Button>
                   <Link as={`/${todo.id}`} href='/[id]'>
-                    <Button colorScheme='blue'><EditIcon /></Button>
+                    <Button colorScheme='blue'>
+                      <EditIcon />
+                    </Button>
                   </Link>
                 </ButtonGroup>
               </WrapItem>

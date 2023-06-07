@@ -14,25 +14,29 @@ export const Header: React.FC = () => {
 
   return (
     <>
-    <Box bg='#3778B8' w='100%' p={4}>
-      <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
-        <Link href='/'>
-          <Text fontSize='2xl'>Todo List</Text>
-        </Link>
-        <Spacer />
+      <Box bg='#3778B8' w='100%' p={4}>
+        <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
+          <Link href='/'>
+            <Text fontSize='2xl'>Todo List</Text>
+          </Link>
+          <Spacer />
 
-        <Button ml='20px' colorScheme='teal' onClick={logout}>
-          ログアウト
-        </Button>
-      </Flex>
-    </Box>
-    <Box  p={4} mb={8}>
-    {user ? (
-      <Text color='teal' fontWeight='bold' fontSize='s'>ログイン中:{user?.email}</Text>
-    ) : (
-      <Text color='teal' fontWeight='bold' fontSize='s'>未ログイン</Text>
-    )}
-    </Box>
+          <Button ml='20px' colorScheme='teal' onClick={logout}>
+            ログアウト
+          </Button>
+        </Flex>
+      </Box>
+      <Box p={4} mb={8}>
+        {user ? (
+          <Text color='teal' fontWeight='bold' fontSize='s'>
+            ログイン中:{user?.email}
+          </Text>
+        ) : (
+          <Text color='teal' fontWeight='bold' fontSize='s'>
+            未ログイン
+          </Text>
+        )}
+      </Box>
     </>
   );
 };
