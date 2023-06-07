@@ -70,6 +70,7 @@ export default function Home() {
 
   const onSubmit = ({ title, status }: { title: string; status: string }) => {
     createTodo(title, status);
+    setTodo({ title: '', status: '未完了' });
     console.log(todos);
     setTodos(todos);
   };
@@ -157,6 +158,7 @@ export default function Home() {
             <Input
               onCompositionStart={startComposition}
               onCompositionEnd={endComposition}
+              value={todo.title}
               onChange={(e) => setTodo({ ...todo, title: e.target.value })}
               type='text'
               id='name'
