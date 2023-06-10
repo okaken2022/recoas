@@ -14,14 +14,16 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <Box bg='#3778B8' w='100%' p={4}>
+      <Box bg='#0F9954' w='100%' p={4}>
         <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
           <Link href='/'>
-            <Text fontSize='2xl'>Todo List</Text>
+            <Text className='logo' fontSize='2xl'>
+              recoAs
+            </Text>
           </Link>
           <Spacer />
 
-          <Button ml='20px' colorScheme='teal' onClick={logout}>
+          <Button ml='20px' colorScheme='#fff' onClick={logout}>
             ログアウト
           </Button>
         </Flex>

@@ -1,4 +1,4 @@
-import '@/styles/globals.css';
+import '../styles/style.css';
 import type { AppProps } from 'next/app';
 import { ChakraProvider } from '@chakra-ui/react';
 import { AuthProvider } from '../hooks/firebase';
