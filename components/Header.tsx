@@ -14,7 +14,7 @@ export const Header: React.FC = () => {
 
   return (
     <>
-      <Box bg='#0F9954' w='100%' p={4}>
+      <Box bg='color.main' w='100%' p={4}>
         <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
           <Link href='/'>
             <Text className='logo' fontSize='2xl'>
