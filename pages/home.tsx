@@ -37,7 +37,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
-import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon, CalendarIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
   const [todos, setTodos] = useState<firestoreTodo[]>([]);
@@ -154,42 +156,74 @@ export default function Home() {
   return (
     <>
       <Header />
+      <Box  w={{ base: '100%', md: '80%' }} m='auto' p='4%'>
       {/* お知らせ */}
-      <Box w='80%' m='auto'>
         <Text fontSize='2xl'>お知らせ</Text>
-      </Box>
-      <Box w='80%' h='200px' m='auto' mt='4' p='4' border='1px' rounded='md' color='#333'>
-        <Text>4/28 田中さんの記録がありません。</Text>
-        <Text>4/28 田中さんの記録がありません。</Text>
-        <Text>4/28 田中さんの記録がありません。</Text>
-      </Box>
-      {/* 利用者一覧 */}
-      <Box w='80%' m='auto' mt='20'>
-        <Text fontSize='2xl'>利用者一覧</Text>
-      </Box>
-      <HStack w='80%' m='auto' mt='4'>
-        <Select placeholder='生活介護'>
-          <option value='option1'>田中</option>
-          <option value='option2'>山田</option>
-          <option value='option3'>佐藤</option>
-        </Select>
-        <Select placeholder='多機能 生活介護'>
-          <option value='option1'>田中</option>
-          <option value='option2'>山田</option>
-          <option value='option3'>佐藤</option>
-        </Select>
-        <Select placeholder='就労以降支援B型'>
-          <option value='option1'>田中</option>
-          <option value='option2'>山田</option>
-          <option value='option3'>佐藤</option>
-        </Select>
-      </HStack>
+        <Box h='200px' m='auto' mt='4' p='4' border='1px' rounded='md' color='#333'>
+          <Text>4/28 田中さんの午前の記録がありません。</Text>
+          <Text>4/28 田中さんの工賃の記録がありません。</Text>
+          <Text>4/28 田中さんの記録がありません。</Text>
+        </Box>
 
-      <Box w='80%' m='auto' mt='4'>
-        <Button>
-          <AddIcon />
-          利用者を追加する
-        </Button>
+        {/* 利用者一覧 */}
+        <Box mt='20'>
+          <Text fontSize='2xl'>利用者一覧</Text>
+        </Box>
+        <Wrap mt='4' spacing='3%' justify='center'>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select w='100%'  placeholder='生活介護'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
+          </WrapItem>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select  placeholder='多機能 生活介護'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
+          </WrapItem>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select placeholder='就労以降支援B型'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
+          </WrapItem>
+        </Wrap>
+
+        {/* 管理者メニュー */}
+        <Box mt='20'>
+          <Text fontSize='2xl'>管理者メニュー</Text>
+          <HStack>
+            <Button>
+              <FontAwesomeIcon icon={faUser}>
+                <i className="fa-solid fa-user" />
+              </FontAwesomeIcon>
+              ユーザー一覧
+            </Button>
+            <Button>
+              <CalendarIcon />
+              カレンダー設定
+            </Button>
+            <Button>
+              <AddIcon />
+              利用者を追加する
+            </Button>
+          </HStack>
+        </Box>
+
+        {/* 開発用リンク */}
+        <Text fontSize='2xl'  mt='20'>
+          開発用リンク
+        </Text>
+        <Link href='/customers/customer'>
+          <Text fontSize='l' color='blue'>
+            記録一覧
+          </Text>
+        </Link>
+
       </Box>
     </>
   );
