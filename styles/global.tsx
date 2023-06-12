@@ -9,5 +9,10 @@ export const theme = extendTheme({
       sub: "#1a202c",
     },
   },
+  fonts: {
+    heading: "'Zen Maru Gothic', sans-serif",
+    body: "'Zen Maru Gothic', sans-serif",
+    logo: "'Montserrat',  sans-serif",
+  }
 })
 
