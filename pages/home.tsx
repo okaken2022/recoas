@@ -198,9 +198,9 @@ export default function Home() {
             <Text fontSize='2xl'>管理者メニュー</Text>
             <HStack>
               <Button>
-                <FontAwesomeIcon icon={faUser}>
+                {/* <FontAwesomeIcon icon={faUser}>
                   <i className="fa-solid fa-user" />
-                </FontAwesomeIcon>
+                </FontAwesomeIcon> */}
                 ユーザー一覧
               </Button>
               <Button>
