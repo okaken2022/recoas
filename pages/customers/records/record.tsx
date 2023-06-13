@@ -3,6 +3,9 @@ import {
   Spacer,
   VStack,
   Text,
+  Box,
+  Grid,
+  GridItem,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -100,25 +103,31 @@ export default function Home() {
         <Heading color='color.sub' as='h2' mb="8" size='xl' noOfLines={1} >
           田中太郎さん
         </Heading>
-        {/* 支援目標 */}
-        <Text fontSize='2xl'>支援目標</Text>
-        <VStack align="start" w='100%' h='auto' m='auto' mt='4' mb='20' p='4' border='1px' rounded='md' color='#333'>
-          <Text fontSize='xl'>1.日常生活のスキルの向上</Text>
-          <Text>田中さんの日常生活スキルを向上させることを目標とします。具体的な目標としては、自己介助の能力の向上、食事の準備や清掃などの家事スキルの習得を挙げます。</Text>
-          <Spacer />
-          <Text fontSize='xl'>2.コミュニケーション能力の向上</Text>
-          <Text>田中さんのコミュニケーション能力を向上させ、社会参加を促進します。具体的な目標としては、日常会話のスキルの向上、表現力や聴取能力の向上を挙げます。</Text>
-        </VStack>
+        {/* 支援記録 */}
+        <Box>
+          {/* 日付 */}
+          <Text fontSize='2xl'>2023年6月12日(月)</Text>
 
-        {/* 利用日カレンダー */}
-        <Text fontSize='2xl'>利用日カレンダー</Text>
+          {/* 活動 */}
+          <Text fontSize='2xl'>午前：</Text>
 
-        <FullCalendar
-        plugins={[dayGridPlugin]}
-        initialView="dayGridMonth"
-        events={events}
-        eventContent={renderEventContent}
-      />
+        </Box>
+        <Grid
+          h='400px'
+          templateRows='repeat(6, 1fr)'
+          templateColumns='repeat(5, 1fr)'
+          // gap={2}
+          
+        >
+          {/* 午前記録 */}
+          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
+          <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/>
+          <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/>
+          <GridItem colSpan={4}  rowSpan={6} bg='tomato' border='1px'/>
+          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
+          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
+          {/* 午後記録 */}
+        </Grid>
       </Layout>
     </>
   );
