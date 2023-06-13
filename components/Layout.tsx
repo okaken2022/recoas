@@ -17,13 +17,24 @@ function Layout({ children }: {
           開発用リンク
         </Text>
         <Link href='/home'>
+
+        {/* HOME */}
           <Text fontSize='l' color='blue'>
             HOME
           </Text>
         </Link>
+
+        {/* 利用者詳細 */}
         <Link href='/customers/customer'>
           <Text fontSize='l' color='blue'>
-            記録一覧
+            利用者詳細
+          </Text>
+        </Link>
+
+        {/* 利用者詳細 */}
+        <Link href='/customers/records/record'>
+          <Text fontSize='l' color='blue'>
+            記録詳細
           </Text>
         </Link>
       </Box>

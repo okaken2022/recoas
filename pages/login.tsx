@@ -60,9 +60,6 @@ export default function Login() {
         <Button mt={4} colorScheme='teal' onClick={handleSubmit(onSubmit)}>
           ログイン
         </Button>
-        <Link as={NextLink} href='/signup'>
-          アカウント作成はこちら
-        </Link>
       </VStack>
     </>
   );
