@@ -6,6 +6,8 @@ import {
   Box,
   Grid,
   GridItem,
+  Flex,
+  Input,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -105,27 +107,30 @@ export default function Home() {
         </Heading>
         {/* 支援記録 */}
         <Box>
-          {/* 日付 */}
-          <Text fontSize='2xl'>2023年6月12日(月)</Text>
-
-          {/* 活動 */}
-          <Text fontSize='2xl'>午前：</Text>
-
         </Box>
         <Grid
-          h='400px'
-          templateRows='repeat(6, 1fr)'
-          templateColumns='repeat(5, 1fr)'
+          h='200px'
+          templateRows='repeat(4, 1fr)'
+          templateColumns='repeat(2, 1fr)'
           // gap={2}
-          
+          border='1px'
+          rounded='md'
         >
           {/* 午前記録 */}
-          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
-          <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/>
-          <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/>
-          <GridItem colSpan={4}  rowSpan={6} bg='tomato' border='1px'/>
-          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
-          <GridItem rowSpan={2} colSpan={1} bg='tomato' border='1px'/>
+          <GridItem rowSpan={1} colSpan={2} bg='color.mainTransparent' p={2}>
+            <Flex alignItems='center'>
+              <Text>2023年6月16日(金)</Text>
+              <Spacer />
+              <Text>記入者：</Text>
+              <Input placeholder='岡田' width='30%' bg="white"/>
+            </Flex>
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} border='1px'/>
+          <GridItem rowSpan={1} colSpan={1}  border='1px'/>
+          <GridItem rowSpan={1} colSpan={1} bg='tomato' />
+          <GridItem rowSpan={1} colSpan={1} bg='tomato' />
+          {/* <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/> */}
+
           {/* 午後記録 */}
         </Grid>
       </Layout>
