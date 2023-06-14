@@ -109,15 +109,15 @@ export default function Home() {
         <Box>
         </Box>
         <Grid
-          h='200px'
-          templateRows='repeat(4, 1fr)'
+          h="auto"
+          templateRows='repeat(7, 1fr)'
           templateColumns='repeat(2, 1fr)'
           // gap={2}
           border='1px'
           rounded='md'
         >
           {/* 午前記録 */}
-          <GridItem rowSpan={1} colSpan={2} bg='color.mainTransparent' p={2}>
+          <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent' p={2}>
             <Flex alignItems='center'>
               <Text>2023年6月16日(金)</Text>
               <Spacer />
@@ -125,14 +125,37 @@ export default function Home() {
               <Input placeholder='岡田' width='30%' bg="white"/>
             </Flex>
           </GridItem>
-          <GridItem rowSpan={1} colSpan={1} border='1px'/>
-          <GridItem rowSpan={1} colSpan={1}  border='1px'/>
-          <GridItem rowSpan={1} colSpan={1} bg='tomato' />
-          <GridItem rowSpan={1} colSpan={1} bg='tomato' />
-          {/* <GridItem colSpan={2} rowSpan={1} bg='papayawhip' border='1px'/> */}
-
-          {/* 午後記録 */}
+          <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
+            <Flex alignItems='center'>
+              <Text>活動</Text>
+              <Spacer />
+              <Text>午前：</Text>
+              <Input placeholder='コーヒー' width='60%' bg="white"/>
+            </Flex>
+          </GridItem>
+          <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
+            <Flex alignItems='center'>
+              <Spacer />
+              <Text>午後：</Text>
+              <Input placeholder='菓子製造' width='60%' bg="white"/>
+            </Flex>
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center' borderRight='1px' >
+            ご本人の様子
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center' >
+            支援、考察
+          </GridItem>
         </Grid>
+        <Flex>
+          <Box p='2' border='1px' w='50%'>
+          テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+          </Box>
+          <Box p='2' border='1px' w='50%'>
+          テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+          </Box>
+        </Flex>
+
       </Layout>
     </>
   );
