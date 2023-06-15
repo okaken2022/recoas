@@ -8,6 +8,10 @@ import {
   GridItem,
   Flex,
   Input,
+  UnorderedList,
+  ListItem,
+  Button,
+  ButtonGroup,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -21,6 +25,7 @@ import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
+import { AddIcon, EditIcon } from '@chakra-ui/icons';
 
 export default function Home() {
 
@@ -105,21 +110,20 @@ export default function Home() {
         <Heading color='color.sub' as='h2' mb="8" size='xl' noOfLines={1} >
           田中太郎さん
         </Heading>
-        {/* 支援記録 */}
-        <Box>
-        </Box>
+        {/* 記録全体 */}
         <Grid
           h="auto"
           templateRows='repeat(7, 1fr)'
           templateColumns='repeat(2, 1fr)'
           // gap={2}
           border='1px'
-          rounded='md'
+          borderTopRadius='md'
         >
-          {/* 午前記録 */}
-          <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent' p={2}>
+
+          {/* 日付 */}
+          <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
             <Flex alignItems='center'>
-              <Text>2023年6月16日(金)</Text>
+              <Text fontSize={{ base: 'md', md: 'xl' }}>2023年6月16日(金)</Text>
               <Spacer />
               <Text>記入者：</Text>
               <Input placeholder='岡田' width='30%' bg="white"/>
@@ -147,15 +151,63 @@ export default function Home() {
             支援、考察
           </GridItem>
         </Grid>
-        <Flex>
-          <Box p='2' border='1px' w='50%'>
-          テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-          </Box>
-          <Box p='2' border='1px' w='50%'>
-          テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-          </Box>
-        </Flex>
 
+        <UnorderedList listStyleType='none' ml='0' border='1px' borderBottomRadius='md'>
+          {/* {todos.map((todo) => ( */}
+            <ListItem key="">
+              <Flex>
+                <Box p='2'  w='50%' borderRight='1px'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2'  w='50%'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+            <ListItem key="">
+              <Flex>
+                <Box p='2'  w='50%' borderRight='1px'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2'  w='50%'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+            <ListItem key="">
+              <Flex>
+                <Box p='2'  w='50%' borderRight='1px'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2'  w='50%'>
+                </Box>
+              </Flex>
+            </ListItem>
+            <ListItem key="">
+              <Flex>
+                <Box p='2'  w='50%' borderRight='1px'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2'  w='50%'>
+                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+          {/* ))} */}
+        </UnorderedList>
+        <Flex p='1'>
+          <Spacer />
+          <ButtonGroup>
+            <Button size='sm' colorScheme='facebook'><AddIcon /></Button>
+            <Button size='sm' colorScheme='teal'><EditIcon /></Button>
+          </ButtonGroup>
+        </Flex>
+        <Flex p='1'>
+          <Spacer />
+          <ButtonGroup>
+            <Button size='sm'>保存してカレンダーに戻る</Button>
+          </ButtonGroup>
+        </Flex>
       </Layout>
     </>
   );
