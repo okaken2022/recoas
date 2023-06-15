@@ -6,7 +6,8 @@ export const theme = extendTheme({
   colors: {
     color: {
       main: "#0F9954",
-      mainTransparent : "rgba(15, 153, 84, 0.3)",
+      mainTransparent1 : "rgba(15, 153, 84, 0.5)",
+      mainTransparent2 : "rgba(15, 153, 84, 0.2)",
       sub: "#1a202c",
     },
   },
