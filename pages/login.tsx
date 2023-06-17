@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { Button, FormLabel, Input, VStack, Box, Text, Link } from '@chakra-ui/react';
+import { Button, FormLabel, Input, VStack, useToast } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { Header } from '@/components/Header';
 
@@ -26,13 +26,27 @@ export default function Login() {
   const router = useRouter();
 
   //login機能
+  const toast = useToast()
   const login = async (email: string, password: string) => {
     try {
       const UserCredential = await signInWithEmailAndPassword(auth, email, password);
       console.log('ログイン成功');
-      router.push('/');
+      router.push('/home');
+      toast({
+        title: 'ログインしました。',
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+      })
     } catch (e) {
       console.error(e);
+      toast({
+        title: 'ログインできませんでした。',
+        description: "メールアドレス、またはパスワードが異なります。",
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
     }
   };
 
