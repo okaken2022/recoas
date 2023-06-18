@@ -76,14 +76,17 @@ export default function Home() {
           title: 'Event',
           start: date,
         }));
-  
+        
         setEvents(newEvents);
       };
       
       fetchHolidays();
     }, []);
   }
+  console.log(events)
   CalendarPage();
+  
+  //カレンダー設定で指定した閉所日を、イベント一覧の配列から削除し、新たな配列を作成。その後カレンダーに表示。
 
   const renderEventContent = (eventInfo: EventContentArg) => {
     return (

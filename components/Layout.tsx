@@ -31,10 +31,17 @@ function Layout({ children }: {
           </Text>
         </Link>
 
-        {/* 利用者詳細 */}
+        {/* 記録詳細 */}
         <Link href='/customers/records/record'>
           <Text fontSize='l' color='blue'>
             記録詳細
+          </Text>
+        </Link>
+
+        {/* 利用者追加 */}
+        <Link href='/administrator/addCustomer'>
+          <Text fontSize='l' color='blue'>
+            利用者追加
           </Text>
         </Link>
       </Box>
