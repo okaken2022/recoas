@@ -12,6 +12,7 @@ import {
   Select,
   Wrap,
   WrapItem,
+  Text,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -21,12 +22,11 @@ import {
   collection,
   doc,
   setDoc,
-  deleteDoc,
-  serverTimestamp,
   orderBy,
   query,
   DocumentData,
   updateDoc,
+  addDoc,
 } from 'firebase/firestore';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -34,11 +34,13 @@ import { useState, useContext, useEffect, ChangeEvent } from 'react';
 import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import Layout from '@/components/Layout';
+import { Customer } from '@/types/customer';
 
 export default function Home() {
-  const [todos, setTodos] = useState<firestoreTodo[]>([]);
-  const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
-  const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
+  const [addCustomer, setAddCustomer] = useState<Customer>({ customerName: '', romaji: '', service: '生活介護' });
 
   {
     /* ログイン */
@@ -49,30 +51,24 @@ export default function Home() {
   const router: NextRouter = useRouter();
 
   {
-    /* todoにuidをつける */
+    /* 利用者追加 */
   }
-  const todoId = uuidv4();
-
-  {
-    /* todo追加 */
-  }
-  const createTodo = async (title: string, status: string) => {
+  const createCustomer = async (customerName: string, romaji: string, service: string) => {
     if (!currentUser) return;
-    if (title === '') return;
-    await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
-      id: todoId,
-      title: title,
-      status: status,
-      timestamp: serverTimestamp(),
+    if (customerName === '') return;
+    await addDoc(collection(db, 'customers'), {
+      customerName: customerName,
+      romaji: romaji,
+      service: service,
     });
-    console.log(todos);
+    console.log(customers);
   };
 
-  const onSubmit = ({ title, status }: { title: string; status: string }) => {
-    createTodo(title, status);
-    setTodo({ title: '', status: '未完了' });
-    console.log(todos);
-    setTodos(todos);
+  const onSubmit = ({ customerName, romaji, service }: { customerName: string; romaji: string; service: string }) => {
+    createCustomer(customerName, romaji, service);
+    setAddCustomer({ customerName: '', romaji: '', service: '生活介護' });
+    console.log(addCustomer);
+    setCustomers(customers);
   };
 
   // {
@@ -93,22 +89,22 @@ export default function Home() {
   // };
 
   {
-    /* ドキュメントを取得する */
+    /* 利用者一覧を取得する */
     /* orderByで並べ替え */
   }
   useEffect(() => {
     if (!currentUser) return;
     const q = query(
-      collection(db, 'users', currentUser.uid, 'todos'),
-      orderBy('timestamp', 'desc'),
+      collection(db, 'customers'),
+      orderBy('romaji', 'asc'),
     );
     const unSub = onSnapshot(q, async (snapshot) => {
-      setTodos(
+      setCustomers(
         snapshot.docs.map((doc) => ({
-          id: doc.id,
-          title: doc.data().title,
-          status: doc.data().status,
-          timestamp: doc.data().timestamp,
+          uid: doc.id,
+          customerName: doc.data().customerName,
+          romaji: doc.data().romaji,
+          service: doc.data().service,
         })),
       );
     });
@@ -118,92 +114,75 @@ export default function Home() {
   }, [currentUser]);
 
 
-  {
-    /* 進捗の更新 */
-  }
-  const updateTodo = async (todoId: string, newStatus: string) => {
-    if (!currentUser) return;
-    if (newStatus === '') return;
-    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
-      status: newStatus,
-    });
-    console.log(todos);
-  };
-
   return (
     <>
-      <Header />
-
-      {/* Todoの追加フォーム */}
-      <Box p='4' mb='4'>
-        <Wrap minWidth='max-content' alignItems='center' gap='2'>
-          <WrapItem w={{ base: '100%', md: '80%' }}>
+      <Layout>
+        <Heading color='color.sub' as='h2' mb="8" size='xl' noOfLines={1} >
+          利用者の追加
+        </Heading>
+        {/* 利用者の追加フォーム */}
+        <Box mb={12}>
+          <Flex alignItems='center' m='4'>
+            <Text w='20%'>利用者:</Text>
+            <Spacer/>
             <Input
-              // onCompositionStart={startComposition}
-              // onCompositionEnd={endComposition}
-              value={todo.title}
-              onChange={(e) => setTodo({ ...todo, title: e.target.value })}
+              ml={2}
+              w='80%'
+              value={addCustomer.customerName}
+              onChange={(e) => setAddCustomer({ ...addCustomer, customerName: e.target.value })}
               type='text'
-              id='name'
-              placeholder='Todoの追加'
-              // onKeyDown={(e) => handleKeyDown(e, todo)}
+              id='customer'
+              placeholder='田中 太郎'
             />
-          </WrapItem>
-          <WrapItem>
-            <Flex gap='2'>
-              <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
-                <option value='未完了'>未完了</option>
-                <option value='着手'>着手</option>
-                <option value='完了'>完了</option>
-              </Select>
-              <Button
-                colorScheme='teal'
-                onClick={() => {
-                  onSubmit(todo);
-                }}
-              >
-                <AddIcon />
-              </Button>
-            </Flex>
-          </WrapItem>
-        </Wrap>
-      </Box>
+          </Flex>
+          <Flex alignItems='center'  m='4'>
+            <Text w='20%'>ローマ字:</Text>
+            <Spacer/>
+            <Input
+                ml={2}
+                w='80%'
+                value={addCustomer.romaji}
+                onChange={(e) => setAddCustomer({ ...addCustomer, romaji: e.target.value })}
+                type='text'
+                id='customer'
+                placeholder='Tanaka Taro'
+              />
+          </Flex>
 
-      {/* Todoリスト */}
-      <UnorderedList listStyleType='none'>
-        {todos.map((todo) => (
-          <ListItem key={todo.id} p={4}>
-            <Wrap minWidth='max-content' alignItems='center' gap='2'>
-              <WrapItem p='2' width='60%'>
-                <Heading size='md'>{todo.title}</Heading>
-              </WrapItem>
-              <Spacer />
-              <WrapItem>
-                <Select
-                  width='140px'
-                  value={todo.status}
-                  onChange={(e) => {
-                    const newStatus = e.target.value;
-                    updateTodo(todo.id, newStatus);
+              <Flex alignItems='center'  m='4'>
+                <Text w='20%'>サービス:</Text>
+                <Select ml={2} width='200px' onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value })}>
+                  <option value='生活介護'>生活介護</option>
+                  <option value='多機能生活介護'>多機能生活介護</option>
+                  <option value='就労継続支援B型'>就労継続支援B型</option>
+                </Select>
+                <Spacer/>
+                <Button
+                  colorScheme='teal'
+                  onClick={() => {
+                    onSubmit(addCustomer);
                   }}
                 >
-                  <option value='未完了'>未完了</option>
-                  <option value='着手'>着手</option>
-                  <option value='完了'>完了</option>
-                </Select>
-                <ButtonGroup gap='2' ml='4'>
-                  <Link as={`/${todo.id}`} href='/[id]'>
-                    <Button colorScheme='blue'>
-                      <EditIcon />
-                    </Button>
-                  </Link>
-                </ButtonGroup>
-              </WrapItem>
-            </Wrap>
-            <Divider orientation='horizontal' mt='4' />
-          </ListItem>
-        ))}
-      </UnorderedList>
+                  <AddIcon />
+                </Button>
+              </Flex>
+        </Box>
+
+        {/* 利用者一覧 */}
+        <Text fontSize='2xl'>利用者一覧</Text>
+        <UnorderedList listStyleType='none'>
+          {customers.map((customer) => (
+            <ListItem key={customer.uid} p={4}  ml={0}>
+                  <Heading size='md'>{customer.customerName}</Heading>
+              <Divider orientation='horizontal' mt='4' />
+            </ListItem>
+          ))}
+        </UnorderedList>
+
+
+      </Layout>
+
+
     </>
   );
 }
