@@ -121,7 +121,7 @@ export default function Home() {
           利用者の追加
         </Heading>
         {/* 利用者の追加フォーム */}
-        <Box>
+        <Box mb={12}>
           <Flex alignItems='center' m='4'>
             <Text w='20%'>利用者:</Text>
             <Spacer/>
@@ -167,7 +167,9 @@ export default function Home() {
                 </Button>
               </Flex>
         </Box>
-        {/* Todoリスト */}
+
+        {/* 利用者一覧 */}
+        <Text fontSize='2xl'>利用者一覧</Text>
         <UnorderedList listStyleType='none'>
           {customers.map((customer) => (
             <ListItem key={customer.uid} p={4}  ml={0}>
