@@ -28,17 +28,22 @@ export const Header: React.FC = () => {
           </Button>
         </Flex>
       </Box>
-      <Box p={4} mb={{ base: '0', md: '8' }}>
-        {user ? (
-          <Text color='teal' fontWeight='bold' fontSize='s'>
-            ログイン中:{user?.email}
-          </Text>
-        ) : (
-          <Text color='teal' fontWeight='bold' fontSize='s'>
-            未ログイン
-          </Text>
-        )}
-      </Box>
+      <Flex>
+        
+        <Spacer />
+        {/* ログイン状態 */}
+        <Box p={4} mb={{ base: '0', md: '8' }}>
+          {user ? (
+            <Text color='teal' fontWeight='bold' fontSize='s'>
+              ログイン中:{user?.email}
+            </Text>
+          ) : (
+            <Text color='teal' fontWeight='bold' fontSize='s'>
+              未ログイン
+            </Text>
+          )}
+        </Box>
+      </Flex>
     </>
   );
 };
