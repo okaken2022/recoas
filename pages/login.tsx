@@ -26,7 +26,7 @@ export default function Login() {
   const router = useRouter();
 
   //login機能
-  const toast = useToast()
+  const toast = useToast();
   const login = async (email: string, password: string) => {
     try {
       const UserCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -37,16 +37,16 @@ export default function Login() {
         status: 'success',
         duration: 9000,
         isClosable: true,
-      })
+      });
     } catch (e) {
       console.error(e);
       toast({
         title: 'ログインできませんでした。',
-        description: "メールアドレス、またはパスワードが異なります。",
+        description: 'メールアドレス、またはパスワードが異なります。',
         status: 'error',
         duration: 9000,
         isClosable: true,
-      })
+      });
     }
   };
 

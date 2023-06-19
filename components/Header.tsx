@@ -29,7 +29,6 @@ export const Header: React.FC = () => {
         </Flex>
       </Box>
       <Flex>
-        
         <Spacer />
         {/* ログイン状態 */}
         <Box p={4} mb={{ base: '0', md: '8' }}>

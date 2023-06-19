@@ -38,9 +38,15 @@ import Layout from '@/components/Layout';
 import { Customer } from '@/types/customer';
 
 export default function Home() {
+  {
+    /* state */
+  }
   const [customers, setCustomers] = useState<Customer[]>([]);
-  // const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
-  const [addCustomer, setAddCustomer] = useState<Customer>({ customerName: '', romaji: '', service: '生活介護' });
+  const [addCustomer, setAddCustomer] = useState<Customer>({
+    customerName: '',
+    romaji: '',
+    service: '生活介護',
+  });
 
   {
     /* ログイン */
@@ -64,7 +70,15 @@ export default function Home() {
     console.log(customers);
   };
 
-  const onSubmit = ({ customerName, romaji, service }: { customerName: string; romaji: string; service: string }) => {
+  const onSubmit = ({
+    customerName,
+    romaji,
+    service,
+  }: {
+    customerName: string;
+    romaji: string;
+    service: string;
+  }) => {
     createCustomer(customerName, romaji, service);
     setAddCustomer({ customerName: '', romaji: '', service: '生活介護' });
     console.log(addCustomer);
@@ -94,10 +108,7 @@ export default function Home() {
   }
   useEffect(() => {
     if (!currentUser) return;
-    const q = query(
-      collection(db, 'customers'),
-      orderBy('romaji', 'asc'),
-    );
+    const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
     const unSub = onSnapshot(q, async (snapshot) => {
       setCustomers(
         snapshot.docs.map((doc) => ({
@@ -113,18 +124,17 @@ export default function Home() {
     };
   }, [currentUser]);
 
-
   return (
     <>
       <Layout>
-        <Heading color='color.sub' as='h2' mb="8" size='xl' noOfLines={1} >
+        <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
           利用者の追加
         </Heading>
         {/* 利用者の追加フォーム */}
         <Box mb={12}>
           <Flex alignItems='center' m='4'>
             <Text w='20%'>利用者:</Text>
-            <Spacer/>
+            <Spacer />
             <Input
               ml={2}
               w='80%'
@@ -135,54 +145,54 @@ export default function Home() {
               placeholder='田中 太郎'
             />
           </Flex>
-          <Flex alignItems='center'  m='4'>
+          <Flex alignItems='center' m='4'>
             <Text w='20%'>ローマ字:</Text>
-            <Spacer/>
+            <Spacer />
             <Input
-                ml={2}
-                w='80%'
-                value={addCustomer.romaji}
-                onChange={(e) => setAddCustomer({ ...addCustomer, romaji: e.target.value })}
-                type='text'
-                id='customer'
-                placeholder='Tanaka Taro'
-              />
+              ml={2}
+              w='80%'
+              value={addCustomer.romaji}
+              onChange={(e) => setAddCustomer({ ...addCustomer, romaji: e.target.value })}
+              type='text'
+              id='customer'
+              placeholder='Tanaka Taro'
+            />
           </Flex>
 
-              <Flex alignItems='center'  m='4'>
-                <Text w='20%'>サービス:</Text>
-                <Select ml={2} width='200px' onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value })}>
-                  <option value='生活介護'>生活介護</option>
-                  <option value='多機能生活介護'>多機能生活介護</option>
-                  <option value='就労継続支援B型'>就労継続支援B型</option>
-                </Select>
-                <Spacer/>
-                <Button
-                  colorScheme='teal'
-                  onClick={() => {
-                    onSubmit(addCustomer);
-                  }}
-                >
-                  <AddIcon />
-                </Button>
-              </Flex>
+          <Flex alignItems='center' m='4'>
+            <Text w='20%'>サービス:</Text>
+            <Select
+              ml={2}
+              width='200px'
+              onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value })}
+            >
+              <option value='生活介護'>生活介護</option>
+              <option value='多機能生活介護'>多機能生活介護</option>
+              <option value='就労継続支援B型'>就労継続支援B型</option>
+            </Select>
+            <Spacer />
+            <Button
+              colorScheme='teal'
+              onClick={() => {
+                onSubmit(addCustomer);
+              }}
+            >
+              <AddIcon />
+            </Button>
+          </Flex>
         </Box>
 
         {/* 利用者一覧 */}
         <Text fontSize='2xl'>利用者一覧</Text>
         <UnorderedList listStyleType='none'>
           {customers.map((customer) => (
-            <ListItem key={customer.uid} p={4}  ml={0}>
-                  <Heading size='md'>{customer.customerName}</Heading>
+            <ListItem key={customer.uid} p={4} ml={0}>
+              <Heading size='md'>{customer.customerName}</Heading>
               <Divider orientation='horizontal' mt='4' />
             </ListItem>
           ))}
         </UnorderedList>
-
-
       </Layout>
-
-
     </>
   );
 }
