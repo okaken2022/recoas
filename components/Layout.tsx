@@ -16,9 +16,9 @@ function Layout({ children }: {
         <Text fontSize='2xl'  mt='20'>
           開発用リンク
         </Text>
-        <Link href='/home'>
 
         {/* HOME */}
+        <Link href='/home'>
           <Text fontSize='l' color='blue'>
             HOME
           </Text>
@@ -44,6 +44,19 @@ function Layout({ children }: {
             利用者追加
           </Text>
         </Link>
+
+        <Text fontSize='2xl'  mt='20'>
+          やること
+        </Text>
+        <Text fontSize='l'>
+          記録のCRUD
+        </Text>
+        <Text fontSize='l'>
+          利用者別のルーティング
+        </Text>
+        <Text fontSize='l'>
+          ぱんくずリスト
+        </Text>
       </Box>
     </>
   );
