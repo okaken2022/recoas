@@ -11,6 +11,8 @@ import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
+import 'moment/locale/ja';
+import jaLocale from '@fullcalendar/core/locales/ja'; // 追加
 
 export default function Home() {
   {
@@ -131,6 +133,7 @@ export default function Home() {
           initialView='dayGridMonth'
           events={events}
           eventContent={renderEventContent}
+          locale={jaLocale} // FullCalendarの日本語表示
         />
       </Layout>
     </>
