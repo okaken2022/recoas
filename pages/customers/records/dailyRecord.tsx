@@ -28,6 +28,7 @@ import { EventContentArg } from '@fullcalendar/core';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { Record } from '@/types/recoad';
 import { DailyRecord } from '@/types/dailyRecord';
+import { addDoc, collection } from 'firebase/firestore';
 
 export default function Home() {
   {
@@ -48,6 +49,46 @@ export default function Home() {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
+
+  {
+    /* 記録母体保存 */
+  }
+  const createDailyRecord = async (start: string,
+  editor: string,
+  amWork: string,
+  pmWork: string,) => {
+    if (!currentUser) return;
+    if (start === '') return;
+    await addDoc(collection(db, 'customers'), {
+      start: start,
+      editor: editor,
+      amWork: amWork,
+      pmWork: pmWork,
+    });
+  };
+
+  const onSubmit = ({
+    start,
+    editor,
+    amWork,
+    pmWork
+  }: {
+    start: string;
+    editor: string;
+    amWork: string;
+    pmWork: string;
+  }) => {
+    createDailyRecord(start,
+      editor,
+      amWork,
+      pmWork);
+    setAddDailyRecord({start: '',
+      editor: '',
+      amWork: '',
+      pmWork: '',});
+    console.log(addDailyRecord);
+    setAddDailyRecord(addDailyRecord);
+  };
 
   return (
     <>
@@ -189,7 +230,9 @@ export default function Home() {
         <Flex p='1'>
           <Spacer />
           <ButtonGroup>
-            <Button size='sm'>保存してカレンダーに戻る</Button>
+            <Button size='sm' onClick={() => {
+                onSubmit(addDailyRecord);
+              }}>保存してカレンダーに戻る</Button>
           </ButtonGroup>
         </Flex>
       </Layout>

@@ -58,6 +58,7 @@ export default function Home() {
 
   {
     /* 利用者追加 */
+    // try, catch
   }
   const createCustomer = async (customerName: string, romaji: string, service: string) => {
     if (!currentUser) return;
