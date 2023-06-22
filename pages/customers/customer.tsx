@@ -12,7 +12,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
 import 'moment/locale/ja';
-import jaLocale from '@fullcalendar/core/locales/ja'; // 追加
+import jaLocale from '@fullcalendar/core/locales/ja';
 
 export default function Home() {
   {
@@ -80,8 +80,16 @@ export default function Home() {
       fetchHolidays();
     }, []);
   };
-  console.log(events);
+  
   CalendarPage();
+
+  const handleEventClick = (eventInfo: EventContentArg) => {
+    const clickedDate = eventInfo.event.start; // クリックされたイベントの日付を取得
+
+    // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
+    router.push(`/customers/records/dailyRecord/?date=${clickedDate}`);
+  };
+
 
   //カレンダー設定で指定した閉所日を、イベント一覧の配列から削除し、新たな配列を作成。その後カレンダーに表示。
 
@@ -89,7 +97,8 @@ export default function Home() {
     return (
       <div>
         <b>{eventInfo.timeText}</b>
-        <p>{eventInfo.event.title}</p>
+        <p style={{ backgroundColor: 'skyblue', padding: '2px',  cursor: 'pointer' }}
+            onClick={() => handleEventClick(eventInfo)}>{eventInfo.event.title}</p>
       </div>
     );
   };
