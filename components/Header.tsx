@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
     <>
       <Box bg='color.main' w='100%' p={4}>
         <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
-          <Link href='/home'>
+          <Link href='/'>
             <Text className='logo' fontSize='2xl'>
               recoAs
             </Text>

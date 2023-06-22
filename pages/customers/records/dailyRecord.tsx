@@ -30,7 +30,6 @@ import { Record } from '@/types/recoad';
 import { DailyRecord } from '@/types/dailyRecord';
 import { addDoc, collection } from 'firebase/firestore';
 
-
 export default function Home() {
   {
     /* state */
@@ -54,16 +53,18 @@ export default function Home() {
     /* ルーティング */
   }
   const router: NextRouter = useRouter();
-  const { date } = router.query as { date: string }; 
+  const { date } = router.query as { date: string };
   const formattedDate = moment(date).format('YYYY年M月D日 (ddd)');
 
   {
     /* 記録母体保存 */
   }
-  const createDailyRecord = async (start: string,
-  editor: string,
-  amWork: string,
-  pmWork: string,) => {
+  const createDailyRecord = async (
+    start: string,
+    editor: string,
+    amWork: string,
+    pmWork: string,
+  ) => {
     if (!currentUser) return;
     if (start === '') return;
     await addDoc(collection(db, 'customers'), {
@@ -78,21 +79,15 @@ export default function Home() {
     start,
     editor,
     amWork,
-    pmWork
+    pmWork,
   }: {
     start: string;
     editor: string;
     amWork: string;
     pmWork: string;
   }) => {
-    createDailyRecord(start,
-      editor,
-      amWork,
-      pmWork);
-    setAddDailyRecord({start: '',
-      editor: '',
-      amWork: '',
-      pmWork: '',});
+    createDailyRecord(start, editor, amWork, pmWork);
+    setAddDailyRecord({ start: '', editor: '', amWork: '', pmWork: '' });
     console.log(addDailyRecord);
     setAddDailyRecord(addDailyRecord);
   };
@@ -237,9 +232,14 @@ export default function Home() {
         <Flex p='1'>
           <Spacer />
           <ButtonGroup>
-            <Button size='sm' onClick={() => {
+            <Button
+              size='sm'
+              onClick={() => {
                 onSubmit(addDailyRecord);
-              }}>保存してカレンダーに戻る</Button>
+              }}
+            >
+              保存してカレンダーに戻る
+            </Button>
           </ButtonGroup>
         </Flex>
       </Layout>

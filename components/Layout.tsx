@@ -14,7 +14,7 @@ function Layout({ children }: { children: any }): JSX.Element {
         </Text>
 
         {/* HOME */}
-        <Link href='/home'>
+        <Link href='/'>
           <Text fontSize='l' color='blue'>
             HOME
           </Text>
