@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
     <>
       <Box bg='color.main' w='100%' p={4}>
         <Flex minWidth='max-content' color='white' alignItems='center' gap='2'>
-          <Link href='/home'>
+          <Link href='/'>
             <Text className='logo' fontSize='2xl'>
               recoAs
             </Text>
@@ -29,7 +29,6 @@ export const Header: React.FC = () => {
         </Flex>
       </Box>
       <Flex>
-        
         <Spacer />
         {/* ログイン状態 */}
         <Box p={4} mb={{ base: '0', md: '8' }}>

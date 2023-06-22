@@ -1,44 +1,25 @@
 import {
-  Input,
   Button,
-  UnorderedList,
-  ListItem,
   Box,
-  Divider,
-  Flex,
-  Heading,
-  Spacer,
-  ButtonGroup,
   Select,
   Wrap,
   WrapItem,
+  Text,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import { Header } from '@/components/Header';
 import {
-  onSnapshot,
   collection,
-  doc,
-  setDoc,
-  deleteDoc,
-  serverTimestamp,
   orderBy,
   query,
-  DocumentData,
-  updateDoc,
 } from 'firebase/firestore';
 
-import { v4 as uuidv4 } from 'uuid';
-import { useState, useContext, useEffect, ChangeEvent } from 'react';
-import Link from 'next/link';
+import { useState, useContext, useEffect } from 'react';
 import { Todo, firestoreTodo } from '@/types/todo';
-import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
+import Layout from '@/components/Layout';
 
 export default function Home() {
-  const [todos, setTodos] = useState<firestoreTodo[]>([]);
-  const [todo, setTodo] = useState<Todo>({ title: '', status: '未完了' });
-  const [editTodo, setEditTodo] = useState<Todo>({ title: '', status: '' });
 
   {
     /* ログイン */
@@ -48,182 +29,72 @@ export default function Home() {
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
 
-  {
-    /* todoにuidをつける */
-  }
-  const todoId = uuidv4();
-
-  {
-    /* todo追加 */
-  }
-  const createTodo = async (title: string, status: string) => {
-    if (!currentUser) return;
-    if (title === '') return;
-    await setDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
-      id: todoId,
-      title: title,
-      status: status,
-      timestamp: serverTimestamp(),
-    });
-    console.log(todos);
-  };
-
-  const onSubmit = ({ title, status }: { title: string; status: string }) => {
-    createTodo(title, status);
-    setTodo({ title: '', status: '未完了' });
-    console.log(todos);
-    setTodos(todos);
-  };
-
-  {
-    /* Enter押下で送信 */
-    /* 日本語変換中は送信しない */
-  }
-  const [composing, setComposition] = useState(false);
-  const startComposition = () => setComposition(true);
-  const endComposition = () => setComposition(false);
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    { title, status }: { title: string; status: string },
-  ) => {
-    if (e.key === 'Enter') {
-      if (composing) return;
-      onSubmit({ title, status });
-    }
-  };
-
-  {
-    /* ドキュメントを取得する */
-    /* orderByで並べ替え */
-  }
-  useEffect(() => {
-    if (!currentUser) return;
-    const q = query(
-      collection(db, 'users', currentUser.uid, 'todos'),
-      orderBy('timestamp', 'desc'),
-    );
-    const unSub = onSnapshot(q, async (snapshot) => {
-      setTodos(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          title: doc.data().title,
-          status: doc.data().status,
-          timestamp: doc.data().timestamp,
-        })),
-      );
-    });
-    return () => {
-      unSub();
-    };
-  }, [currentUser]);
-
-  {
-    /* todo削除 */
-  }
-  const deleteTodo = async (todo: firestoreTodo) => {
-    console.log(todo);
-    if (!currentUser) return;
-    const todoRef = doc(db, 'users', currentUser.uid, 'todos', todo.id);
-    await deleteDoc(todoRef)
-      .then(() => {
-        console.log('success');
-      })
-      .catch((e) => {
-        console.log(e.message);
-      });
-    // setTodosで対象のtodoを消す
-    setTodos(todos.filter((item) => item.id !== todo.id));
-  };
-
-  {
-    /* 進捗の更新 */
-  }
-  const updateTodo = async (todoId: string, newStatus: string) => {
-    if (!currentUser) return;
-    if (newStatus === '') return;
-    await updateDoc(doc(db, 'users', currentUser.uid, 'todos', todoId), {
-      status: newStatus,
-    });
-    console.log(todos);
-  };
-
   return (
     <>
-      <Header />
+      <Layout>
+        {/* お知らせ */}
+        <Text fontSize='2xl'>お知らせ</Text>
+        <Box mt='4' p='4' border='1px' rounded='md' color='#333'>
+          <Text>4/28 田中さんの午前の記録がありません。</Text>
+          <Text>4/28 田中さんの工賃の記録がありません。</Text>
+          <Text>4/28 田中さんの記録がありません。</Text>
+        </Box>
 
-      {/* Todoの追加フォーム */}
-      <Box p='4' mb='4'>
-        <Wrap minWidth='max-content' alignItems='center' gap='2'>
-          <WrapItem w={{ base: '100%', md: '80%' }}>
-            <Input
-              onCompositionStart={startComposition}
-              onCompositionEnd={endComposition}
-              value={todo.title}
-              onChange={(e) => setTodo({ ...todo, title: e.target.value })}
-              type='text'
-              id='name'
-              placeholder='Todoの追加'
-              onKeyDown={(e) => handleKeyDown(e, todo)}
-            />
+        {/* 利用者一覧 */}
+        <Box mt='20'>
+          <Text fontSize='2xl'>利用者一覧</Text>
+        </Box>
+        <Wrap mt='4' spacing='3%' justify='center'>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select w='100%' placeholder='生活介護'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
           </WrapItem>
-          <WrapItem>
-            <Flex gap='2'>
-              <Select width='140px' onChange={(e) => setTodo({ ...todo, status: e.target.value })}>
-                <option value='未完了'>未完了</option>
-                <option value='着手'>着手</option>
-                <option value='完了'>完了</option>
-              </Select>
-              <Button
-                colorScheme='teal'
-                onClick={() => {
-                  onSubmit(todo);
-                }}
-              >
-                <AddIcon />
-              </Button>
-            </Flex>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select placeholder='多機能 生活介護'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
+          </WrapItem>
+          <WrapItem w={{ base: '100%', md: '30%' }}>
+            <Select placeholder='就労継続支援B型'>
+              <option value='option1'>田中</option>
+              <option value='option2'>山田</option>
+              <option value='option3'>佐藤</option>
+            </Select>
           </WrapItem>
         </Wrap>
-      </Box>
 
-      {/* Todoリスト */}
-      <UnorderedList listStyleType='none'>
-        {todos.map((todo) => (
-          <ListItem key={todo.id} p={4}>
-            <Wrap minWidth='max-content' alignItems='center' gap='2'>
-              <WrapItem p='2' width='60%'>
-                <Heading size='md'>{todo.title}</Heading>
-              </WrapItem>
-              <Spacer />
-              <WrapItem>
-                <Select
-                  width='140px'
-                  value={todo.status}
-                  onChange={(e) => {
-                    const newStatus = e.target.value;
-                    updateTodo(todo.id, newStatus);
-                  }}
-                >
-                  <option value='未完了'>未完了</option>
-                  <option value='着手'>着手</option>
-                  <option value='完了'>完了</option>
-                </Select>
-                <ButtonGroup gap='2' ml='4'>
-                  <Button colorScheme='red' onClick={() => deleteTodo(todo)}>
-                    <DeleteIcon />
-                  </Button>
-                  <Link as={`/${todo.id}`} href='/[id]'>
-                    <Button colorScheme='blue'>
-                      <EditIcon />
-                    </Button>
-                  </Link>
-                </ButtonGroup>
-              </WrapItem>
-            </Wrap>
-            <Divider orientation='horizontal' mt='4' />
-          </ListItem>
-        ))}
-      </UnorderedList>
+        {/* 管理者メニュー */}
+        <Box mt='20'>
+          <Text fontSize='2xl'>管理者メニュー</Text>
+          <Wrap mt='4' spacing='3%' justify='center'>
+            <WrapItem w={{ base: '100%', md: '30%' }}>
+              <Button>
+                {/* <FontAwesomeIcon icon={faUser}>
+                  <i className="fa-solid fa-user" />
+                </FontAwesomeIcon> */}
+                ユーザー一覧
+              </Button>
+            </WrapItem>
+            <WrapItem w={{ base: '100%', md: '30%' }}>
+              <Button>
+                <CalendarIcon />
+                カレンダー設定
+              </Button>
+            </WrapItem>
+            <WrapItem w={{ base: '100%', md: '30%' }}>
+              <Button>
+                <AddIcon />
+                利用者を追加する
+              </Button>
+            </WrapItem>
+          </Wrap>
+        </Box>
+      </Layout>
     </>
   );
 }
