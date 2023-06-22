@@ -30,6 +30,7 @@ import { Record } from '@/types/recoad';
 import { DailyRecord } from '@/types/dailyRecord';
 import { addDoc, collection } from 'firebase/firestore';
 
+
 export default function Home() {
   {
     /* state */
@@ -48,7 +49,13 @@ export default function Home() {
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
+
+  {
+    /* ルーティング */
+  }
   const router: NextRouter = useRouter();
+  const { date } = router.query as { date: string }; 
+  const formattedDate = moment(date).format('YYYY年M月D日 (ddd)');
 
   {
     /* 記録母体保存 */
@@ -108,7 +115,7 @@ export default function Home() {
           {/* 日付 */}
           <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
             <Flex alignItems='center'>
-              <Text fontSize={{ base: 'md', md: 'xl' }}>2023年6月16日(金)</Text>
+              <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
               <Spacer />
 
               {/* 記入者 */}

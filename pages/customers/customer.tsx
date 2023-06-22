@@ -87,7 +87,10 @@ export default function Home() {
     const clickedDate = eventInfo.event.start; // クリックされたイベントの日付を取得
 
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
-    router.push(`/customers/records/dailyRecord/?date=${clickedDate}`);
+    router.push({
+      pathname: `/customers/records/dailyRecord/`, // ルーティング先のパスを指定
+      query: { date: clickedDate.toISOString() }, // クエリパラメータとして日付情報を渡す
+    });
   };
 
 
