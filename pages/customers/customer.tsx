@@ -84,7 +84,7 @@ export default function Home() {
   CalendarPage();
 
   const handleEventClick = (eventInfo: EventContentArg) => {
-    const clickedDate = eventInfo.event.start; // クリックされたイベントの日付を取得
+    const clickedDate = eventInfo.event.start as Date;; // クリックされたイベントの日付を取得
 
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
