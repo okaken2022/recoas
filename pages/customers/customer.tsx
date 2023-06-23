@@ -1,6 +1,7 @@
 import { Heading, Spacer, VStack, Text } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
+import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 
@@ -22,7 +23,7 @@ export default function Home() {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
-
+  console.log(currentUser);
   {
     /* FullCalendar 土日祝日を除いた日付をイベントとして配列を作成 */
   }
@@ -83,14 +84,26 @@ export default function Home() {
   
   CalendarPage();
 
-  const handleEventClick = (eventInfo: EventContentArg) => {
+  const handleEventClick = async (eventInfo: EventContentArg) => {
     const clickedDate = eventInfo.event.start as Date;; // クリックされたイベントの日付を取得
+    const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
 
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
       pathname: `/customers/records/dailyRecord/`, // ルーティング先のパスを指定
       query: { date: clickedDate.toISOString() }, // クエリパラメータとして日付情報を渡す
     });
+
+    // Firestoreのコレクションを作成
+  const db = getFirestore();
+  const recordsCollectionRef = collection(db, 'customers', 'FXR6E98YoncDuNYrMkXk', 'records');
+  const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
+
+  // コレクションが存在しない場合のみ追加
+  const monthSnapshot = await getDoc(monthDocumentRef);
+  if (!monthSnapshot.exists()) {
+    await setDoc(monthDocumentRef, {});
+  }
   };
 
 
@@ -138,7 +151,7 @@ export default function Home() {
         </VStack>
 
         {/* 利用日カレンダー */}
-        <Text fontSize='2xl'>利用日カレンダー</Text>
+        <Text fontSize='2xl'>記録一覧</Text>
 
         <FullCalendar
           plugins={[dayGridPlugin]}
