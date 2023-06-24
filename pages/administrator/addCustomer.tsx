@@ -35,7 +35,7 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { Customer } from '@/types/customer';
+import { Customer, ServiceType } from '@/types/customer';
 
 export default function Home() {
   {
@@ -85,23 +85,6 @@ export default function Home() {
     console.log(addCustomer);
     setCustomers(customers);
   };
-
-  // {
-  //   /* Enter押下で送信 */
-  //   /* 日本語変換中は送信しない */
-  // }
-  // const [composing, setComposition] = useState(false);
-  // const startComposition = () => setComposition(true);
-  // const endComposition = () => setComposition(false);
-  // const handleKeyDown = (
-  //   e: React.KeyboardEvent<HTMLInputElement>,
-  //   { title, status }: { title: string; status: string },
-  // ) => {
-  //   if (e.key === 'Enter') {
-  //     if (composing) return;
-  //     onSubmit({ title, status });
-  //   }
-  // };
 
   {
     /* 利用者一覧を取得する */
@@ -165,7 +148,7 @@ export default function Home() {
             <Select
               ml={2}
               width='200px'
-              onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value })}
+              onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value as ServiceType })}
             >
               <option value='生活介護'>生活介護</option>
               <option value='多機能生活介護'>多機能生活介護</option>

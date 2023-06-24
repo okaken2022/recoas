@@ -81,11 +81,11 @@ export default function Home() {
       fetchHolidays();
     }, []);
   };
-  
+
   CalendarPage();
 
   const handleEventClick = async (eventInfo: EventContentArg) => {
-    const clickedDate = eventInfo.event.start as Date;; // クリックされたイベントの日付を取得
+    const clickedDate = eventInfo.event.start as Date; // クリックされたイベントの日付を取得
     const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
 
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
@@ -95,17 +95,16 @@ export default function Home() {
     });
 
     // Firestoreのコレクションを作成
-  const db = getFirestore();
-  const recordsCollectionRef = collection(db, 'customers', 'FXR6E98YoncDuNYrMkXk', 'records');
-  const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
+    const db = getFirestore();
+    const recordsCollectionRef = collection(db, 'customers', 'FXR6E98YoncDuNYrMkXk', 'records');
+    const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
 
-  // コレクションが存在しない場合のみ追加
-  const monthSnapshot = await getDoc(monthDocumentRef);
-  if (!monthSnapshot.exists()) {
-    await setDoc(monthDocumentRef, {});
-  }
+    // コレクションが存在しない場合のみ追加
+    const monthSnapshot = await getDoc(monthDocumentRef);
+    if (!monthSnapshot.exists()) {
+      await setDoc(monthDocumentRef, {});
+    }
   };
-
 
   //カレンダー設定で指定した閉所日を、イベント一覧の配列から削除し、新たな配列を作成。その後カレンダーに表示。
 
@@ -113,8 +112,12 @@ export default function Home() {
     return (
       <div>
         <b>{eventInfo.timeText}</b>
-        <p style={{ backgroundColor: 'skyblue', padding: '2px',  cursor: 'pointer' }}
-            onClick={() => handleEventClick(eventInfo)}>{eventInfo.event.title}</p>
+        <p
+          style={{ backgroundColor: 'skyblue', padding: '2px', cursor: 'pointer' }}
+          onClick={() => handleEventClick(eventInfo)}
+        >
+          {eventInfo.event.title}
+        </p>
       </div>
     );
   };
