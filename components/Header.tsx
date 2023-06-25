@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
           </Link>
           <Spacer />
 
-          <Button ml='20px' colorScheme='#fff' onClick={logout}>
+          <Button p ={0} ml='20px' colorScheme='#fff' onClick={logout}>
             ログアウト
           </Button>
         </Flex>

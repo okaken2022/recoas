@@ -3,6 +3,13 @@ import { extendTheme } from '@chakra-ui/react';
 
 // 2. Call `extendTheme` and pass your custom values
 export const theme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        backgroundColor: '#FFFAFAF',
+      },
+    },
+  },
   colors: {
     color: {
       main: '#0F9954',
