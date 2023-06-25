@@ -30,7 +30,7 @@ import { Record } from '@/types/recoad';
 import { DailyRecord } from '@/types/dailyRecord';
 import { addDoc, collection } from 'firebase/firestore';
 
-export default function Record() {
+export default function RecordPage() {
   {
     /* state */
   }

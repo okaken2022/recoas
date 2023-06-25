@@ -1,4 +1,4 @@
-import { Heading, Spacer, VStack, Text } from '@chakra-ui/react';
+import { Heading, Spacer, VStack, Text, Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { getFirestore, collection, addDoc, doc, setDoc, getDoc, query, orderBy, onSnapshot, DocumentData } from 'firebase/firestore';
@@ -185,14 +185,26 @@ export default function Customer() {
 
         {/* 利用日カレンダー */}
         <Text className='head' fontSize='2xl' mb='4'>記録一覧</Text>
-
-        <FullCalendar
-          plugins={[dayGridPlugin]}
-          initialView='dayGridMonth'
-          events={events}
-          eventContent={renderEventContent}
-          locale={jaLocale} // FullCalendarの日本語表示
-        />
+        <Tabs size='md' variant='enclosed'>
+          <TabList>
+            <Tab>カレンダー</Tab>
+            <Tab>リスト表示</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+                <FullCalendar
+                  plugins={[dayGridPlugin]}
+                  initialView='dayGridMonth'
+                  events={events}
+                  eventContent={renderEventContent}
+                  locale={jaLocale} // FullCalendarの日本語表示
+                />
+            </TabPanel>
+            <TabPanel>
+              <p>リスト表示予定</p>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </Layout>
     </>
   );
