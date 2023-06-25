@@ -95,7 +95,7 @@ export default function Home() {
         </Box>
 
         {/* 利用者一覧 */}
-        <Box mt='20'>
+        <Box mt='16'>
           <Text className='head' fontSize='2xl'>利用者一覧</Text>
         </Box>
         <Wrap mt='4' spacing='3%' justify='center'>
@@ -122,7 +122,7 @@ export default function Home() {
         </Wrap>
 
         {/* 管理者メニュー */}
-        <Box mt='20'>
+        <Box mt='16'>
           <Text className='head' fontSize='2xl'>管理者メニュー</Text>
           <Wrap mt='4' spacing='3%' justify='center'>
             <WrapItem w={{ base: '100%', md: '30%' }}>

@@ -1,7 +1,7 @@
 import { Heading, Spacer, VStack, Text } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import { getFirestore, collection, addDoc, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, doc, setDoc, getDoc, query, orderBy, onSnapshot, DocumentData } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 
@@ -15,7 +15,11 @@ import { EventContentArg } from '@fullcalendar/core';
 import 'moment/locale/ja';
 import jaLocale from '@fullcalendar/core/locales/ja';
 
-export default function Home() {
+
+
+export default function Customer() {
+  const [events, setEvents] = useState<Event[]>([]);
+
   {
     /* ログイン */
   }
@@ -24,7 +28,83 @@ export default function Home() {
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
 
+  {
+    /* 利用者情報取得 */
+  }
+  const {id: customerId} = router.query; // クエリパラメーターからcustomerIdを取得
+  console.log(customerId)
+  const [customer, setCustomer] = useState<DocumentData | null>(null);
   
+  const fetchCustomer = async () => {
+    const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
+    const unSub = onSnapshot(q, (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        const customerData = doc.data();
+        if (doc.id === customerId) {
+          setCustomer(customerData);
+        }
+      });
+    });
+
+    return () => {
+      unSub();
+    };
+  };
+
+
+  const fetchHolidays = async () => {
+    // Google Calendar APIで祝日情報を取得
+    const response = await axios.get(
+      'https://www.googleapis.com/calendar/v3/calendars/ja.japanese%23holiday%40group.v.calendar.google.com/events',
+      {
+        params: {
+          key: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
+          timeMin: moment().startOf('year').toISOString(),
+          timeMax: moment().endOf('year').toISOString(),
+          singleEvents: true,
+          orderBy: 'startTime',
+        },
+      },
+    );
+
+    // 取得した祝日情報から日付の配列を作成
+    const holidays = response.data.items.map((item: any) =>
+      moment(item.start.date).format('YYYY-MM-DD'),
+    );
+
+    // 土日と祝日を除いた日付の配列を作成
+    const dates = [];
+    const currentDate = moment().startOf('year');
+    const endDate = moment().endOf('year');
+    while (currentDate.isSameOrBefore(endDate)) {
+      const dayOfWeek = currentDate.day();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const isHoliday = holidays.includes(currentDate.format('YYYY-MM-DD'));
+      if (!isWeekend && !isHoliday) {
+        dates.push(currentDate.format('YYYY-MM-DD'));
+      }
+      currentDate.add(1, 'day');
+    }
+
+    // 日付ごとにイベントオブジェクトを作成
+    const newEvents: Event[] = dates.map((date) => ({
+      title: 'Event',
+      start: date,
+    }));
+
+    setEvents(newEvents);
+  };
+
+  useEffect(() => {
+    if (customerId) {
+      fetchCustomer();
+      fetchHolidays();
+    }
+  }, [customerId]);
+
+  if (!customer) {
+    return <div>Loading...</div>;
+  }
 
   {
     /* FullCalendar 土日祝日を除いた日付をイベントとして配列を作成 */
@@ -33,58 +113,6 @@ export default function Home() {
     title: string;
     start: string;
   }
-  const [events, setEvents] = useState<Event[]>([]);
-
-  const CalendarPage = () => {
-    useEffect(() => {
-      const fetchHolidays = async () => {
-        // Google Calendar APIで祝日情報を取得
-        const response = await axios.get(
-          'https://www.googleapis.com/calendar/v3/calendars/ja.japanese%23holiday%40group.v.calendar.google.com/events',
-          {
-            params: {
-              key: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
-              timeMin: moment().startOf('year').toISOString(),
-              timeMax: moment().endOf('year').toISOString(),
-              singleEvents: true,
-              orderBy: 'startTime',
-            },
-          },
-        );
-
-        // 取得した祝日情報から日付の配列を作成
-        const holidays = response.data.items.map((item: any) =>
-          moment(item.start.date).format('YYYY-MM-DD'),
-        );
-
-        // 土日と祝日を除いた日付の配列を作成
-        const dates = [];
-        const currentDate = moment().startOf('year');
-        const endDate = moment().endOf('year');
-        while (currentDate.isSameOrBefore(endDate)) {
-          const dayOfWeek = currentDate.day();
-          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-          const isHoliday = holidays.includes(currentDate.format('YYYY-MM-DD'));
-          if (!isWeekend && !isHoliday) {
-            dates.push(currentDate.format('YYYY-MM-DD'));
-          }
-          currentDate.add(1, 'day');
-        }
-
-        // 日付ごとにイベントオブジェクトを作成
-        const newEvents: Event[] = dates.map((date) => ({
-          title: 'Event',
-          start: date,
-        }));
-
-        setEvents(newEvents);
-      };
-
-      fetchHolidays();
-    }, []);
-  };
-  CalendarPage();
-
 
   {
     /* FullCalendar 月別のコレクション追加 */
@@ -95,13 +123,13 @@ export default function Home() {
 
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
-      pathname: `/customers/records/dailyRecord/`, // ルーティング先のパスを指定
+      pathname: `/customers/${customerId}/records/`, // ルーティング先のパスを指定
       query: { date: clickedDate.toISOString() }, // クエリパラメータとして日付情報を渡す
     });
 
     // Firestoreのコレクションを作成
     const db = getFirestore();
-    const recordsCollectionRef = collection(db, 'customers', 'FXR6E98YoncDuNYrMkXk', 'records');
+    const recordsCollectionRef = collection(db, 'customers', customerId as string , 'records');
     const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
 
     // コレクションが存在しない場合のみ追加
@@ -130,8 +158,8 @@ export default function Home() {
   return (
     <>
       <Layout>
-        <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
-          田中太郎さん
+        <Heading className='title' color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
+          {customer.customerName}さん
         </Heading>
         {/* 支援目標 */}
         <Text className='head' fontSize='2xl'>支援目標</Text>
