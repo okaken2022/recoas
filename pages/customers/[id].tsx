@@ -23,7 +23,9 @@ export default function Home() {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
-  console.log(currentUser);
+
+  
+
   {
     /* FullCalendar 土日祝日を除いた日付をイベントとして配列を作成 */
   }
@@ -81,9 +83,12 @@ export default function Home() {
       fetchHolidays();
     }, []);
   };
-
   CalendarPage();
 
+
+  {
+    /* FullCalendar 月別のコレクション追加 */
+  }
   const handleEventClick = async (eventInfo: EventContentArg) => {
     const clickedDate = eventInfo.event.start as Date; // クリックされたイベントの日付を取得
     const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得

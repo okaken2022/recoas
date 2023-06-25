@@ -56,8 +56,17 @@ export default function Home() {
     };
   }, [currentUser]);
 
-  console.log(allCustomersByService);
+  {
+    /* 利用者名をクリックして、記録一覧ページに遷移 */
+  }
+  const handleCustomerClick = (
+    customerId: string | undefined
+  ) => {
+    console.log(customerId)
+    router.push(`/customers/${customerId}`);
+  };
 
+  
   {
     /* サービスごとに異なる背景色をあてる */
   }
@@ -96,9 +105,14 @@ export default function Home() {
               w='100%'
               placeholder={service}
               bg={getServiceBackgroundColor(service)}
+              onChange={(event) => handleCustomerClick(event.target.value)}
               >
                 {customers.map((customer) => (
-                  <option value={customer.uid} key={customer.uid}>
+                  <option
+                  value={customer.uid}
+                  key={customer.uid}
+                  
+                  >
                     {customer.customerName}
                   </option>
                 ))}
