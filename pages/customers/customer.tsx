@@ -129,7 +129,7 @@ export default function Home() {
           田中太郎さん
         </Heading>
         {/* 支援目標 */}
-        <Text fontSize='2xl'>支援目標</Text>
+        <Text className='head' fontSize='2xl'>支援目標</Text>
         <VStack
           align='start'
           w='100%'
@@ -138,9 +138,6 @@ export default function Home() {
           mt='4'
           mb='20'
           p='4'
-          border='1px'
-          rounded='md'
-          color='#333'
         >
           <Text fontSize='xl'>1.日常生活のスキルの向上</Text>
           <Text>
@@ -154,7 +151,7 @@ export default function Home() {
         </VStack>
 
         {/* 利用日カレンダー */}
-        <Text fontSize='2xl'>記録一覧</Text>
+        <Text className='head' fontSize='2xl' mb='4'>記録一覧</Text>
 
         <FullCalendar
           plugins={[dayGridPlugin]}

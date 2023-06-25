@@ -111,9 +111,7 @@ export default function Home() {
   return (
     <>
       <Layout>
-        <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
-          利用者の追加
-        </Heading>
+      <Text className='head' fontSize='2xl'>利用者の追加</Text>
         {/* 利用者の追加フォーム */}
         <Box mb={12}>
           <Flex alignItems='center' m='4'>
@@ -167,7 +165,7 @@ export default function Home() {
         </Box>
 
         {/* 利用者一覧 */}
-        <Text fontSize='2xl'>利用者一覧</Text>
+        <Text className='head'  fontSize='2xl'>利用者情報の編集</Text>
         <UnorderedList listStyleType='none'>
           {customers.map((customer) => (
             <ListItem key={customer.uid} p={4} ml={0}>

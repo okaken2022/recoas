@@ -8,3 +8,9 @@
 .logo {
   font-family: 'Montserrat', sans-serif;
 }
+.head {
+  padding: 0.25em;/*文字周りの余白*/
+  color: #494949;/*文字色*/
+  background: rgba(15, 153, 84, 0.2);/*背景色*/
+  border-left: solid 5px #0F9954;/*左線（実線 太さ 色）*/
+}

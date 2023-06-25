@@ -58,12 +58,28 @@ export default function Home() {
 
   console.log(allCustomersByService);
 
+  {
+    /* サービスごとに異なる背景色をあてる */
+  }
+  function getServiceBackgroundColor(service: string) {
+    switch (service) {
+      case '生活介護':
+        return 'red.200';
+      case '多機能生活介護':
+        return 'blue.200';
+      case '就労継続支援B型':
+        return 'green.200';
+      default:
+        return 'gray.200';
+    }
+  }
+  
   return (
     <>
       <Layout>
         {/* お知らせ */}
-        <Text fontSize='2xl'>お知らせ</Text>
-        <Box mt='4' p='4' border='1px' rounded='md' color='#333'>
+        <Text className='head' fontSize='2xl'>お知らせ</Text>
+        <Box mt='4' p='4'>
           <Text>4/28 田中さんの午前の記録がありません。</Text>
           <Text>4/28 田中さんの工賃の記録がありません。</Text>
           <Text>4/28 田中さんの記録がありません。</Text>
@@ -71,12 +87,16 @@ export default function Home() {
 
         {/* 利用者一覧 */}
         <Box mt='20'>
-          <Text fontSize='2xl'>利用者一覧</Text>
+          <Text className='head' fontSize='2xl'>利用者一覧</Text>
         </Box>
         <Wrap mt='4' spacing='3%' justify='center'>
           {Object.entries(allCustomersByService).map(([service, customers]) => (
             <WrapItem w={{ base: '100%', md: '30%' }} key={service}>
-              <Select w='100%' placeholder={service}>
+              <Select
+              w='100%'
+              placeholder={service}
+              bg={getServiceBackgroundColor(service)}
+              >
                 {customers.map((customer) => (
                   <option value={customer.uid} key={customer.uid}>
                     {customer.customerName}
@@ -89,10 +109,10 @@ export default function Home() {
 
         {/* 管理者メニュー */}
         <Box mt='20'>
-          <Text fontSize='2xl'>管理者メニュー</Text>
+          <Text className='head' fontSize='2xl'>管理者メニュー</Text>
           <Wrap mt='4' spacing='3%' justify='center'>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button>
+              <Button w='100%'>
                 {/* <FontAwesomeIcon icon={faUser}>
                   <i className="fa-solid fa-user" />
                 </FontAwesomeIcon> */}
@@ -100,14 +120,14 @@ export default function Home() {
               </Button>
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button>
-                <CalendarIcon />
+              <Button w='100%'>
+                <CalendarIcon mr='2'/>
                 カレンダー設定
               </Button>
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button>
-                <AddIcon />
+              <Button w='100%'>
+                <AddIcon mr='2' />
                 利用者を追加する
               </Button>
             </WrapItem>
