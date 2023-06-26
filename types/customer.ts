@@ -3,6 +3,13 @@ export type Customer = {
   customerName: string;
   romaji: string;
   service: ServiceType;
+};
+
+export type AddCustomer = {
+  uid?: string;
+  customerName: string;
+  romaji: string;
+  service: ServiceType;
   targetOfSupport1: string;
   targetOfSupport2: string;
   targetOfSupport3: string;

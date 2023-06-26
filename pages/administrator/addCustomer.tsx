@@ -36,14 +36,14 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { Customer, ServiceType } from '@/types/customer';
+import { AddCustomer, ServiceType } from '@/types/customer';
 
 export default function Home() {
   {
     /* state */
   }
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [addCustomer, setAddCustomer] = useState<Customer>({
+  const [customers, setCustomers] = useState<AddCustomer[]>([]);
+  const [addCustomer, setAddCustomer] = useState<AddCustomer>({
     customerName: '',
     romaji: '',
     service: '生活介護',
@@ -67,12 +67,17 @@ export default function Home() {
     /* 利用者追加 */
     // try, catch
   }
-  const createCustomer = async (customerName: string, romaji: string, service: string,targetOfSupport1: string,
+  const createCustomer = async (
+    customerName: string,
+    romaji: string,
+    service: string,
+    targetOfSupport1: string,
     targetOfSupport2: string,
     targetOfSupport3: string,
     detailOfSupport1: string,
     detailOfSupport2: string,
-    detailOfSupport3: string,) => {
+    detailOfSupport3: string,
+  ) => {
     if (!currentUser) return;
     if (customerName === '') return;
     await addDoc(collection(db, 'customers'), {
@@ -103,25 +108,35 @@ export default function Home() {
     customerName: string;
     romaji: string;
     service: string;
-    targetOfSupport1: string,
-    targetOfSupport2: string,
-    targetOfSupport3: string,
-    detailOfSupport1: string,
-    detailOfSupport2: string,
-    detailOfSupport3: string,
+    targetOfSupport1: string;
+    targetOfSupport2: string;
+    targetOfSupport3: string;
+    detailOfSupport1: string;
+    detailOfSupport2: string;
+    detailOfSupport3: string;
   }) => {
-    createCustomer(customerName, romaji, service, targetOfSupport1,
+    createCustomer(
+      customerName,
+      romaji,
+      service,
+      targetOfSupport1,
       targetOfSupport2,
       targetOfSupport3,
       detailOfSupport1,
       detailOfSupport2,
-      detailOfSupport3,);
-    setAddCustomer({ customerName: '', romaji: '', service: '生活介護', targetOfSupport1: '',
-    targetOfSupport2: '',
-    targetOfSupport3: '',
-    detailOfSupport1: '',
-    detailOfSupport2: '',
-    detailOfSupport3: '',});
+      detailOfSupport3,
+    );
+    setAddCustomer({
+      customerName: '',
+      romaji: '',
+      service: '生活介護',
+      targetOfSupport1: '',
+      targetOfSupport2: '',
+      targetOfSupport3: '',
+      detailOfSupport1: '',
+      detailOfSupport2: '',
+      detailOfSupport3: '',
+    });
     console.log(addCustomer);
     setCustomers(customers);
   };
@@ -157,11 +172,15 @@ export default function Home() {
   return (
     <>
       <Layout>
-      <Text className='head' fontSize='2xl'>利用者の追加</Text>
+        <Text className='head' fontSize='2xl'>
+          利用者の追加
+        </Text>
         {/* 利用者の追加フォーム */}
-        <Text className='lead' fontSize='xl' m='4'>利用者情報</Text>
+        <Text className='lead' fontSize='xl' m='4'>
+          利用者情報
+        </Text>
         <Box mb={12}>
-          <Box  className='text_card' p="2">
+          <Box className='text_card' p='2'>
             <Flex alignItems='center' m='4'>
               <Text w='20%'>利用者:</Text>
               <Spacer />
@@ -194,7 +213,9 @@ export default function Home() {
               <Select
                 ml={2}
                 width='200px'
-                onChange={(e) => setAddCustomer({ ...addCustomer, service: e.target.value as ServiceType })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, service: e.target.value as ServiceType })
+                }
               >
                 <option value='生活介護'>生活介護</option>
                 <option value='多機能生活介護'>多機能生活介護</option>
@@ -204,7 +225,9 @@ export default function Home() {
             </Flex>
           </Box>
 
-          <Text className='lead' fontSize='xl' m='4'>支援目標</Text>
+          <Text className='lead' fontSize='xl' m='4'>
+            支援目標
+          </Text>
           <Box mb='8'>
             <Flex alignItems='center' m='4'>
               <Text w='20%'>支援目標 1:</Text>
@@ -213,7 +236,9 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.targetOfSupport1}
-                onChange={(e) => setAddCustomer({ ...addCustomer, targetOfSupport1: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, targetOfSupport1: e.target.value })
+                }
                 type='text'
                 id='targetOfSupport1'
               />
@@ -225,7 +250,9 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.detailOfSupport1}
-                onChange={(e) => setAddCustomer({ ...addCustomer, detailOfSupport1: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, detailOfSupport1: e.target.value })
+                }
                 id='detailOfSupport1'
               />
             </Flex>
@@ -239,7 +266,9 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.targetOfSupport2}
-                onChange={(e) => setAddCustomer({ ...addCustomer, targetOfSupport2: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, targetOfSupport2: e.target.value })
+                }
                 type='text'
                 id='targetOfSupport2'
               />
@@ -251,7 +280,9 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.detailOfSupport2}
-                onChange={(e) => setAddCustomer({ ...addCustomer, detailOfSupport2: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, detailOfSupport2: e.target.value })
+                }
                 id='detailOfSupport2'
               />
             </Flex>
@@ -265,7 +296,9 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.targetOfSupport3}
-                onChange={(e) => setAddCustomer({ ...addCustomer, targetOfSupport3: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, targetOfSupport3: e.target.value })
+                }
                 type='text'
                 id='targetOfSupport3'
               />
@@ -277,26 +310,31 @@ export default function Home() {
                 ml={2}
                 w='80%'
                 value={addCustomer.detailOfSupport3}
-                onChange={(e) => setAddCustomer({ ...addCustomer, detailOfSupport3: e.target.value })}
+                onChange={(e) =>
+                  setAddCustomer({ ...addCustomer, detailOfSupport3: e.target.value })
+                }
                 id='detailOfSupport3'
               />
             </Flex>
           </Box>
           <Flex>
             <Spacer />
-          <Button
+            <Button
               colorScheme='teal'
               onClick={() => {
                 onSubmit(addCustomer);
               }}
             >
-              <AddIcon mr="2"/>利用者を追加する
+              <AddIcon mr='2' />
+              利用者を追加する
             </Button>
           </Flex>
         </Box>
 
         {/* 利用者一覧 */}
-        <Text className='head'  fontSize='2xl'>利用者情報の編集</Text>
+        <Text className='head' fontSize='2xl'>
+          利用者情報の編集
+        </Text>
         <UnorderedList listStyleType='none'>
           {customers.map((customer) => (
             <ListItem key={customer.uid} p={4} ml={0}>

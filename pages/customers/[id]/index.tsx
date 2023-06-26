@@ -1,7 +1,28 @@
-import { Heading, Spacer, VStack, Text, Tabs, TabList, Tab, TabPanels, TabPanel } from '@chakra-ui/react';
+import {
+  Heading,
+  Spacer,
+  VStack,
+  Text,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+} from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import { getFirestore, collection, addDoc, doc, setDoc, getDoc, query, orderBy, onSnapshot, DocumentData } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  orderBy,
+  onSnapshot,
+  DocumentData,
+} from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 
@@ -14,8 +35,6 @@ import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
 import 'moment/locale/ja';
 import jaLocale from '@fullcalendar/core/locales/ja';
-
-
 
 export default function Customer() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -31,10 +50,10 @@ export default function Customer() {
   {
     /* 利用者情報取得 */
   }
-  const {id: customerId} = router.query; // クエリパラメーターからcustomerIdを取得
-  console.log(customerId)
+  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
+  console.log(customerId);
   const [customer, setCustomer] = useState<DocumentData | null>(null);
-  
+
   const fetchCustomer = async () => {
     const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
     const unSub = onSnapshot(q, (snapshot) => {
@@ -50,7 +69,6 @@ export default function Customer() {
       unSub();
     };
   };
-
 
   const fetchHolidays = async () => {
     // Google Calendar APIで祝日情報を取得
@@ -129,7 +147,7 @@ export default function Customer() {
 
     // Firestoreのコレクションを作成
     const db = getFirestore();
-    const recordsCollectionRef = collection(db, 'customers', customerId as string , 'records');
+    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'records');
     const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
 
     // コレクションが存在しない場合のみ追加
@@ -162,29 +180,33 @@ export default function Customer() {
           {customer.customerName}さん
         </Heading>
         {/* 支援目標 */}
-        <Text className='head' fontSize='2xl'>支援目標</Text>
-        <VStack
-          align='start'
-          w='100%'
-          h='auto'
-          m='auto'
-          mt='4'
-          mb='20'
-          p='4'
-        >
-          <Text fontSize='xl'>1.日常生活のスキルの向上</Text>
-          <Text>
-            田中さんの日常生活スキルを向上させることを目標とします。具体的な目標としては、自己介助の能力の向上、食事の準備や清掃などの家事スキルの習得を挙げます。
+        <Text className='head' fontSize='2xl'>
+          支援目標
+        </Text>
+        <VStack align='start' w='100%' h='auto' m='auto' mt='4' mb='20' p='4'>
+          <Text className='lead' fontSize='xl'>
+            1. {customer.targetOfSupport1}
           </Text>
+          <Text>{customer.detailOfSupport1}</Text>
           <Spacer />
-          <Text fontSize='xl'>2.コミュニケーション能力の向上</Text>
-          <Text>
-            田中さんのコミュニケーション能力を向上させ、社会参加を促進します。具体的な目標としては、日常会話のスキルの向上、表現力や聴取能力の向上を挙げます。
+          <Text className='lead' fontSize='xl'>
+            2. {customer.targetOfSupport2}
           </Text>
+          <Text>{customer.detailOfSupport2}</Text>
+          {customer.targetOfSupport3 !== '' && (
+            <>
+              <Text className='lead' fontSize='xl'>
+                3. {customer.targetOfSupport2}
+              </Text>
+              <Text>{customer.detailOfSupport3}</Text>
+            </>
+          )}
         </VStack>
 
         {/* 利用日カレンダー */}
-        <Text className='head' fontSize='2xl' mb='4'>記録一覧</Text>
+        <Text className='head' fontSize='2xl' mb='4'>
+          記録一覧
+        </Text>
         <Tabs size='md' variant='enclosed'>
           <TabList>
             <Tab>カレンダー</Tab>
@@ -192,13 +214,13 @@ export default function Customer() {
           </TabList>
           <TabPanels>
             <TabPanel>
-                <FullCalendar
-                  plugins={[dayGridPlugin]}
-                  initialView='dayGridMonth'
-                  events={events}
-                  eventContent={renderEventContent}
-                  locale={jaLocale} // FullCalendarの日本語表示
-                />
+              <FullCalendar
+                plugins={[dayGridPlugin]}
+                initialView='dayGridMonth'
+                events={events}
+                eventContent={renderEventContent}
+                locale={jaLocale} // FullCalendarの日本語表示
+              />
             </TabPanel>
             <TabPanel>
               <p>リスト表示予定</p>

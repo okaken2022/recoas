@@ -8,17 +8,16 @@
   font-family: 'Montserrat', sans-serif;
 }
 .head {
-  padding: 0.25em;/*文字周りの余白*/
-  color: #494949;/*文字色*/
-  background: rgba(15, 153, 84, 0.2);/*背景色*/
-  border-left: solid 4px #0F9954;/*左線（実線 太さ 色）*/
+  padding: 0.25em; /*文字周りの余白*/
+  color: #494949; /*文字色*/
+  background: rgba(15, 153, 84, 0.2); /*背景色*/
+  border-left: solid 4px #0f9954; /*左線（実線 太さ 色）*/
 }
 .title {
   padding: 0.25rem;
-  border-left: 8px solid #0F9954;
+  border-left: 8px solid #0f9954;
 }
 .lead {
   background: linear-gradient(transparent 70%, #a7d6ff 70%);
   display: inline-block;
 }
-
