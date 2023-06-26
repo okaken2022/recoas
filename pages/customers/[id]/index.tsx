@@ -88,7 +88,7 @@ export default function Customer() {
 
     // 日付ごとにイベントオブジェクトを作成
     const newEvents: Event[] = dates.map((date) => ({
-      title: 'Event',
+      title: '',
       start: date,
     }));
 
@@ -146,7 +146,7 @@ export default function Customer() {
       <div>
         <b>{eventInfo.timeText}</b>
         <p
-          style={{ backgroundColor: 'skyblue', padding: '2px', cursor: 'pointer' }}
+          style={{ backgroundColor: 'skyblue', height: '50px', cursor: 'pointer' }}
           onClick={() => handleEventClick(eventInfo)}
         >
           {eventInfo.event.title}
