@@ -8,6 +8,7 @@ import { Header } from '@/components/Header';
 
 import { useAuth, useUser } from '@/hooks/firebase';
 
+
 type Inputs = {
   email: string;
   password: string;
@@ -29,9 +30,9 @@ export default function Login() {
   const toast = useToast();
   const login = async (email: string, password: string) => {
     try {
-      const UserCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       console.log('ログイン成功');
-      router.push('/home');
+      router.push('/');
       toast({
         title: 'ログインしました。',
         status: 'success',
