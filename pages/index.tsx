@@ -8,6 +8,7 @@ import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
 import { Customer, CustomersByService, ServiceType } from '@/types/customer';
+import CustomerList from '@/components/CustomerList';
 
 export default function Home() {
   const [allCustomersByService, setAllCustomersByService] = useState<CustomersByService>({
@@ -99,24 +100,10 @@ export default function Home() {
             利用者一覧
           </Text>
         </Box>
-        <Wrap mt='4' spacing='3%' justify='center'>
-          {Object.entries(allCustomersByService).map(([service, customers]) => (
-            <WrapItem w={{ base: '100%', md: '30%' }} key={service}>
-              <Select
-                w='100%'
-                placeholder={service}
-                bg={getServiceBackgroundColor(service)}
-                onChange={(event) => handleCustomerClick(event.target.value)}
-              >
-                {customers.map((customer) => (
-                  <option value={customer.uid} key={customer.uid}>
-                    {customer.customerName}
-                  </option>
-                ))}
-              </Select>
-            </WrapItem>
-          ))}
-        </Wrap>
+        <CustomerList
+          allCustomersByService={allCustomersByService}
+          handleCustomerClick={handleCustomerClick}
+        />
 
         {/* 管理者メニュー */}
         <Box mt='16'>
