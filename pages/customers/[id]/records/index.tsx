@@ -36,7 +36,7 @@ export default function RecordPage() {
   }
   const [addDailyRecord, setAddDailyRecord] = useState<DailyRecord>({
     // FullCalendarから持ってきたstartの値を入れる
-    start: '',
+    date: '',
     editor: '',
     amWork: '',
     pmWork: '',
@@ -60,15 +60,15 @@ export default function RecordPage() {
     /* 記録母体保存 */
   }
   const createDailyRecord = async (
-    start: string,
+    date: string,
     editor: string,
     amWork: string,
     pmWork: string,
   ) => {
     if (!currentUser) return;
-    if (start === '') return;
+    if (date === '') return;
     await addDoc(collection(db, 'customers'), {
-      start: start,
+      date: date,
       editor: editor,
       amWork: amWork,
       pmWork: pmWork,
@@ -76,18 +76,18 @@ export default function RecordPage() {
   };
 
   const onSubmit = ({
-    start,
+    date,
     editor,
     amWork,
     pmWork,
   }: {
-    start: string;
+    date: string;
     editor: string;
     amWork: string;
     pmWork: string;
   }) => {
-    createDailyRecord(start, editor, amWork, pmWork);
-    setAddDailyRecord({ start: '', editor: '', amWork: '', pmWork: '' });
+    createDailyRecord(date, editor, amWork, pmWork);
+    setAddDailyRecord({ date: '', editor: '', amWork: '', pmWork: '' });
     console.log(addDailyRecord);
     setAddDailyRecord(addDailyRecord);
   };
@@ -176,7 +176,7 @@ export default function RecordPage() {
           </GridItem>
         </Grid>
 
-        <UnorderedList listStyleType='none' ml='0' border='1px' borderBottomRadius='md'>
+        <UnorderedList listStyleType='none' ml='0' border='1px' borderBottomRadius='md' fontSize={{ base: 'sm', md: 'md' }} >
           {/* {todos.map((todo) => ( */}
           <ListItem key=''>
             <Flex>
@@ -218,27 +218,26 @@ export default function RecordPage() {
           </ListItem>
           {/* ))} */}
         </UnorderedList>
-        <Flex p='1'>
-          <Spacer />
-          <ButtonGroup>
-            <Button size='sm' colorScheme='facebook'>
-              <AddIcon />
-            </Button>
-            <Button size='sm' colorScheme='teal'>
-              <EditIcon />
-            </Button>
-          </ButtonGroup>
-        </Flex>
-        <Flex p='1'>
-          <Spacer />
-          <ButtonGroup>
-            <Button
+        <Flex mt='2'>
+        <Button
+              colorScheme='teal'
               size='sm'
               onClick={() => {
                 onSubmit(addDailyRecord);
               }}
             >
-              保存してカレンダーに戻る
+              保存して戻る
+            </Button>
+          <Spacer />
+          <ButtonGroup>
+
+            <Button size='sm' colorScheme='facebook'>
+              <AddIcon mr='1' />
+              記録を追加
+            </Button>
+            <Button size='sm' colorScheme='orange'>
+              <EditIcon mr='1'  />
+              編集
             </Button>
           </ButtonGroup>
         </Flex>
