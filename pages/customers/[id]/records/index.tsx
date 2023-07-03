@@ -12,6 +12,11 @@ import {
   ListItem,
   Button,
   ButtonGroup,
+  Badge,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  Stack,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -22,12 +27,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
 
-import axios from 'axios';
 import moment from 'moment';
-import { EventContentArg } from '@fullcalendar/core';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
-import { Record } from '@/types/recoad';
-import { DailyRecord } from '@/types/dailyRecord';
+import { BasicInfoOfRecord } from '@/types/record';
 import { addDoc, collection } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
@@ -36,7 +38,7 @@ export default function RecordPage() {
   {
     /* state */
   }
-  const [addDailyRecord, setAddDailyRecord] = useState<DailyRecord>({
+  const [addDailyRecord, setAddDailyRecord] = useState<BasicInfoOfRecord>({
     // FullCalendarから持ってきたstartの値を入れる
     date: '',
     editor: '',
@@ -53,22 +55,26 @@ export default function RecordPage() {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
 
-  {
-    /* ルーティング */
-  }
   const router: NextRouter = useRouter();
+
+  {
+    /* 日付情報 */
+  }
   const { date } = router.query as { date: string };
-  const formattedDate = moment(date).format('YYYY年M月D日 (ddd)');
-  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
+  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)'); //日本語表記の文字列
+  const formattedDate = moment(date).format('YYYY年M月D日 (ddd)'); //日付の文字列
+  const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   {
     /* 利用者情報取得 */
   }
+  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
     }
   }, [customerId]);
+
   {
     /* 記録母体保存 */
   }
@@ -114,7 +120,7 @@ export default function RecordPage() {
         {/* 記録全体 */}
         <Grid
           h='auto'
-          templateRows='repeat(7, 1fr)'
+          templateRows='repeat(9, 1fr)'
           templateColumns='repeat(2, 1fr)'
           // gap={2}
           border='1px'
@@ -123,12 +129,13 @@ export default function RecordPage() {
           {/* 日付 */}
           <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
             <Flex alignItems='center'>
-              <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
+              <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
               <Spacer />
 
               {/* 記入者 */}
               <Text>記入者：</Text>
               <Input
+              size={{ base: 'sm', md: 'md' }}
                 placeholder='岡田'
                 width='30%'
                 bg='white'
@@ -147,6 +154,7 @@ export default function RecordPage() {
               <Spacer />
               <Text>午前：</Text>
               <Input
+                size={{ base: 'sm', md: 'md' }}
                 placeholder='コーヒー'
                 width='60%'
                 bg='white'
@@ -157,11 +165,13 @@ export default function RecordPage() {
               />
             </Flex>
           </GridItem>
-          <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
+          <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
             <Flex alignItems='center'>
               <Spacer />
               <Text>午後：</Text>
               <Input
+                            size={{ base: 'sm', md: 'md' }}
+
                 placeholder='菓子製造'
                 width='60%'
                 bg='white'
@@ -170,6 +180,34 @@ export default function RecordPage() {
                 value={addDailyRecord.pmWork}
                 onChange={(e) => setAddDailyRecord({ ...addDailyRecord, pmWork: e.target.value })}
               />
+            </Flex>
+          </GridItem>
+
+          <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
+            <Flex alignItems='center' gap='2'>
+            <Text>工賃</Text>
+              <Spacer />
+              <RadioGroup>
+                <Stack spacing={5} direction='row'>
+                  <Radio colorScheme='green' defaultChecked>
+                    通常
+                  </Radio>
+                  <Radio colorScheme='red'>
+                    変更
+                  </Radio>
+                </Stack>
+              </RadioGroup>
+              <Input
+                            size={{ base: 'sm', md: 'md' }}
+
+                placeholder='0'
+                width='20%'
+                bg='white'
+                type='text'
+                id='pmWork'
+                value={addDailyRecord.pmWork}
+                onChange={(e) => setAddDailyRecord({ ...addDailyRecord, pmWork: e.target.value })}
+              />分
             </Flex>
           </GridItem>
 
@@ -201,7 +239,8 @@ export default function RecordPage() {
               </Box>
             </Flex>
           </ListItem>
-          <ListItem key=''>
+          <ListItem key='' backgroundColor='teal.50'>
+            <Badge ml='2' colorScheme='teal'>Good</Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -219,7 +258,8 @@ export default function RecordPage() {
               <Box p='2' w='50%'></Box>
             </Flex>
           </ListItem>
-          <ListItem key=''>
+          <ListItem key='' backgroundColor='red.50'>
+            <Badge ml='2' colorScheme='red'>特記事項</Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります

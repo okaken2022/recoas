@@ -1,4 +1,4 @@
-export type DailyRecord = {
+export type BasicInfoOfRecord = {
   date: string;
   editor: string;
   amWork: string;
