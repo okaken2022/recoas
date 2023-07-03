@@ -29,6 +29,8 @@ import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { Record } from '@/types/recoad';
 import { DailyRecord } from '@/types/dailyRecord';
 import { addDoc, collection } from 'firebase/firestore';
+import { CustomerInfoType } from '@/types/customerInfo';
+import { fetchCustomer } from '@/utils/fetchCustomer';
 
 export default function RecordPage() {
   {
@@ -41,6 +43,8 @@ export default function RecordPage() {
     amWork: '',
     pmWork: '',
   });
+
+  const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
   {
     /* ログイン */
@@ -55,7 +59,16 @@ export default function RecordPage() {
   const router: NextRouter = useRouter();
   const { date } = router.query as { date: string };
   const formattedDate = moment(date).format('YYYY年M月D日 (ddd)');
-
+  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
+  {
+    /* 利用者情報取得 */
+  }
+  useEffect(() => {
+    if (customerId) {
+      const id = Array.isArray(customerId) ? customerId[0] : customerId;
+      fetchCustomer(id, setCustomer);
+    }
+  }, [customerId]);
   {
     /* 記録母体保存 */
   }
@@ -96,7 +109,7 @@ export default function RecordPage() {
     <>
       <Layout>
         <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
-          田中太郎さん
+          {customer?.customerName}さん
         </Heading>
         {/* 記録全体 */}
         <Grid
