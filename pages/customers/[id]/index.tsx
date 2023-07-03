@@ -35,6 +35,9 @@ import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
 import 'moment/locale/ja';
 import jaLocale from '@fullcalendar/core/locales/ja';
+import { CustomerInfoType } from '@/types/customerInfo';
+import CustomerInfo from '@/components/CustomerInfo';
+import { fetchCustomer } from '@/utils/fetchCustomer';
 
 export default function Customer() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -52,23 +55,8 @@ export default function Customer() {
   }
   const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
   console.log(customerId);
-  const [customer, setCustomer] = useState<DocumentData | null>(null);
+  const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
-  const fetchCustomer = async () => {
-    const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
-    const unSub = onSnapshot(q, (snapshot) => {
-      snapshot.docs.forEach((doc) => {
-        const customerData = doc.data();
-        if (doc.id === customerId) {
-          setCustomer(customerData);
-        }
-      });
-    });
-
-    return () => {
-      unSub();
-    };
-  };
 
   const fetchHolidays = async () => {
     // Google Calendar APIで祝日情報を取得
@@ -115,10 +103,12 @@ export default function Customer() {
 
   useEffect(() => {
     if (customerId) {
-      fetchCustomer();
+      const id = Array.isArray(customerId) ? customerId[0] : customerId;
+      fetchCustomer(id, setCustomer);
       fetchHolidays();
     }
   }, [customerId]);
+  
 
   if (!customer) {
     return <div>Loading...</div>;
@@ -176,32 +166,7 @@ export default function Customer() {
   return (
     <>
       <Layout>
-        <Heading className='title' color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
-          {customer.customerName}さん
-        </Heading>
-        {/* 支援目標 */}
-        <Text className='head' fontSize='2xl'>
-          支援目標
-        </Text>
-        <VStack align='start' w='100%' h='auto' m='auto' mt='4' mb='20' p='4'>
-          <Text className='lead' fontSize='xl'>
-            1. {customer.targetOfSupport1}
-          </Text>
-          <Text>{customer.detailOfSupport1}</Text>
-          <Spacer />
-          <Text className='lead' fontSize='xl'>
-            2. {customer.targetOfSupport2}
-          </Text>
-          <Text>{customer.detailOfSupport2}</Text>
-          {customer.targetOfSupport3 !== '' && (
-            <>
-              <Text className='lead' fontSize='xl'>
-                3. {customer.targetOfSupport2}
-              </Text>
-              <Text>{customer.detailOfSupport3}</Text>
-            </>
-          )}
-        </VStack>
+        <CustomerInfo customer={customer} />
 
         {/* 利用日カレンダー */}
         <Text className='head' fontSize='2xl' mb='4'>
