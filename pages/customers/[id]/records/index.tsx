@@ -111,6 +111,10 @@ export default function RecordPage() {
     setAddDailyRecord(addDailyRecord);
   };
 
+  const editRecord = () => {
+    alert('click')
+  }
+
   return (
     <>
       <Layout>
@@ -229,7 +233,7 @@ export default function RecordPage() {
 
         <UnorderedList listStyleType='none' ml='0' border='1px' borderBottomRadius='md' fontSize={{ base: 'sm', md: 'md' }} >
           {/* {todos.map((todo) => ( */}
-          <ListItem key=''>
+          <ListItem key=''  className='record' onClick={editRecord}>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -239,7 +243,7 @@ export default function RecordPage() {
               </Box>
             </Flex>
           </ListItem>
-          <ListItem key='' backgroundColor='teal.50'>
+          <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
             <Badge ml='2' colorScheme='teal'>Good</Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
@@ -250,7 +254,7 @@ export default function RecordPage() {
               </Box>
             </Flex>
           </ListItem>
-          <ListItem key=''>
+          <ListItem key='' className='record' onClick={editRecord}>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -258,7 +262,7 @@ export default function RecordPage() {
               <Box p='2' w='50%'></Box>
             </Flex>
           </ListItem>
-          <ListItem key='' backgroundColor='red.50'>
+          <ListItem key='' backgroundColor='red.50' className='record' onClick={editRecord}>
             <Badge ml='2' colorScheme='red'>特記事項</Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
@@ -282,17 +286,10 @@ export default function RecordPage() {
               保存して戻る
             </Button>
           <Spacer />
-          <ButtonGroup>
-
             <Button size='sm' colorScheme='facebook'>
               <AddIcon mr='1' />
               記録を追加
             </Button>
-            <Button size='sm' colorScheme='orange'>
-              <EditIcon mr='1'  />
-              編集
-            </Button>
-          </ButtonGroup>
         </Flex>
       </Layout>
     </>
