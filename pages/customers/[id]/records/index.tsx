@@ -89,9 +89,9 @@ export default function RecordPage() {
   ) => {
     if (!currentUser) return;
 
-    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'records', formattedMonth, 'record');
-    const daylyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const monthSnapshot = await getDoc(daylyDocumentRef);
+    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'monthlyRecords', formattedMonth, 'dailyRecords');
+    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+    const monthSnapshot = await getDoc(dailyDocumentRef);
       if (!monthSnapshot.exists()) {
         const data = {
           editor: editor,
@@ -100,7 +100,7 @@ export default function RecordPage() {
           timeAdjustment: timeAdjustment
         };
 
-  await setDoc(daylyDocumentRef, data);
+  await setDoc(dailyDocumentRef, data);
 }
   };
 

@@ -137,7 +137,7 @@ export default function Customer() {
 
     // Firestoreのコレクションを作成
     const db = getFirestore();
-    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'records');
+    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'monthlyRecords');
     const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
 
     // コレクションが存在しない場合のみ追加
