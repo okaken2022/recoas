@@ -220,9 +220,9 @@ export default function RecordPage() {
                 width='20%'
                 bg='white'
                 type='text'
-                id='pmWork'
-                value={addBasicInfo.pmWork}
-                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, pmWork: e.target.value })}
+                id='timeAdjustment'
+                value={addBasicInfo.timeAdjustment}
+                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, timeAdjustment: parseInt(e.target.value) || 0, })}
               />分
             </Flex>
           </GridItem>
