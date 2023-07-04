@@ -30,7 +30,7 @@ import { useContext, useEffect, useState } from 'react';
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord } from '@/types/record';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 
@@ -38,12 +38,11 @@ export default function RecordPage() {
   {
     /* state */
   }
-  const [addDailyRecord, setAddDailyRecord] = useState<BasicInfoOfRecord>({
-    // FullCalendarから持ってきたstartの値を入れる
-    date: '',
+  const [addBasicInfo, setAddBasicInfo] = useState<BasicInfoOfRecord>({
     editor: '',
     amWork: '',
     pmWork: '',
+    timeAdjustment: 0,
   });
 
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
@@ -62,53 +61,64 @@ export default function RecordPage() {
   }
   const { date } = router.query as { date: string };
   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)'); //日本語表記の文字列
-  const formattedDate = moment(date).format('YYYY年M月D日 (ddd)'); //日付の文字列
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
+  const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
+  console.log(formattedDate);
+  
   {
     /* 利用者情報取得 */
   }
-  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
+  const { id: customerId } = router.query as { id: string };; // クエリパラメーターからcustomerIdを取得
+
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
     }
   }, [customerId]);
+  console.log(customerId)
 
   {
     /* 記録母体保存 */
   }
-  const createDailyRecord = async (
-    date: string,
+  const createBasicInfo = async (
     editor: string,
     amWork: string,
     pmWork: string,
+    timeAdjustment: number,
   ) => {
     if (!currentUser) return;
-    if (date === '') return;
-    await addDoc(collection(db, 'customers'), {
-      date: date,
-      editor: editor,
-      amWork: amWork,
-      pmWork: pmWork,
-    });
+
+    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'records', formattedMonth, 'record');
+    const daylyDocumentRef = doc(recordsCollectionRef, formattedDate);
+    const monthSnapshot = await getDoc(daylyDocumentRef);
+      if (!monthSnapshot.exists()) {
+        const data = {
+          editor: editor,
+          amWork: amWork,
+          pmWork: pmWork,
+          timeAdjustment: timeAdjustment
+        };
+
+  await setDoc(daylyDocumentRef, data);
+}
   };
 
   const onSubmit = ({
-    date,
     editor,
     amWork,
     pmWork,
+    timeAdjustment
   }: {
-    date: string;
     editor: string;
     amWork: string;
     pmWork: string;
+    timeAdjustment: number;
   }) => {
-    createDailyRecord(date, editor, amWork, pmWork);
-    setAddDailyRecord({ date: '', editor: '', amWork: '', pmWork: '' });
-    console.log(addDailyRecord);
-    setAddDailyRecord(addDailyRecord);
+    createBasicInfo(editor, amWork, pmWork, timeAdjustment);
+    setAddBasicInfo({editor: '', amWork: '', pmWork: '', timeAdjustment: 0});
+    console.log(addBasicInfo);
+    setAddBasicInfo(addBasicInfo);
   };
 
   const editRecord = () => {
@@ -121,6 +131,8 @@ export default function RecordPage() {
         <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
           {customer?.customerName}さん
         </Heading>
+        {/* テキストはクリックで編集可能 */}
+
         {/* 記録全体 */}
         <Grid
           h='auto'
@@ -145,8 +157,8 @@ export default function RecordPage() {
                 bg='white'
                 type='text'
                 id='editor'
-                value={addDailyRecord.editor}
-                onChange={(e) => setAddDailyRecord({ ...addDailyRecord, editor: e.target.value })}
+                value={addBasicInfo.editor}
+                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, editor: e.target.value })}
               />
             </Flex>
           </GridItem>
@@ -164,8 +176,8 @@ export default function RecordPage() {
                 bg='white'
                 type='text'
                 id='amWork'
-                value={addDailyRecord.amWork}
-                onChange={(e) => setAddDailyRecord({ ...addDailyRecord, amWork: e.target.value })}
+                value={addBasicInfo.amWork}
+                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, amWork: e.target.value })}
               />
             </Flex>
           </GridItem>
@@ -181,8 +193,8 @@ export default function RecordPage() {
                 bg='white'
                 type='text'
                 id='pmWork'
-                value={addDailyRecord.pmWork}
-                onChange={(e) => setAddDailyRecord({ ...addDailyRecord, pmWork: e.target.value })}
+                value={addBasicInfo.pmWork}
+                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, pmWork: e.target.value })}
               />
             </Flex>
           </GridItem>
@@ -209,8 +221,8 @@ export default function RecordPage() {
                 bg='white'
                 type='text'
                 id='pmWork'
-                value={addDailyRecord.pmWork}
-                onChange={(e) => setAddDailyRecord({ ...addDailyRecord, pmWork: e.target.value })}
+                value={addBasicInfo.pmWork}
+                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, pmWork: e.target.value })}
               />分
             </Flex>
           </GridItem>
@@ -280,7 +292,7 @@ export default function RecordPage() {
               colorScheme='teal'
               size='sm'
               onClick={() => {
-                onSubmit(addDailyRecord);
+                onSubmit(addBasicInfo);
               }}
             >
               保存して戻る

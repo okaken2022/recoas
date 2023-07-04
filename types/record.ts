@@ -1,10 +1,8 @@
 export type BasicInfoOfRecord = {
-  date: string;
   editor: string;
   amWork: string;
   pmWork: string;
-  // onTime: boolean;
-  // timeAdjustment: number;
+  timeAdjustment: number;
 };
 
 export type Record = {
