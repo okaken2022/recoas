@@ -64,11 +64,11 @@ export default function RecordPage() {
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
   console.log(formattedDate);
-  
+
   {
     /* 利用者情報取得 */
   }
-  const { id: customerId } = router.query as { id: string };; // クエリパラメーターからcustomerIdを取得
+  const { id: customerId } = router.query as { id: string }; // クエリパラメーターからcustomerIdを取得
 
   useEffect(() => {
     if (customerId) {
@@ -76,7 +76,7 @@ export default function RecordPage() {
       fetchCustomer(id, setCustomer);
     }
   }, [customerId]);
-  console.log(customerId)
+  console.log(customerId);
 
   {
     /* 記録母体保存 */
@@ -89,26 +89,33 @@ export default function RecordPage() {
   ) => {
     if (!currentUser) return;
 
-    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'monthlyRecords', formattedMonth, 'dailyRecords');
+    const recordsCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+    );
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
-      if (!monthSnapshot.exists()) {
-        const data = {
-          editor: editor,
-          amWork: amWork,
-          pmWork: pmWork,
-          timeAdjustment: timeAdjustment
-        };
+    if (!monthSnapshot.exists()) {
+      const data = {
+        editor: editor,
+        amWork: amWork,
+        pmWork: pmWork,
+        timeAdjustment: timeAdjustment,
+      };
 
-  await setDoc(dailyDocumentRef, data);
-}
+      await setDoc(dailyDocumentRef, data);
+    }
   };
 
   const onSubmit = ({
     editor,
     amWork,
     pmWork,
-    timeAdjustment
+    timeAdjustment,
   }: {
     editor: string;
     amWork: string;
@@ -116,14 +123,14 @@ export default function RecordPage() {
     timeAdjustment: number;
   }) => {
     createBasicInfo(editor, amWork, pmWork, timeAdjustment);
-    setAddBasicInfo({editor: '', amWork: '', pmWork: '', timeAdjustment: 0});
+    setAddBasicInfo({ editor: '', amWork: '', pmWork: '', timeAdjustment: 0 });
     console.log(addBasicInfo);
     setAddBasicInfo(addBasicInfo);
   };
 
   const editRecord = () => {
-    alert('click')
-  }
+    alert('click');
+  };
 
   return (
     <>
@@ -151,7 +158,7 @@ export default function RecordPage() {
               {/* 記入者 */}
               <Text>記入者：</Text>
               <Input
-              size={{ base: 'sm', md: 'md' }}
+                size={{ base: 'sm', md: 'md' }}
                 placeholder='岡田'
                 width='30%'
                 bg='white'
@@ -186,8 +193,7 @@ export default function RecordPage() {
               <Spacer />
               <Text>午後：</Text>
               <Input
-                            size={{ base: 'sm', md: 'md' }}
-
+                size={{ base: 'sm', md: 'md' }}
                 placeholder='菓子製造'
                 width='60%'
                 bg='white'
@@ -201,29 +207,32 @@ export default function RecordPage() {
 
           <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
             <Flex alignItems='center' gap='2'>
-            <Text>工賃</Text>
+              <Text>工賃</Text>
               <Spacer />
               <RadioGroup>
                 <Stack spacing={5} direction='row'>
                   <Radio colorScheme='green' defaultChecked>
                     通常
                   </Radio>
-                  <Radio colorScheme='red'>
-                    変更
-                  </Radio>
+                  <Radio colorScheme='red'>変更</Radio>
                 </Stack>
               </RadioGroup>
               <Input
-                            size={{ base: 'sm', md: 'md' }}
-
+                size={{ base: 'sm', md: 'md' }}
                 placeholder='0'
                 width='20%'
                 bg='white'
                 type='text'
                 id='timeAdjustment'
                 value={addBasicInfo.timeAdjustment}
-                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, timeAdjustment: parseInt(e.target.value) || 0, })}
-              />分
+                onChange={(e) =>
+                  setAddBasicInfo({
+                    ...addBasicInfo,
+                    timeAdjustment: parseFloat(e.target.value) || 0,
+                  })
+                }
+              />
+              分
             </Flex>
           </GridItem>
 
@@ -243,9 +252,15 @@ export default function RecordPage() {
           </GridItem>
         </Grid>
 
-        <UnorderedList listStyleType='none' ml='0' border='1px' borderBottomRadius='md' fontSize={{ base: 'sm', md: 'md' }} >
+        <UnorderedList
+          listStyleType='none'
+          ml='0'
+          border='1px'
+          borderBottomRadius='md'
+          fontSize={{ base: 'sm', md: 'md' }}
+        >
           {/* {todos.map((todo) => ( */}
-          <ListItem key=''  className='record' onClick={editRecord}>
+          <ListItem key='' className='record' onClick={editRecord}>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -256,7 +271,9 @@ export default function RecordPage() {
             </Flex>
           </ListItem>
           <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
-            <Badge ml='2' colorScheme='teal'>Good</Badge>
+            <Badge ml='2' colorScheme='teal'>
+              Good
+            </Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -275,7 +292,9 @@ export default function RecordPage() {
             </Flex>
           </ListItem>
           <ListItem key='' backgroundColor='red.50' className='record' onClick={editRecord}>
-            <Badge ml='2' colorScheme='red'>特記事項</Badge>
+            <Badge ml='2' colorScheme='red'>
+              特記事項
+            </Badge>
             <Flex>
               <Box p='2' w='50%' borderRight='1px'>
                 テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -288,20 +307,20 @@ export default function RecordPage() {
           {/* ))} */}
         </UnorderedList>
         <Flex mt='2'>
-        <Button
-              colorScheme='teal'
-              size='sm'
-              onClick={() => {
-                onSubmit(addBasicInfo);
-              }}
-            >
-              保存して戻る
-            </Button>
+          <Button
+            colorScheme='teal'
+            size='sm'
+            onClick={() => {
+              onSubmit(addBasicInfo);
+            }}
+          >
+            保存して戻る
+          </Button>
           <Spacer />
-            <Button size='sm' colorScheme='facebook'>
-              <AddIcon mr='1' />
-              記録を追加
-            </Button>
+          <Button size='sm' colorScheme='facebook'>
+            <AddIcon mr='1' />
+            記録を追加
+          </Button>
         </Flex>
       </Layout>
     </>

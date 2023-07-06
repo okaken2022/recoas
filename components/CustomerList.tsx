@@ -10,11 +10,7 @@ interface ServiceListProps {
   handleCustomerClick: (customerId: string | undefined) => void;
 }
 
-const ServiceList: React.FC<ServiceListProps> = ({
-  service,
-  customers,
-  handleCustomerClick,
-}) => {
+const ServiceList: React.FC<ServiceListProps> = ({ service, customers, handleCustomerClick }) => {
   return (
     <WrapItem w={{ base: '100%', md: '30%' }} key={service}>
       <Select

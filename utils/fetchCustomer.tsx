@@ -2,7 +2,10 @@ import { collection, query, orderBy, onSnapshot, DocumentData } from 'firebase/f
 import { db } from '@/hooks/firebase';
 import { CustomerInfoType } from '@/types/customerInfo';
 
-export const fetchCustomer = async (customerId: string, callback: (customer: CustomerInfoType) => void) => {
+export const fetchCustomer = async (
+  customerId: string,
+  callback: (customer: CustomerInfoType) => void,
+) => {
   const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
   const unSub = onSnapshot(q, (snapshot) => {
     snapshot.docs.forEach((doc) => {

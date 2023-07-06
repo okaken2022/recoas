@@ -8,7 +8,6 @@ import { Header } from '@/components/Header';
 
 import { useAuth, useUser } from '@/hooks/firebase';
 
-
 type Inputs = {
   email: string;
   password: string;

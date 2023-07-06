@@ -10,5 +10,4 @@ export type Record = {
   support: string;
   good: boolean;
   notice: boolean;
-}
-
+};

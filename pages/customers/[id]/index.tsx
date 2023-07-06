@@ -57,7 +57,6 @@ export default function Customer() {
   console.log(customerId);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
-
   const fetchHolidays = async () => {
     // Google Calendar APIで祝日情報を取得
     const response = await axios.get(
@@ -108,7 +107,7 @@ export default function Customer() {
       fetchHolidays();
     }
   }, [customerId]);
-  console.log(customer)
+  console.log(customer);
 
   if (!customer) {
     return <div>Loading...</div>;
@@ -137,7 +136,12 @@ export default function Customer() {
 
     // Firestoreのコレクションを作成
     const db = getFirestore();
-    const recordsCollectionRef = collection(db, 'customers', customerId as string, 'monthlyRecords');
+    const recordsCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+    );
     const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
 
     // コレクションが存在しない場合のみ追加

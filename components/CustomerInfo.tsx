@@ -2,8 +2,7 @@ import React from 'react';
 import { Heading, Spacer, VStack, Text } from '@chakra-ui/react';
 import { CustomerInfoProps } from '@/types/customerInfo';
 
-
-const CustomerInfo: React.FC<CustomerInfoProps>  = ({ customer }) => {
+const CustomerInfo: React.FC<CustomerInfoProps> = ({ customer }) => {
   return (
     <>
       <Heading className='title' color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
