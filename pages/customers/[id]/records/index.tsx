@@ -50,13 +50,7 @@ export default function RecordPage() {
   {
     /* state */
   }
-  const [addBasicInfo, setAddBasicInfo] = useState<BasicInfoOfRecord>({
-    editor: '',
-    amWork: '',
-    pmWork: '',
-    timeAdjustment: 0,
-  });
-
+  const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
   {
@@ -91,7 +85,7 @@ export default function RecordPage() {
   console.log(customerId);
 
   {
-    /* 記録母体保存 */
+    /* 基本情報保存 */
   }
   const createBasicInfo = async (
     editor: string,
@@ -121,6 +115,14 @@ export default function RecordPage() {
       await setDoc(dailyDocumentRef, data);
       console.log(data);
     }
+  };
+
+
+  {
+    /* 時間変更 */
+  }
+  const handleRadioChange = (value: string) => {
+    setIsCustomTime(value === '変更');
   };
 
   const onSubmit: SubmitHandler<BasicInfoOfRecord> = async(data) => {
@@ -212,12 +214,12 @@ export default function RecordPage() {
               <Flex alignItems='center' gap='2'>
                 <Text>工賃</Text>
                 <Spacer />
-                <RadioGroup>
+                <RadioGroup onChange={handleRadioChange} value={isCustomTime ? '変更' : '通常'}>
                   <Stack spacing={5} direction='row'>
-                    <Radio colorScheme='green' defaultChecked>
+                    <Radio colorScheme='green' defaultChecked value="通常">
                       通常
                     </Radio>
-                    <Radio colorScheme='red'>変更</Radio>
+                    <Radio colorScheme='red' value="変更">変更</Radio>
                   </Stack>
                 </RadioGroup>
                 <Input
@@ -229,6 +231,7 @@ export default function RecordPage() {
                   id='timeAdjustment'
                   {...register('timeAdjustment', { valueAsNumber: true })}
                   defaultValue={0}
+                  readOnly={!isCustomTime} // '変更'が選択されていない場合は読み取り専用にする
                   />
                 分
               </Flex>
