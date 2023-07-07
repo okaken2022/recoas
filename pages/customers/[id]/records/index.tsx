@@ -43,6 +43,7 @@ export default function RecordPage() {
   const {
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
     reset,
   } = useForm<BasicInfoOfRecord>();
@@ -52,6 +53,10 @@ export default function RecordPage() {
   }
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
+    null,
+  );
 
   {
     /* ログイン */
@@ -80,8 +85,9 @@ export default function RecordPage() {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
+      fetchRecordData();
     }
-  }, [customerId]);
+  }, [customerId, setValue]);
   console.log(customerId);
 
   {
@@ -94,7 +100,7 @@ export default function RecordPage() {
     timeAdjustment: number,
   ) => {
     if (!currentUser) return;
-    console.log('onSubmit fired2')
+    console.log('onSubmit fired2');
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -105,31 +111,57 @@ export default function RecordPage() {
     );
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
-    if (!monthSnapshot.exists()) {
-      const data = {
-        editor: editor,
-        amWork: amWork,
-        pmWork: pmWork,
-        timeAdjustment: timeAdjustment,
-      };
-      await setDoc(dailyDocumentRef, data);
-      console.log(data);
-    }
+    const data = {
+      editor: editor,
+      amWork: amWork,
+      pmWork: pmWork,
+      timeAdjustment: timeAdjustment,
+    };
+    await setDoc(dailyDocumentRef, data);
+    console.log('データが更新されました');
   };
 
+  {
+    /* 基本情報取得 */
+  }
+  const fetchRecordData = async () => {
+    if (!currentUser) return;
+    const recordsCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+    );
+    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+    const recordSnapshot = await getDoc(dailyDocumentRef);
+
+    if (recordSnapshot.exists()) {
+      const data = recordSnapshot.data() as BasicInfoOfRecord;
+      setbasicInfoOfRecordData(data);
+
+      // フォームの各フィールドに値を設定
+      setValue('editor', data.editor);
+      setValue('amWork', data.amWork);
+      setValue('pmWork', data.pmWork);
+      setValue('timeAdjustment', data.timeAdjustment);
+    }
+
+    setLoading(false);
+  };
 
   {
-    /* 時間変更 */
+    /* 時間変更のラジオボタン */
   }
   const handleRadioChange = (value: string) => {
     setIsCustomTime(value === '変更');
   };
 
-  const onSubmit: SubmitHandler<BasicInfoOfRecord> = async(data) => {
-    console.log('onSubmit fired')
-    console.log(data.amWork)
+  const onSubmit: SubmitHandler<BasicInfoOfRecord> = async (data) => {
+    console.log('onSubmit fired');
+    console.log(data.amWork);
     await createBasicInfo(data.editor, data.amWork, data.pmWork, data.timeAdjustment);
-    reset();
   };
 
   const editRecord = () => {
@@ -171,9 +203,7 @@ export default function RecordPage() {
                   id='editor'
                   {...register('editor', { required: '記入者を入力してください' })}
                 />
-                {errors.editor && (
-                  <FormErrorMessage>{errors.editor.message}</FormErrorMessage>
-                )}
+                {errors.editor && <FormErrorMessage>{errors.editor.message}</FormErrorMessage>}
               </Flex>
             </GridItem>
 
@@ -216,10 +246,12 @@ export default function RecordPage() {
                 <Spacer />
                 <RadioGroup onChange={handleRadioChange} value={isCustomTime ? '変更' : '通常'}>
                   <Stack spacing={5} direction='row'>
-                    <Radio colorScheme='green' defaultChecked value="通常">
+                    <Radio colorScheme='green' defaultChecked value='通常'>
                       通常
                     </Radio>
-                    <Radio colorScheme='red' value="変更">変更</Radio>
+                    <Radio colorScheme='red' value='変更'>
+                      変更
+                    </Radio>
                   </Stack>
                 </RadioGroup>
                 <Input
@@ -232,7 +264,7 @@ export default function RecordPage() {
                   {...register('timeAdjustment', { valueAsNumber: true })}
                   defaultValue={0}
                   readOnly={!isCustomTime} // '変更'が選択されていない場合は読み取り専用にする
-                  />
+                />
                 分
               </Flex>
             </GridItem>
@@ -308,11 +340,7 @@ export default function RecordPage() {
             {/* ))} */}
           </UnorderedList>
           <Flex mt='2'>
-            <Button
-              colorScheme='teal'
-              size='sm'
-              onClick={handleSubmit(onSubmit)}
-            >
+            <Button colorScheme='teal' size='sm' onClick={handleSubmit(onSubmit)}>
               保存して戻る
             </Button>
             <Spacer />
