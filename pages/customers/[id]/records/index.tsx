@@ -18,6 +18,14 @@ import {
   RadioGroup,
   Stack,
   FormErrorMessage,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -47,6 +55,11 @@ export default function RecordPage() {
     formState: { errors },
     reset,
   } = useForm<BasicInfoOfRecord>();
+
+  {
+    /* modal */
+  }
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   {
     /* state */
@@ -293,7 +306,7 @@ export default function RecordPage() {
             fontSize={{ base: 'sm', md: 'md' }}
           >
             {/* {todos.map((todo) => ( */}
-            <ListItem key='' className='record' onClick={editRecord}>
+            <ListItem key='' className='record' onClick={onOpen}>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
                   テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -302,7 +315,32 @@ export default function RecordPage() {
                   テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
                 </Box>
               </Flex>
+              <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>編集</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Flex>
+                      <Box p='2' w='50%' borderRight='1px'>
+                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                      </Box>
+                      <Box p='2' w='50%'>
+                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                      </Box>
+                    </Flex>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme='blue' mr={3} onClick={onClose}>
+                      Close
+                    </Button>
+                    <Button variant='ghost'>保存</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
             </ListItem>
+
             <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
               <Badge ml='2' colorScheme='teal'>
                 Good
@@ -340,14 +378,41 @@ export default function RecordPage() {
             {/* ))} */}
           </UnorderedList>
           <Flex mt='2'>
+
             <Button colorScheme='teal' size='sm' onClick={handleSubmit(onSubmit)}>
               保存して戻る
             </Button>
+
             <Spacer />
-            <Button size='sm' colorScheme='facebook'>
+
+            <Button size='sm' colorScheme='facebook' onClick={onOpen}>
               <AddIcon mr='1' />
               記録を追加
             </Button>
+            <Modal isOpen={isOpen} onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>編集</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Flex>
+                      <Box p='2' w='50%' borderRight='1px'>
+                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                      </Box>
+                      <Box p='2' w='50%'>
+                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                      </Box>
+                    </Flex>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme='blue' mr={3} onClick={onClose}>
+                      Close
+                    </Button>
+                    <Button variant='ghost'>保存</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
           </Flex>
         </form>
       </Layout>
