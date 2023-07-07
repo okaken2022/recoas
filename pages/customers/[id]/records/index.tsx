@@ -17,6 +17,7 @@ import {
   Radio,
   RadioGroup,
   Stack,
+  FormErrorMessage,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -33,8 +34,19 @@ import { BasicInfoOfRecord } from '@/types/record';
 import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 export default function RecordPage() {
+  {
+    /* useForm */
+  }
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    reset,
+  } = useForm<BasicInfoOfRecord>();
+
   {
     /* state */
   }
@@ -88,7 +100,7 @@ export default function RecordPage() {
     timeAdjustment: number,
   ) => {
     if (!currentUser) return;
-
+    console.log('onSubmit fired2')
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -106,26 +118,16 @@ export default function RecordPage() {
         pmWork: pmWork,
         timeAdjustment: timeAdjustment,
       };
-
       await setDoc(dailyDocumentRef, data);
+      console.log(data);
     }
   };
 
-  const onSubmit = ({
-    editor,
-    amWork,
-    pmWork,
-    timeAdjustment,
-  }: {
-    editor: string;
-    amWork: string;
-    pmWork: string;
-    timeAdjustment: number;
-  }) => {
-    createBasicInfo(editor, amWork, pmWork, timeAdjustment);
-    setAddBasicInfo({ editor: '', amWork: '', pmWork: '', timeAdjustment: 0 });
-    console.log(addBasicInfo);
-    setAddBasicInfo(addBasicInfo);
+  const onSubmit: SubmitHandler<BasicInfoOfRecord> = async(data) => {
+    console.log('onSubmit fired')
+    console.log(data.amWork)
+    await createBasicInfo(data.editor, data.amWork, data.pmWork, data.timeAdjustment);
+    reset();
   };
 
   const editRecord = () => {
@@ -135,193 +137,188 @@ export default function RecordPage() {
   return (
     <>
       <Layout>
-        <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
-          {customer?.customerName}さん
-        </Heading>
-        {/* テキストはクリックで編集可能 */}
+        <form>
+          <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
+            {customer?.customerName}さん
+          </Heading>
+          {/* テキストはクリックで編集可能 */}
 
-        {/* 記録全体 */}
-        <Grid
-          h='auto'
-          templateRows='repeat(9, 1fr)'
-          templateColumns='repeat(2, 1fr)'
-          // gap={2}
-          border='1px'
-          borderTopRadius='md'
-        >
-          {/* 日付 */}
-          <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
-            <Flex alignItems='center'>
-              <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
-              <Spacer />
-
-              {/* 記入者 */}
-              <Text>記入者：</Text>
-              <Input
-                size={{ base: 'sm', md: 'md' }}
-                placeholder='岡田'
-                width='30%'
-                bg='white'
-                type='text'
-                id='editor'
-                value={addBasicInfo.editor}
-                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, editor: e.target.value })}
-              />
-            </Flex>
-          </GridItem>
-
-          {/* 活動 */}
-          <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
-            <Flex alignItems='center'>
-              <Text>活動</Text>
-              <Spacer />
-              <Text>午前：</Text>
-              <Input
-                size={{ base: 'sm', md: 'md' }}
-                placeholder='コーヒー'
-                width='60%'
-                bg='white'
-                type='text'
-                id='amWork'
-                value={addBasicInfo.amWork}
-                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, amWork: e.target.value })}
-              />
-            </Flex>
-          </GridItem>
-          <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
-            <Flex alignItems='center'>
-              <Spacer />
-              <Text>午後：</Text>
-              <Input
-                size={{ base: 'sm', md: 'md' }}
-                placeholder='菓子製造'
-                width='60%'
-                bg='white'
-                type='text'
-                id='pmWork'
-                value={addBasicInfo.pmWork}
-                onChange={(e) => setAddBasicInfo({ ...addBasicInfo, pmWork: e.target.value })}
-              />
-            </Flex>
-          </GridItem>
-
-          <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
-            <Flex alignItems='center' gap='2'>
-              <Text>工賃</Text>
-              <Spacer />
-              <RadioGroup>
-                <Stack spacing={5} direction='row'>
-                  <Radio colorScheme='green' defaultChecked>
-                    通常
-                  </Radio>
-                  <Radio colorScheme='red'>変更</Radio>
-                </Stack>
-              </RadioGroup>
-              <Input
-                size={{ base: 'sm', md: 'md' }}
-                placeholder='0'
-                width='20%'
-                bg='white'
-                type='text'
-                id='timeAdjustment'
-                value={addBasicInfo.timeAdjustment}
-                onChange={(e) =>
-                  setAddBasicInfo({
-                    ...addBasicInfo,
-                    timeAdjustment: parseFloat(e.target.value) || 0,
-                  })
-                }
-              />
-              分
-            </Flex>
-          </GridItem>
-
-          {/* 記録 */}
-          <GridItem
-            rowSpan={1}
-            colSpan={1}
-            bg='white'
-            alignItems='center'
-            textAlign='center'
-            borderRight='1px'
+          {/* 記録全体 */}
+          <Grid
+            h='auto'
+            templateRows='repeat(9, 1fr)'
+            templateColumns='repeat(2, 1fr)'
+            // gap={2}
+            border='1px'
+            borderTopRadius='md'
           >
-            ご本人の様子
-          </GridItem>
-          <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center'>
-            支援、考察
-          </GridItem>
-        </Grid>
+            {/* 日付 */}
+            <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
+              <Flex alignItems='center'>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
+                <Spacer />
 
-        <UnorderedList
-          listStyleType='none'
-          ml='0'
-          border='1px'
-          borderBottomRadius='md'
-          fontSize={{ base: 'sm', md: 'md' }}
-        >
-          {/* {todos.map((todo) => ( */}
-          <ListItem key='' className='record' onClick={editRecord}>
-            <Flex>
-              <Box p='2' w='50%' borderRight='1px'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-              <Box p='2' w='50%'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-            </Flex>
-          </ListItem>
-          <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
-            <Badge ml='2' colorScheme='teal'>
-              Good
-            </Badge>
-            <Flex>
-              <Box p='2' w='50%' borderRight='1px'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-              <Box p='2' w='50%'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-            </Flex>
-          </ListItem>
-          <ListItem key='' className='record' onClick={editRecord}>
-            <Flex>
-              <Box p='2' w='50%' borderRight='1px'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-              <Box p='2' w='50%'></Box>
-            </Flex>
-          </ListItem>
-          <ListItem key='' backgroundColor='red.50' className='record' onClick={editRecord}>
-            <Badge ml='2' colorScheme='red'>
-              特記事項
-            </Badge>
-            <Flex>
-              <Box p='2' w='50%' borderRight='1px'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-              <Box p='2' w='50%'>
-                テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-              </Box>
-            </Flex>
-          </ListItem>
-          {/* ))} */}
-        </UnorderedList>
-        <Flex mt='2'>
-          <Button
-            colorScheme='teal'
-            size='sm'
-            onClick={() => {
-              onSubmit(addBasicInfo);
-            }}
+                {/* 記入者 */}
+                <Text>記入者：</Text>
+                <Input
+                  size={{ base: 'sm', md: 'md' }}
+                  placeholder='岡田'
+                  width='30%'
+                  bg='white'
+                  type='text'
+                  id='editor'
+                  {...register('editor', { required: '記入者を入力してください' })}
+                />
+                {errors.editor && (
+                  <FormErrorMessage>{errors.editor.message}</FormErrorMessage>
+                )}
+              </Flex>
+            </GridItem>
+
+            {/* 活動 */}
+            <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
+              <Flex alignItems='center'>
+                <Text>活動</Text>
+                <Spacer />
+                <Text>午前：</Text>
+                <Input
+                  size={{ base: 'sm', md: 'md' }}
+                  placeholder='コーヒー'
+                  width='60%'
+                  bg='white'
+                  type='text'
+                  id='amWork'
+                  {...register('amWork', { required: '午前の活動を入力してください' })}
+                />
+              </Flex>
+            </GridItem>
+            <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
+              <Flex alignItems='center'>
+                <Spacer />
+                <Text>午後：</Text>
+                <Input
+                  size={{ base: 'sm', md: 'md' }}
+                  placeholder='菓子製造'
+                  width='60%'
+                  bg='white'
+                  type='text'
+                  id='pmWork'
+                  {...register('pmWork', { required: '午後の活動を入力してください' })}
+                />
+              </Flex>
+            </GridItem>
+
+            <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
+              <Flex alignItems='center' gap='2'>
+                <Text>工賃</Text>
+                <Spacer />
+                <RadioGroup>
+                  <Stack spacing={5} direction='row'>
+                    <Radio colorScheme='green' defaultChecked>
+                      通常
+                    </Radio>
+                    <Radio colorScheme='red'>変更</Radio>
+                  </Stack>
+                </RadioGroup>
+                <Input
+                  size={{ base: 'sm', md: 'md' }}
+                  placeholder='0'
+                  width='20%'
+                  bg='white'
+                  type='text'
+                  id='timeAdjustment'
+                  {...register('timeAdjustment', { valueAsNumber: true })}
+                  defaultValue={0}
+                  />
+                分
+              </Flex>
+            </GridItem>
+
+            {/* 記録 */}
+            <GridItem
+              rowSpan={1}
+              colSpan={1}
+              bg='white'
+              alignItems='center'
+              textAlign='center'
+              borderRight='1px'
+            >
+              ご本人の様子
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center'>
+              支援、考察
+            </GridItem>
+          </Grid>
+
+          <UnorderedList
+            listStyleType='none'
+            ml='0'
+            border='1px'
+            borderBottomRadius='md'
+            fontSize={{ base: 'sm', md: 'md' }}
           >
-            保存して戻る
-          </Button>
-          <Spacer />
-          <Button size='sm' colorScheme='facebook'>
-            <AddIcon mr='1' />
-            記録を追加
-          </Button>
-        </Flex>
+            {/* {todos.map((todo) => ( */}
+            <ListItem key='' className='record' onClick={editRecord}>
+              <Flex>
+                <Box p='2' w='50%' borderRight='1px'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2' w='50%'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+            <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
+              <Badge ml='2' colorScheme='teal'>
+                Good
+              </Badge>
+              <Flex>
+                <Box p='2' w='50%' borderRight='1px'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2' w='50%'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+            <ListItem key='' className='record' onClick={editRecord}>
+              <Flex>
+                <Box p='2' w='50%' borderRight='1px'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2' w='50%'></Box>
+              </Flex>
+            </ListItem>
+            <ListItem key='' backgroundColor='red.50' className='record' onClick={editRecord}>
+              <Badge ml='2' colorScheme='red'>
+                特記事項
+              </Badge>
+              <Flex>
+                <Box p='2' w='50%' borderRight='1px'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+                <Box p='2' w='50%'>
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                </Box>
+              </Flex>
+            </ListItem>
+            {/* ))} */}
+          </UnorderedList>
+          <Flex mt='2'>
+            <Button
+              colorScheme='teal'
+              size='sm'
+              onClick={handleSubmit(onSubmit)}
+            >
+              保存して戻る
+            </Button>
+            <Spacer />
+            <Button size='sm' colorScheme='facebook'>
+              <AddIcon mr='1' />
+              記録を追加
+            </Button>
+          </Flex>
+        </form>
       </Layout>
     </>
   );
