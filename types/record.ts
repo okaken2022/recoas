@@ -1,5 +1,5 @@
 export type BasicInfoOfRecord = {
-  editor: string;
+  author: string;
   amWork: string;
   pmWork: string;
   timeAdjustment: number;

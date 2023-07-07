@@ -43,6 +43,7 @@ import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import Link from 'next/link';
 
 export default function RecordPage() {
   {
@@ -107,7 +108,7 @@ export default function RecordPage() {
     /* 基本情報保存 */
   }
   const createBasicInfo = async (
-    editor: string,
+    author: string,
     amWork: string,
     pmWork: string,
     timeAdjustment: number,
@@ -125,7 +126,7 @@ export default function RecordPage() {
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
     const data = {
-      editor: editor,
+      author: author,
       amWork: amWork,
       pmWork: pmWork,
       timeAdjustment: timeAdjustment,
@@ -155,7 +156,7 @@ export default function RecordPage() {
       setbasicInfoOfRecordData(data);
 
       // フォームの各フィールドに値を設定
-      setValue('editor', data.editor);
+      setValue('author', data.author);
       setValue('amWork', data.amWork);
       setValue('pmWork', data.pmWork);
       setValue('timeAdjustment', data.timeAdjustment);
@@ -172,14 +173,13 @@ export default function RecordPage() {
   };
 
   const onSubmit: SubmitHandler<BasicInfoOfRecord> = async (data) => {
-    console.log('onSubmit fired');
-    console.log(data.amWork);
-    await createBasicInfo(data.editor, data.amWork, data.pmWork, data.timeAdjustment);
+      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+    router.push({
+      pathname: `/customers/${customerId}/` 
+    });
   };
 
-  const editRecord = () => {
-    alert('click');
-  };
+
 
   return (
     <>
@@ -213,10 +213,10 @@ export default function RecordPage() {
                   width='30%'
                   bg='white'
                   type='text'
-                  id='editor'
-                  {...register('editor', { required: '記入者を入力してください' })}
+                  id='author'
+                  {...register('author')}
                 />
-                {errors.editor && <FormErrorMessage>{errors.editor.message}</FormErrorMessage>}
+                {errors.author && <FormErrorMessage>{errors.author.message}</FormErrorMessage>}
               </Flex>
             </GridItem>
 
@@ -233,7 +233,7 @@ export default function RecordPage() {
                   bg='white'
                   type='text'
                   id='amWork'
-                  {...register('amWork', { required: '午前の活動を入力してください' })}
+                  {...register('amWork')}
                 />
               </Flex>
             </GridItem>
@@ -248,7 +248,7 @@ export default function RecordPage() {
                   bg='white'
                   type='text'
                   id='pmWork'
-                  {...register('pmWork', { required: '午後の活動を入力してください' })}
+                  {...register('pmWork')}
                 />
               </Flex>
             </GridItem>
@@ -341,7 +341,7 @@ export default function RecordPage() {
               </Modal>
             </ListItem>
 
-            <ListItem key='' backgroundColor='teal.50' className='record' onClick={editRecord}>
+            <ListItem key='' backgroundColor='teal.50' className='record' onClick={onOpen}>
               <Badge ml='2' colorScheme='teal'>
                 Good
               </Badge>
@@ -354,7 +354,7 @@ export default function RecordPage() {
                 </Box>
               </Flex>
             </ListItem>
-            <ListItem key='' className='record' onClick={editRecord}>
+            <ListItem key='' className='record' onClick={onOpen}>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
                   テキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -362,7 +362,7 @@ export default function RecordPage() {
                 <Box p='2' w='50%'></Box>
               </Flex>
             </ListItem>
-            <ListItem key='' backgroundColor='red.50' className='record' onClick={editRecord}>
+            <ListItem key='' backgroundColor='red.50' className='record' onClick={onOpen}>
               <Badge ml='2' colorScheme='red'>
                 特記事項
               </Badge>
@@ -380,7 +380,7 @@ export default function RecordPage() {
           <Flex mt='2'>
 
             <Button colorScheme='teal' size='sm' onClick={handleSubmit(onSubmit)}>
-              保存して戻る
+                保存して戻る
             </Button>
 
             <Spacer />
