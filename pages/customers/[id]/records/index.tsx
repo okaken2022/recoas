@@ -173,13 +173,11 @@ export default function RecordPage() {
   };
 
   const onSubmit: SubmitHandler<BasicInfoOfRecord> = async (data) => {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+    await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
     router.push({
-      pathname: `/customers/${customerId}/` 
+      pathname: `/customers/${customerId}/`,
     });
   };
-
-
 
   return (
     <>
@@ -188,9 +186,8 @@ export default function RecordPage() {
           <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
             {customer?.customerName}さん
           </Heading>
-          {/* テキストはクリックで編集可能 */}
 
-          {/* 記録全体 */}
+          {/* 基本情報 */}
           <Grid
             h='auto'
             templateRows='repeat(9, 1fr)'
@@ -378,9 +375,8 @@ export default function RecordPage() {
             {/* ))} */}
           </UnorderedList>
           <Flex mt='2'>
-
             <Button colorScheme='teal' size='sm' onClick={handleSubmit(onSubmit)}>
-                保存して戻る
+              保存して戻る
             </Button>
 
             <Spacer />
@@ -390,29 +386,29 @@ export default function RecordPage() {
               記録を追加
             </Button>
             <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                  <ModalHeader>編集</ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <Flex>
-                      <Box p='2' w='50%' borderRight='1px'>
-                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                      </Box>
-                      <Box p='2' w='50%'>
-                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                      </Box>
-                    </Flex>
-                  </ModalBody>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>編集</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>
+                  <Flex>
+                    <Box p='2' w='50%' borderRight='1px'>
+                      テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                    </Box>
+                    <Box p='2' w='50%'>
+                      テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                    </Box>
+                  </Flex>
+                </ModalBody>
 
-                  <ModalFooter>
-                    <Button colorScheme='blue' mr={3} onClick={onClose}>
-                      Close
-                    </Button>
-                    <Button variant='ghost'>保存</Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
+                <ModalFooter>
+                  <Button colorScheme='blue' mr={3} onClick={onClose}>
+                    Close
+                  </Button>
+                  <Button variant='ghost'>保存</Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
           </Flex>
         </form>
       </Layout>
