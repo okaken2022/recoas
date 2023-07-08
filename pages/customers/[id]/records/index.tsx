@@ -26,6 +26,8 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -35,6 +37,7 @@ import Layout from '@/components/Layout';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
+import ResizeTextarea from "react-textarea-autosize";
 
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
@@ -58,10 +61,10 @@ export default function RecordPage() {
   } = useForm<BasicInfoOfRecord>();
 
   {
-    /* modal */
+    /* modal, toast */
   }
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const toast = useToast();
   {
     /* state */
   }
@@ -135,6 +138,26 @@ export default function RecordPage() {
     console.log('データが更新されました');
   };
 
+  const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
+    try {
+    await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+    toast({
+      title: '基本情報を保存しました。',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+    } catch (e) {
+    console.error(e);
+    toast({
+      title: '保存に失敗しました。',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+  }
+  };
+
   {
     /* 基本情報取得 */
   }
@@ -172,12 +195,12 @@ export default function RecordPage() {
     setIsCustomTime(value === '変更');
   };
 
-  const onSubmit: SubmitHandler<BasicInfoOfRecord> = async (data) => {
-    await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+  
+  const returnList = () => {
     router.push({
       pathname: `/customers/${customerId}/`,
     });
-  };
+  }
 
   return (
     <>
@@ -255,7 +278,7 @@ export default function RecordPage() {
                 <Text>工賃</Text>
                 <Spacer />
                 <RadioGroup onChange={handleRadioChange} value={isCustomTime ? '変更' : '通常'}>
-                  <Stack spacing={5} direction='row'>
+                  <Stack spacing={3} direction='row'>
                     <Radio colorScheme='green' defaultChecked value='通常'>
                       通常
                     </Radio>
@@ -276,6 +299,9 @@ export default function RecordPage() {
                   readOnly={!isCustomTime} // '変更'が選択されていない場合は読み取り専用にする
                 />
                 分
+                <Button colorScheme='teal' size={{ base: 'xs', md: 'md' }} onClick={handleSubmit(onSubmitBasicInfo)}>
+                  保存
+                </Button>
               </Flex>
             </GridItem>
 
@@ -312,22 +338,52 @@ export default function RecordPage() {
                   テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
                 </Box>
               </Flex>
+
               <Modal isOpen={isOpen} onClose={onClose}>
                 <ModalOverlay />
-                <ModalContent>
+                <ModalContent width="60%">
                   <ModalHeader>編集</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
-                    <Flex>
-                      <Box p='2' w='50%' borderRight='1px'>
-                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                    <Flex borderBottom='1px' textAlign='center'>
+                    <Box p='2' w='50%' borderRight='1px'>
+                        ご本人の様子
                       </Box>
                       <Box p='2' w='50%'>
-                        テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                        支援・考察
                       </Box>
                     </Flex>
-                  </ModalBody>
+                    <Flex>
 
+                    <Textarea
+                          minH="unset"
+                          overflow="hidden"
+                          resize="none"
+                          minRows={1}
+                          as={ResizeTextarea}
+                  placeholder='テキスト'
+                  width='50%'
+
+                  bg='white'
+                  id='situation'
+                  {...register('situation')}
+                />
+                    <Textarea
+                          minH="unset"
+                          overflow="hidden"
+                          resize="none"
+                          minRows={1}
+                          as={ResizeTextarea}
+                  placeholder='テキスト'
+                  width='50%'
+
+                  bg='white'
+                  id='support'
+                  {...register('support')}
+                />
+
+                    </Flex>
+                  </ModalBody>
                   <ModalFooter>
                     <Button colorScheme='blue' mr={3} onClick={onClose}>
                       Close
@@ -375,8 +431,8 @@ export default function RecordPage() {
             {/* ))} */}
           </UnorderedList>
           <Flex mt='2'>
-            <Button colorScheme='teal' size='sm' onClick={handleSubmit(onSubmit)}>
-              保存して戻る
+            <Button colorScheme='teal' size='sm' onClick={returnList}>
+              一覧へ戻る
             </Button>
 
             <Spacer />
@@ -385,30 +441,6 @@ export default function RecordPage() {
               <AddIcon mr='1' />
               記録を追加
             </Button>
-            <Modal isOpen={isOpen} onClose={onClose}>
-              <ModalOverlay />
-              <ModalContent>
-                <ModalHeader>編集</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <Flex>
-                    <Box p='2' w='50%' borderRight='1px'>
-                      テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                    </Box>
-                    <Box p='2' w='50%'>
-                      テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                    </Box>
-                  </Flex>
-                </ModalBody>
-
-                <ModalFooter>
-                  <Button colorScheme='blue' mr={3} onClick={onClose}>
-                    Close
-                  </Button>
-                  <Button variant='ghost'>保存</Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
           </Flex>
         </form>
       </Layout>
