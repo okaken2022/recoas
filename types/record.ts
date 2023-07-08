@@ -5,7 +5,9 @@ export type BasicInfoOfRecord = {
   timeAdjustment: number;
 };
 
-export type Record = {
+export type SingleRecord = {
+  serialNumber: number;
+  editor: string;
   situation: string;
   support: string;
   good: boolean;

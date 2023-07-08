@@ -131,7 +131,7 @@ export default function Customer() {
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
       pathname: `/customers/${customerId}/records/`, // ルーティング先のパスを指定
-      query: { date: clickedDate.toISOString(), customerId: customerId }, // クエリパラメータとして日付情報を渡す
+      query: { date: clickedDate.toISOString() }, // クエリパラメータとして日付情報を渡す
     });
 
     // Firestoreのコレクションを作成

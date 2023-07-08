@@ -37,7 +37,7 @@ import Layout from '@/components/Layout';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
-import ResizeTextarea from "react-textarea-autosize";
+import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
@@ -140,22 +140,22 @@ export default function RecordPage() {
 
   const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
     try {
-    await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
-    toast({
-      title: '基本情報を保存しました。',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
+      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+      toast({
+        title: '基本情報を保存しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     } catch (e) {
-    console.error(e);
-    toast({
-      title: '保存に失敗しました。',
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-  }
+      console.error(e);
+      toast({
+        title: '保存に失敗しました。',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   {
@@ -195,21 +195,29 @@ export default function RecordPage() {
     setIsCustomTime(value === '変更');
   };
 
-  
   const returnList = () => {
     router.push({
       pathname: `/customers/${customerId}/`,
     });
-  }
+  };
+
+  const goToRecordEditPage = () => {
+    router.push({
+      pathname: `/customers/${customerId}/records/id`,
+      query: { date: router.query.date, customerId: customerId },
+    });
+  };
 
   return (
     <>
       <Layout>
         <form>
-          <Heading color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
+          <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
             {customer?.customerName}さん
           </Heading>
-
+          <Text color='color.main' fontWeight={'bold'}>
+            ※各記録をタップすると編集できます
+          </Text>
           {/* 基本情報 */}
           <Grid
             h='auto'
@@ -299,7 +307,11 @@ export default function RecordPage() {
                   readOnly={!isCustomTime} // '変更'が選択されていない場合は読み取り専用にする
                 />
                 分
-                <Button colorScheme='teal' size={{ base: 'xs', md: 'md' }} onClick={handleSubmit(onSubmitBasicInfo)}>
+                <Button
+                  colorScheme='teal'
+                  size={{ base: 'xs', md: 'md' }}
+                  onClick={handleSubmit(onSubmitBasicInfo)}
+                >
                   保存
                 </Button>
               </Flex>
@@ -329,72 +341,18 @@ export default function RecordPage() {
             fontSize={{ base: 'sm', md: 'md' }}
           >
             {/* {todos.map((todo) => ( */}
-            <ListItem key='' className='record' onClick={onOpen}>
+            <ListItem key='recordId' className='record' onClick={() => goToRecordEditPage()}>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
+                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
                 </Box>
                 <Box p='2' w='50%'>
                   テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
                 </Box>
               </Flex>
-
-              <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent width="60%">
-                  <ModalHeader>編集</ModalHeader>
-                  <ModalCloseButton />
-                  <ModalBody>
-                    <Flex borderBottom='1px' textAlign='center'>
-                    <Box p='2' w='50%' borderRight='1px'>
-                        ご本人の様子
-                      </Box>
-                      <Box p='2' w='50%'>
-                        支援・考察
-                      </Box>
-                    </Flex>
-                    <Flex>
-
-                    <Textarea
-                          minH="unset"
-                          overflow="hidden"
-                          resize="none"
-                          minRows={1}
-                          as={ResizeTextarea}
-                  placeholder='テキスト'
-                  width='50%'
-
-                  bg='white'
-                  id='situation'
-                  {...register('situation')}
-                />
-                    <Textarea
-                          minH="unset"
-                          overflow="hidden"
-                          resize="none"
-                          minRows={1}
-                          as={ResizeTextarea}
-                  placeholder='テキスト'
-                  width='50%'
-
-                  bg='white'
-                  id='support'
-                  {...register('support')}
-                />
-
-                    </Flex>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button colorScheme='blue' mr={3} onClick={onClose}>
-                      Close
-                    </Button>
-                    <Button variant='ghost'>保存</Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
             </ListItem>
 
-            <ListItem key='' backgroundColor='teal.50' className='record' onClick={onOpen}>
+            <ListItem key='' backgroundColor='teal.50' className='record' onClick={() => goToRecordEditPage()}>
               <Badge ml='2' colorScheme='teal'>
                 Good
               </Badge>
@@ -407,7 +365,7 @@ export default function RecordPage() {
                 </Box>
               </Flex>
             </ListItem>
-            <ListItem key='' className='record' onClick={onOpen}>
+            <ListItem key='' className='record' onClick={() => goToRecordEditPage()}>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
                   テキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -415,7 +373,7 @@ export default function RecordPage() {
                 <Box p='2' w='50%'></Box>
               </Flex>
             </ListItem>
-            <ListItem key='' backgroundColor='red.50' className='record' onClick={onOpen}>
+            <ListItem key='' backgroundColor='red.50' className='record' onClick={() => goToRecordEditPage()}>
               <Badge ml='2' colorScheme='red'>
                 特記事項
               </Badge>
