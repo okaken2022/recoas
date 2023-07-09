@@ -42,13 +42,47 @@ import ResizeTextarea from 'react-textarea-autosize';
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Link from 'next/link';
+import { NextPage } from 'next';
 
-export default function RecordPage() {
+export async function getStaticProps() {
+  // 日付を取得
+  const date = new Date();
+  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
+
+  return {
+    props: {
+      formattedDateJa,
+    },
+  };
+}
+
+export async function getStaticPaths() {
+  const customerIds: string[] = [];
+
+  try {
+    const querySnapshot = await getDocs(collection(db, 'customers'));
+    querySnapshot.forEach((doc) => {
+      customerIds.push(doc.id);
+    });
+  } catch (error) {
+    console.error('Error fetching customerIds:', error);
+  }
+
+  const paths = customerIds.map((id) => ({
+    params: { id },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) => {
   {
     /* useForm */
   }
@@ -88,10 +122,8 @@ export default function RecordPage() {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
-  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)'); //日本語表記の文字列
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
-  console.log(formattedDate);
 
   {
     /* 利用者情報取得 */
@@ -105,7 +137,6 @@ export default function RecordPage() {
       fetchRecordData();
     }
   }, [customerId, setValue]);
-  console.log(customerId);
 
   {
     /* 基本情報保存 */
@@ -341,7 +372,15 @@ export default function RecordPage() {
             fontSize={{ base: 'sm', md: 'md' }}
           >
             {/* {todos.map((todo) => ( */}
-            <ListItem key='recordId' className='record' onClick={() => goToRecordEditPage()}>
+            <ListItem
+              key='recordId'
+              className='record'
+              backgroundColor='teal.50'
+              onClick={() => goToRecordEditPage()}
+            >
+              <Badge ml='2' colorScheme='teal'>
+                Good
+              </Badge>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
                   テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
@@ -352,40 +391,6 @@ export default function RecordPage() {
               </Flex>
             </ListItem>
 
-            <ListItem key='' backgroundColor='teal.50' className='record' onClick={() => goToRecordEditPage()}>
-              <Badge ml='2' colorScheme='teal'>
-                Good
-              </Badge>
-              <Flex>
-                <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-                <Box p='2' w='50%'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-              </Flex>
-            </ListItem>
-            <ListItem key='' className='record' onClick={() => goToRecordEditPage()}>
-              <Flex>
-                <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-                <Box p='2' w='50%'></Box>
-              </Flex>
-            </ListItem>
-            <ListItem key='' backgroundColor='red.50' className='record' onClick={() => goToRecordEditPage()}>
-              <Badge ml='2' colorScheme='red'>
-                特記事項
-              </Badge>
-              <Flex>
-                <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-                <Box p='2' w='50%'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-              </Flex>
-            </ListItem>
             {/* ))} */}
           </UnorderedList>
           <Flex mt='2'>
@@ -404,4 +409,6 @@ export default function RecordPage() {
       </Layout>
     </>
   );
-}
+};
+
+export default RecordPage;

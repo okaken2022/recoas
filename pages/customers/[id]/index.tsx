@@ -54,7 +54,6 @@ export default function Customer() {
     /* 利用者情報取得 */
   }
   const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
-  console.log(customerId);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
   const fetchHolidays = async () => {
@@ -107,7 +106,6 @@ export default function Customer() {
       fetchHolidays();
     }
   }, [customerId]);
-  console.log(customer);
 
   if (!customer) {
     return <div>Loading...</div>;
