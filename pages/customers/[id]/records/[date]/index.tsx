@@ -48,41 +48,41 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 
-export async function getStaticProps() {
-  // 日付を取得
-  const date = new Date();
-  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
+// export async function getStaticProps() {
+//   // 日付を取得
+//   const date = new Date();
+//   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
 
-  return {
-    props: {
-      formattedDateJa,
-    },
-  };
-}
+//   return {
+//     props: {
+//       formattedDateJa,
+//     },
+//   };
+// }
 
-export async function getStaticPaths() {
-  const customerIds: string[] = [];
+// export async function getStaticPaths() {
+//   const customerIds: string[] = [];
 
-  try {
-    const querySnapshot = await getDocs(collection(db, 'customers'));
-    querySnapshot.forEach((doc) => {
-      customerIds.push(doc.id);
-    });
-  } catch (error) {
-    console.error('Error fetching customerIds:', error);
-  }
+//   try {
+//     const querySnapshot = await getDocs(collection(db, 'customers'));
+//     querySnapshot.forEach((doc) => {
+//       customerIds.push(doc.id);
+//     });
+//   } catch (error) {
+//     console.error('Error fetching customerIds:', error);
+//   }
 
-  const paths = customerIds.map((id) => ({
-    params: { id },
-  }));
+//   const paths = customerIds.map((id) => ({
+//     params: { id },
+//   }));
 
-  return {
-    paths,
-    fallback: false,
-  };
-}
+//   return {
+//     paths,
+//     fallback: false,
+//   };
+// }
 
-const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) => {
+const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* useForm */
   }
@@ -124,6 +124,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
   const { date } = router.query as { date: string };
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
+  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
 
   {
     /* 利用者情報取得 */
@@ -232,10 +233,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
     });
   };
 
-  const goToRecordEditPage = () => {
+  const goToRecordEditPage = (recordId: string) => {
     router.push({
-      pathname: `/customers/${customerId}/records/id`,
-      query: { date: router.query.date, customerId: customerId },
+      pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
+      query: { recordId: recordId },
     });
   };
 
@@ -261,7 +262,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
             {/* 日付 */}
             <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
               <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
                 <Spacer />
 
                 {/* 記入者 */}

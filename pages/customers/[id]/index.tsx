@@ -125,11 +125,10 @@ export default function Customer() {
   const handleEventClick = async (eventInfo: EventContentArg) => {
     const clickedDate = eventInfo.event.start as Date; // クリックされたイベントの日付を取得
     const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
-
+    const formattedDate = moment(clickedDate).format('YYYY-MM-DD'); //日付の文字列
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
-      pathname: `/customers/${customerId}/records/`, // ルーティング先のパスを指定
-      query: { date: clickedDate.toISOString() }, // クエリパラメータとして日付情報を渡す
+      pathname: `/customers/${customerId}/records/${formattedDate}/`, // ルーティング先のパスを指定
     });
 
     // Firestoreのコレクションを作成
