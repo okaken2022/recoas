@@ -213,7 +213,7 @@ export default function RecordPage() {
       <Layout>
         <form>
           <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
-            記録の編集
+            記録の追加
           </Heading>
           <Box border='1px' borderRadius='md'>
             <Flex mb='2' textAlign='center' borderTopRadius='md' bg='color.mainTransparent1'>

@@ -41,7 +41,7 @@ import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
-import { BasicInfoOfRecord } from '@/types/record';
+import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
 import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
@@ -108,6 +108,9 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
+  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(
+    null,
+  );
 
   {
     /* ログイン */
@@ -135,7 +138,8 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchRecordData();
+      fetchBasiRecordInfo();
+      // fetchSingleRecord();
     }
   }, [customerId, setValue]);
 
@@ -193,7 +197,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* 基本情報取得 */
   }
-  const fetchRecordData = async () => {
+  const fetchBasiRecordInfo = async () => {
     if (!currentUser) return;
     const recordsCollectionRef = collection(
       db,
@@ -233,10 +237,47 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     });
   };
 
+  {
+    /* singleRecord取得 */
+  }
+  // const fetchSingleRecord = async () => {
+  //   if (!currentUser) return;
+  //   const singleRecordCollectionRef = collection(
+  //     db,
+  //     'customers',
+  //     customerId as string,
+  //     'monthlyRecords',
+  //     formattedMonth,
+  //     'dailyRecords',
+  //     formattedDate as string,
+  //     'singleRecord'
+  //   );
+  //   const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
+
+  //   singleRecordQuerySnapshot.forEach((doc) => {
+  //     const docId = doc.id;
+  //     // docId を使用して何らかの操作を行う
+  //     console.log(docId)
+  //     const singleRecordDocRef = doc(singleRecordCollectionRef, docId);
+  //     const singleRecordDocSnapshot = await getDoc(singleRecordDocRef);
+  //     if (singleRecordDocSnapshot.exists()) {
+  //       const singleRecordData = singleRecordDocSnapshot.data();
+  //       // singleRecordDataを使用して何らかの操作を行う
+  //     }
+  //   });
+  // };
+
+
   const goToRecordEditPage = (recordId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
       query: { recordId: recordId },
+    });
+  };
+
+  const goToRecordCreatePage = () => {
+    router.push({
+      pathname: `/customers/${customerId}/records/${formattedDate}/create/`,
     });
   };
 
@@ -401,7 +442,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
 
             <Spacer />
 
-            <Button size='sm' colorScheme='facebook' onClick={onOpen}>
+            <Button size='sm' colorScheme='facebook' onClick={() => goToRecordCreatePage()}>
               <AddIcon mr='1' />
               記録を追加
             </Button>
