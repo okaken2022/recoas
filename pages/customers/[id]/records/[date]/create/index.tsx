@@ -20,7 +20,7 @@ import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -90,7 +90,6 @@ export default function RecordPage() {
     /* singleRecord保存 */
   }
   const createsingleRecord = async (
-    serialNumber: number | null,
     editor: string | null,
     situation: string,
     support: string,
@@ -110,8 +109,16 @@ export default function RecordPage() {
       formattedDate,
       'singleRecord',
     );
+
+    // singleRecordコレクション内のドキュメント数を取得
+    const querySnapshot = await getDocs(singleRecordCollectionRef);
+    const documentCount = querySnapshot.size;
+
+    // 連番を付与するために、取得したドキュメント数に1を加える
+    const serialNumber = documentCount + 1;
+
     const data = {
-    serialNumber: 'serialNumber',
+    serialNumber: serialNumber,
     editor: 'editor',
     situation: situation,
     support: support,
@@ -119,7 +126,7 @@ export default function RecordPage() {
     notice: notice,
     };
 
-    await addDoc(singleRecordCollectionRef, {data})
+    await addDoc(singleRecordCollectionRef, data)
 
     console.log('データが登録されました');
   };
@@ -127,7 +134,7 @@ export default function RecordPage() {
   const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
     console.log('発火')
     try {
-      await createsingleRecord(data.serialNumber, data.editor, data.situation, data.support, data.good, data.notice);
+      await createsingleRecord( data.editor, data.situation, data.support, data.good, data.notice);
       toast({
         title: '記録を保存しました。',
         status: 'success',
