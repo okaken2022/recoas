@@ -6,8 +6,8 @@ export type BasicInfoOfRecord = {
 };
 
 export type SingleRecord = {
-  serialNumber: number;
-  editor: string;
+  serialNumber: number | null;
+  editor: string | null;
   situation: string;
   support: string;
   good: boolean;

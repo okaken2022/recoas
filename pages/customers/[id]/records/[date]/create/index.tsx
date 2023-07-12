@@ -1,31 +1,12 @@
 import {
   Heading,
   Spacer,
-  VStack,
-  Text,
   Box,
-  Grid,
-  GridItem,
   Flex,
-  Input,
-  UnorderedList,
-  ListItem,
   Button,
-  ButtonGroup,
-  Badge,
   Checkbox,
-  Radio,
-  RadioGroup,
   Stack,
-  FormErrorMessage,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -34,15 +15,12 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { addDoc, collection } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -61,14 +39,12 @@ export default function RecordPage() {
   } = useForm<SingleRecord>();
 
   {
-    /* modal, toast */
+    /* toast */
   }
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   {
     /* state */
   }
-  const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
   const [loading, setLoading] = useState(true);
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
@@ -111,41 +87,49 @@ export default function RecordPage() {
   console.log(customerId);
 
   {
-    /* 基本情報保存 */
+    /* singleRecord保存 */
   }
-  const createBasicInfo = async (
-    author: string,
-    amWork: string,
-    pmWork: string,
-    timeAdjustment: number,
+  const createsingleRecord = async (
+    serialNumber: number | null,
+    editor: string | null,
+    situation: string,
+    support: string,
+    good: boolean,
+    notice: boolean,
   ) => {
     if (!currentUser) return;
-    console.log('onSubmit fired2');
-    const recordsCollectionRef = collection(
+    //formが空の場合送信しない処理を追加
+
+    const singleRecordCollectionRef = collection(
       db,
       'customers',
       customerId as string,
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
+      formattedDate,
+      'singleRecord',
     );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const monthSnapshot = await getDoc(dailyDocumentRef);
     const data = {
-      author: author,
-      amWork: amWork,
-      pmWork: pmWork,
-      timeAdjustment: timeAdjustment,
+    serialNumber: 'serialNumber',
+    editor: 'editor',
+    situation: situation,
+    support: support,
+    good: good,
+    notice: notice,
     };
-    await setDoc(dailyDocumentRef, data);
-    console.log('データが更新されました');
+
+    await addDoc(singleRecordCollectionRef, {data})
+
+    console.log('データが登録されました');
   };
 
-  const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
+  const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
+    console.log('発火')
     try {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+      await createsingleRecord(data.serialNumber, data.editor, data.situation, data.support, data.good, data.notice);
       toast({
-        title: '基本情報を保存しました。',
+        title: '記録を保存しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,
@@ -159,53 +143,6 @@ export default function RecordPage() {
         isClosable: true,
       });
     }
-  };
-
-  {
-    /* 時間変更のラジオボタン */
-  }
-  const handleRadioChange = (value: string) => {
-    setIsCustomTime(value === '変更');
-  };
-
-  const returnRecords = () => {
-    router.push({
-      pathname: `/customers/${customerId}/`,
-    });
-  };
-
-  {
-    /* singleRecord取得 */
-  }
-  const fetchRecordId = async () => {
-    if (!currentUser) return;
-    const singleRecordCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-      formattedDate as string,
-
-    );
-    const singleRecordRef = doc(singleRecordCollectionRef, 'law59lSu9J3VaJ2YDYDN');
-    const singleRecordSnapshot = await getDoc(singleRecordRef);
-
-    if (singleRecordSnapshot.exists()) {
-      const data = singleRecordSnapshot.data() as SingleRecord;
-      setSingleRecordData(data);
-
-      // フォームの各フィールドに値を設定
-      setValue('serialNumber', data.serialNumber);
-      setValue('editor', data.editor);
-      setValue('situation', data.situation);
-      setValue('support', data.support);
-      setValue('good', data.good);
-      setValue('notice', data.notice);
-    }
-
-    setLoading(false);
   };
 
   return (
@@ -237,7 +174,7 @@ export default function RecordPage() {
                 width='50%'
                 bg='white'
                 id='situation'
-                // {...register('situation')}
+                {...register('situation')}
               />
               <Textarea
                 p='1'
@@ -251,12 +188,12 @@ export default function RecordPage() {
                 width='50%'
                 bg='white'
                 id='support'
-                // {...register('support')}
+                {...register('support')}
               />
             </Flex>
             <Stack spacing={5} direction='row' p='2'>
-              <Checkbox colorScheme='blue'>Good</Checkbox>
-              <Checkbox colorScheme='red'>特記事項</Checkbox>
+              <Checkbox colorScheme='blue' {...register('good')}>Good</Checkbox>
+              <Checkbox colorScheme='red' {...register('notice')}>特記事項</Checkbox>
             </Stack>
           </Box>
 
@@ -268,7 +205,7 @@ export default function RecordPage() {
             <Button size='sm' colorScheme='red'>
               削除
             </Button>
-            <Button ml='2' size='sm' colorScheme='facebook'>
+            <Button ml='2' size='sm' colorScheme='facebook' onClick={handleSubmit(onSubmitSingleRecord)}>
               保存
             </Button>
           </Flex>

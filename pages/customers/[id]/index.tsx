@@ -33,6 +33,7 @@ import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import { EventContentArg } from '@fullcalendar/core';
+//momentは削除
 import 'moment/locale/ja';
 import jaLocale from '@fullcalendar/core/locales/ja';
 import { CustomerInfoType } from '@/types/customerInfo';

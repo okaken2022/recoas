@@ -125,6 +125,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
+  moment.locale("ja");
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
@@ -268,10 +269,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   // };
 
 
-  const goToRecordEditPage = (recordId: string) => {
+  const goToRecordEditPage = () => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
-      query: { recordId: recordId },
+      // query: { recordId: recordId }
     });
   };
 
@@ -303,7 +304,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             {/* 日付 */}
             <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
               <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
                 <Spacer />
 
                 {/* 記入者 */}
