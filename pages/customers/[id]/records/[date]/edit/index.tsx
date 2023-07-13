@@ -1,31 +1,12 @@
 import {
   Heading,
   Spacer,
-  VStack,
-  Text,
   Box,
-  Grid,
-  GridItem,
   Flex,
-  Input,
-  UnorderedList,
-  ListItem,
   Button,
-  ButtonGroup,
-  Badge,
   Checkbox,
-  Radio,
-  RadioGroup,
   Stack,
-  FormErrorMessage,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -34,15 +15,12 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { DocumentData, addDoc, collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -61,20 +39,20 @@ export default function RecordPage() {
   } = useForm<SingleRecord>();
 
   {
-    /* modal, toast */
+    /* toast */
   }
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   {
     /* state */
   }
-  const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
   const [loading, setLoading] = useState(true);
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
-  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(null);
+  const [singleRecordData, setSingleRecordData] = useState<
+    { docId: string; data: DocumentData }[] | null
+  >(null);
 
   {
     /* ログイン */
@@ -103,51 +81,63 @@ export default function RecordPage() {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      // fetchRecordData();
+      fetchSingleRecord();
     }
-  }, [customerId, setValue]);
+  }, [customerId, singleRecordData, setValue]);
   console.log(customerId);
 
   {
-    /* 基本情報保存 */
+    /* singleRecord取得 */
   }
-  const createBasicInfo = async (
-    author: string,
-    amWork: string,
-    pmWork: string,
-    timeAdjustment: number,
-  ) => {
+  const fetchSingleRecord = async () => {
     if (!currentUser) return;
-    console.log('onSubmit fired2');
-    const recordsCollectionRef = collection(
+    const singleRecordCollectionRef = collection(
       db,
       'customers',
       customerId as string,
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
+      formattedDate as string,
+      'singleRecord',
     );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const monthSnapshot = await getDoc(dailyDocumentRef);
-    const data = {
-      author: author,
-      amWork: amWork,
-      pmWork: pmWork,
-      timeAdjustment: timeAdjustment,
-    };
-    await setDoc(dailyDocumentRef, data);
-    console.log('データが更新されました');
+    const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
+
+    singleRecordQuerySnapshot.forEach((doc) => {
+      const docId = doc.id;
+      const data = doc.data();
+      setSingleRecordData([{ docId, data }]);
+    });
   };
 
-  const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
+  {
+    /* singleRecord編集、保存 */
+  }
+
+  const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
+    console.log('発火');
     try {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
-      toast({
-        title: '基本情報を保存しました。',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      });
+      if (singleRecordData) {
+        const { docId } = singleRecordData[0];
+        const singleRecordDocumentRef = doc(
+          db,
+          'customers',
+          customerId as string,
+          'monthlyRecords',
+          formattedMonth,
+          'dailyRecords',
+          formattedDate,
+          'singleRecord',
+          docId,
+        );
+        await setDoc(singleRecordDocumentRef, data);
+        toast({
+          title: '記録を保存しました。',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
     } catch (e) {
       console.error(e);
       toast({
@@ -159,52 +149,11 @@ export default function RecordPage() {
     }
   };
 
-  {
-    /* 時間変更のラジオボタン */
-  }
-  const handleRadioChange = (value: string) => {
-    setIsCustomTime(value === '変更');
-  };
-
-  const returnRecords = () => {
+  const goToDailyRecordPage = () => {
     router.push({
-      pathname: `/customers/${customerId}/`,
+      pathname: `/customers/${customerId}/records/${formattedDate}/`,
     });
   };
-
-  {
-    /* singleRecord取得 */
-  }
-  const fetchRecordId = async () => {
-    if (!currentUser) return;
-    const singleRecordCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-      formattedDate as string,
-    );
-    const singleRecordRef = doc(singleRecordCollectionRef, 'law59lSu9J3VaJ2YDYDN');
-    const singleRecordSnapshot = await getDoc(singleRecordRef);
-
-    if (singleRecordSnapshot.exists()) {
-      const data = singleRecordSnapshot.data() as SingleRecord;
-      setSingleRecordData(data);
-
-      // フォームの各フィールドに値を設定
-      setValue('serialNumber', data.serialNumber);
-      setValue('editor', data.editor);
-      setValue('situation', data.situation);
-      setValue('support', data.support);
-      setValue('good', data.good);
-      setValue('notice', data.notice);
-    }
-
-    setLoading(false);
-  };
-
   return (
     <>
       <Layout>
@@ -234,7 +183,7 @@ export default function RecordPage() {
                 width='50%'
                 bg='white'
                 id='situation'
-                // {...register('situation')}
+                {...register('situation')}
               />
               <Textarea
                 p='1'
@@ -248,24 +197,30 @@ export default function RecordPage() {
                 width='50%'
                 bg='white'
                 id='support'
-                // {...register('support')}
+                {...register('support')}
               />
             </Flex>
             <Stack spacing={5} direction='row' p='2'>
-              <Checkbox colorScheme='blue'>Good</Checkbox>
-              <Checkbox colorScheme='red'>特記事項</Checkbox>
+              <Checkbox colorScheme='blue' {...register('good')}>
+                Good
+              </Checkbox>
+              <Checkbox colorScheme='red' {...register('notice')}>
+                特記事項
+              </Checkbox>
             </Stack>
           </Box>
 
           <Flex mt='2'>
-            <Button colorScheme='teal' size='sm'>
+            <Button colorScheme='teal' size='sm' onClick={() => goToDailyRecordPage()}>
               戻る
             </Button>
             <Spacer />
-            <Button size='sm' colorScheme='red'>
-              削除
-            </Button>
-            <Button ml='2' size='sm' colorScheme='facebook'>
+            <Button
+              ml='2'
+              size='sm'
+              colorScheme='facebook'
+              onClick={handleSubmit(onSubmitSingleRecord)}
+            >
               保存
             </Button>
           </Flex>
