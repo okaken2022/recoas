@@ -411,15 +411,17 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             borderBottomRadius='md'
             fontSize={{ base: 'sm', md: 'md' }}
           >
-            {singleRecordData.map((record) => {
+            {singleRecordData.map((record, index) => {
               const { docId, data } = record;
               const { situation, support } = data;
+
+              const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
 
               return (
                 <ListItem
                   key={docId}
                   className='record'
-                  // backgroundColor='teal.50'
+                  backgroundColor={backgroundColor}
                   onClick={() => goToRecordEditPage(docId)}
                 >
                   <Flex>
