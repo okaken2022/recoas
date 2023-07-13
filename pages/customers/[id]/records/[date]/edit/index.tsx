@@ -83,7 +83,7 @@ export default function RecordPage() {
       fetchCustomer(id, setCustomer);
       fetchSingleRecord();
     }
-  }, [customerId, singleRecordData, setValue]);
+  }, [customerId, setValue]);
   console.log(customerId);
 
   {
