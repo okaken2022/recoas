@@ -34,7 +34,7 @@ export const Header: React.FC = () => {
         <Box p={4} mb={{ base: '0', md: '8' }}>
           {user ? (
             <Text color='teal' fontWeight='bold' fontSize='s'>
-              ログイン中:{user?.email}
+              user: {user?.name}
             </Text>
           ) : (
             <Text color='teal' fontWeight='bold' fontSize='s'>

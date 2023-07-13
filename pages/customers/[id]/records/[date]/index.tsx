@@ -41,48 +41,57 @@ import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
-import { BasicInfoOfRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+} from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 
-export async function getStaticProps() {
-  // 日付を取得
-  const date = new Date();
-  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
+// export async function getStaticProps() {
+//   // 日付を取得
+//   const date = new Date();
+//   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
 
-  return {
-    props: {
-      formattedDateJa,
-    },
-  };
-}
+//   return {
+//     props: {
+//       formattedDateJa,
+//     },
+//   };
+// }
 
-export async function getStaticPaths() {
-  const customerIds: string[] = [];
+// export async function getStaticPaths() {
+//   const customerIds: string[] = [];
 
-  try {
-    const querySnapshot = await getDocs(collection(db, 'customers'));
-    querySnapshot.forEach((doc) => {
-      customerIds.push(doc.id);
-    });
-  } catch (error) {
-    console.error('Error fetching customerIds:', error);
-  }
+//   try {
+//     const querySnapshot = await getDocs(collection(db, 'customers'));
+//     querySnapshot.forEach((doc) => {
+//       customerIds.push(doc.id);
+//     });
+//   } catch (error) {
+//     console.error('Error fetching customerIds:', error);
+//   }
 
-  const paths = customerIds.map((id) => ({
-    params: { id },
-  }));
+//   const paths = customerIds.map((id) => ({
+//     params: { id },
+//   }));
 
-  return {
-    paths,
-    fallback: false,
-  };
-}
+//   return {
+//     paths,
+//     fallback: false,
+//   };
+// }
 
-const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) => {
+const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* useForm */
   }
@@ -108,6 +117,9 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
+  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
+    [],
+  );
 
   {
     /* ログイン */
@@ -122,8 +134,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
+  moment.locale('ja');
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
+  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
 
   {
     /* 利用者情報取得 */
@@ -134,7 +148,8 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchRecordData();
+      fetchBasiRecordInfo();
+      fetchSingleRecord();
     }
   }, [customerId, setValue]);
 
@@ -192,7 +207,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
   {
     /* 基本情報取得 */
   }
-  const fetchRecordData = async () => {
+  const fetchBasiRecordInfo = async () => {
     if (!currentUser) return;
     const recordsCollectionRef = collection(
       db,
@@ -232,10 +247,45 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
     });
   };
 
-  const goToRecordEditPage = () => {
+  {
+    /* singleRecord取得 */
+  }
+  const fetchSingleRecord = async () => {
+    if (!currentUser) return;
+    const singleRecordCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+      formattedDate as string,
+      'singleRecord',
+    );
+    const singleRecordQuerySnapshot = await getDocs(
+      query(singleRecordCollectionRef, orderBy('serialNumber')),
+    );
+
+    const records = singleRecordQuerySnapshot.docs.map((doc) => {
+      const docId = doc.id;
+      const data = doc.data() as SingleRecord;
+      return { docId, data };
+    });
+
+    setSingleRecordData(records);
+  };
+
+  const goToRecordEditPage = (docId: string) => {
     router.push({
-      pathname: `/customers/${customerId}/records/id`,
-      query: { date: router.query.date, customerId: customerId },
+      pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
+      query: { docId: docId },
+    });
+  };
+
+  const goToRecordCreatePage = () => {
+    router.push({
+      pathname: `/customers/${customerId}/records/${formattedDate}/create/`,
+      query: { formattedDate: formattedDate },
     });
   };
 
@@ -261,7 +311,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
             {/* 日付 */}
             <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
               <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
                 <Spacer />
 
                 {/* 記入者 */}
@@ -371,27 +421,40 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
             borderBottomRadius='md'
             fontSize={{ base: 'sm', md: 'md' }}
           >
-            {/* {todos.map((todo) => ( */}
-            <ListItem
-              key='recordId'
-              className='record'
-              backgroundColor='teal.50'
-              onClick={() => goToRecordEditPage()}
-            >
-              <Badge ml='2' colorScheme='teal'>
-                Good
-              </Badge>
-              <Flex>
-                <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-                <Box p='2' w='50%'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-              </Flex>
-            </ListItem>
+            {singleRecordData.map((record, index) => {
+              const { docId, data } = record;
+              const { situation, support, good, notice } = data;
 
-            {/* ))} */}
+              const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
+
+              return (
+                <ListItem
+                  key={docId}
+                  className='record'
+                  backgroundColor={backgroundColor}
+                  onClick={() => goToRecordEditPage(docId)}
+                >
+                  {good && (
+                    <Badge ml='2' colorScheme='teal'>
+                      Good
+                    </Badge>
+                  )}
+                  {notice && (
+                    <Badge ml='2' colorScheme='red'>
+                      特記事項
+                    </Badge>
+                  )}
+                  <Flex>
+                    <Box p='2' w='50%' borderRight='1px'>
+                      {situation}
+                    </Box>
+                    <Box p='2' w='50%'>
+                      {support}
+                    </Box>
+                  </Flex>
+                </ListItem>
+              );
+            })}
           </UnorderedList>
           <Flex mt='2'>
             <Button colorScheme='teal' size='sm' onClick={returnList}>
@@ -400,7 +463,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = ({ formattedDateJa }) 
 
             <Spacer />
 
-            <Button size='sm' colorScheme='facebook' onClick={onOpen}>
+            <Button size='sm' colorScheme='facebook' onClick={() => goToRecordCreatePage()}>
               <AddIcon mr='1' />
               記録を追加
             </Button>
