@@ -74,9 +74,7 @@ export default function RecordPage() {
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
-  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(
-    null,
-  );
+  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(null);
 
   {
     /* ログイン */
@@ -187,7 +185,6 @@ export default function RecordPage() {
       formattedMonth,
       'dailyRecords',
       formattedDate as string,
-
     );
     const singleRecordRef = doc(singleRecordCollectionRef, 'law59lSu9J3VaJ2YDYDN');
     const singleRecordSnapshot = await getDoc(singleRecordRef);

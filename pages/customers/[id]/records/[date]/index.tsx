@@ -42,7 +42,16 @@ import ResizeTextarea from 'react-textarea-autosize';
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  setDoc,
+} from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -108,7 +117,9 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
-  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>([]);
+  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
+    [],
+  );
 
   {
     /* ログイン */
@@ -123,7 +134,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
-  moment.locale("ja");
+  moment.locale('ja');
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
@@ -249,10 +260,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       formattedMonth,
       'dailyRecords',
       formattedDate as string,
-      'singleRecord'
+      'singleRecord',
     );
     const singleRecordQuerySnapshot = await getDocs(
-      query(singleRecordCollectionRef, orderBy('serialNumber'))
+      query(singleRecordCollectionRef, orderBy('serialNumber')),
     );
 
     const records = singleRecordQuerySnapshot.docs.map((doc) => {
@@ -260,22 +271,21 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       const data = doc.data() as SingleRecord;
       return { docId, data };
     });
-  
+
     setSingleRecordData(records);
   };
-
 
   const goToRecordEditPage = (docId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
-      query: { docId: docId }
+      query: { docId: docId },
     });
   };
 
   const goToRecordCreatePage = () => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/create/`,
-      query: { formattedDate: formattedDate }
+      query: { formattedDate: formattedDate },
     });
   };
 
@@ -413,7 +423,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
           >
             {singleRecordData.map((record, index) => {
               const { docId, data } = record;
-              const { situation, support } = data;
+              const { situation, support, good, notice } = data;
 
               const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
 
@@ -424,6 +434,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                   backgroundColor={backgroundColor}
                   onClick={() => goToRecordEditPage(docId)}
                 >
+                  {good && (
+                    <Badge ml='2' colorScheme='teal'>
+                      Good
+                    </Badge>
+                  )}
+                  {notice && (
+                    <Badge ml='2' colorScheme='red'>
+                      特記事項
+                    </Badge>
+                  )}
                   <Flex>
                     <Box p='2' w='50%' borderRight='1px'>
                       {situation}

@@ -50,9 +50,7 @@ export default function RecordPage() {
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
-  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(
-    null,
-  );
+  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(null);
 
   {
     /* ログイン */
@@ -117,23 +115,23 @@ export default function RecordPage() {
     const serialNumber = documentCount + 1;
 
     const data = {
-    serialNumber: serialNumber,
-    editor: user?.name,
-    situation: situation,
-    support: support,
-    good: good,
-    notice: notice,
+      serialNumber: serialNumber,
+      editor: user?.name,
+      situation: situation,
+      support: support,
+      good: good,
+      notice: notice,
     };
 
-    await addDoc(singleRecordCollectionRef, data)
+    await addDoc(singleRecordCollectionRef, data);
 
     console.log('データが登録されました');
   };
 
   const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
-    console.log('発火')
+    console.log('発火');
     try {
-      await createsingleRecord( data.situation, data.support, data.good, data.notice);
+      await createsingleRecord(data.situation, data.support, data.good, data.notice);
       toast({
         title: '記録を保存しました。',
         status: 'success',
@@ -203,18 +201,26 @@ export default function RecordPage() {
               />
             </Flex>
             <Stack spacing={5} direction='row' p='2'>
-              <Checkbox colorScheme='blue' {...register('good')}>Good</Checkbox>
-              <Checkbox colorScheme='red' {...register('notice')}>特記事項</Checkbox>
+              <Checkbox colorScheme='blue' {...register('good')}>
+                Good
+              </Checkbox>
+              <Checkbox colorScheme='red' {...register('notice')}>
+                特記事項
+              </Checkbox>
             </Stack>
           </Box>
 
           <Flex mt='2'>
-            <Button colorScheme='teal' size='sm' onClick={() => goToDailyRecordPage()}
->
+            <Button colorScheme='teal' size='sm' onClick={() => goToDailyRecordPage()}>
               戻る
             </Button>
             <Spacer />
-            <Button ml='2' size='sm' colorScheme='facebook' onClick={handleSubmit(onSubmitSingleRecord)}>
+            <Button
+              ml='2'
+              size='sm'
+              colorScheme='facebook'
+              onClick={handleSubmit(onSubmitSingleRecord)}
+            >
               保存
             </Button>
           </Flex>
