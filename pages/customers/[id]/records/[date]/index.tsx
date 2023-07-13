@@ -42,7 +42,7 @@ import ResizeTextarea from 'react-textarea-autosize';
 import moment from 'moment';
 import { AddIcon, EditIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -251,8 +251,9 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       formattedDate as string,
       'singleRecord'
     );
-    const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
-
+    const singleRecordQuerySnapshot = await getDocs(
+      query(singleRecordCollectionRef, orderBy('serialNumber'))
+    );
 
     const records = singleRecordQuerySnapshot.docs.map((doc) => {
       const docId = doc.id;
