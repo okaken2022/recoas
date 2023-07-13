@@ -90,7 +90,6 @@ export default function RecordPage() {
     /* singleRecord保存 */
   }
   const createsingleRecord = async (
-    editor: string | null,
     situation: string,
     support: string,
     good: boolean,
@@ -134,7 +133,7 @@ export default function RecordPage() {
   const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
     console.log('発火')
     try {
-      await createsingleRecord( data.editor, data.situation, data.support, data.good, data.notice);
+      await createsingleRecord( data.situation, data.support, data.good, data.notice);
       toast({
         title: '記録を保存しました。',
         status: 'success',
@@ -152,6 +151,11 @@ export default function RecordPage() {
     }
   };
 
+  const goToDailyRecordPage = () => {
+    router.push({
+      pathname: `/customers/${customerId}/records/${formattedDate}/`,
+    });
+  };
   return (
     <>
       <Layout>
@@ -205,13 +209,11 @@ export default function RecordPage() {
           </Box>
 
           <Flex mt='2'>
-            <Button colorScheme='teal' size='sm'>
+            <Button colorScheme='teal' size='sm' onClick={() => goToDailyRecordPage()}
+>
               戻る
             </Button>
             <Spacer />
-            <Button size='sm' colorScheme='red'>
-              削除
-            </Button>
             <Button ml='2' size='sm' colorScheme='facebook' onClick={handleSubmit(onSubmitSingleRecord)}>
               保存
             </Button>

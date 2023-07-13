@@ -108,9 +108,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
     null,
   );
-  const [singleRecordData, setSingleRecordData] = useState<SingleRecord | null>(
-    null,
-  );
+  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>([]);
 
   {
     /* ログイン */
@@ -140,7 +138,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
       fetchBasiRecordInfo();
-      // fetchSingleRecord();
+      fetchSingleRecord();
     }
   }, [customerId, setValue]);
 
@@ -241,44 +239,42 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* singleRecord取得 */
   }
-  // const fetchSingleRecord = async () => {
-  //   if (!currentUser) return;
-  //   const singleRecordCollectionRef = collection(
-  //     db,
-  //     'customers',
-  //     customerId as string,
-  //     'monthlyRecords',
-  //     formattedMonth,
-  //     'dailyRecords',
-  //     formattedDate as string,
-  //     'singleRecord'
-  //   );
-  //   const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
-
-  //   singleRecordQuerySnapshot.forEach((doc) => {
-  //     const docId = doc.id;
-  //     // docId を使用して何らかの操作を行う
-  //     console.log(docId)
-  //     const singleRecordDocRef = doc(singleRecordCollectionRef, docId);
-  //     const singleRecordDocSnapshot = await getDoc(singleRecordDocRef);
-  //     if (singleRecordDocSnapshot.exists()) {
-  //       const singleRecordData = singleRecordDocSnapshot.data();
-  //       // singleRecordDataを使用して何らかの操作を行う
-  //     }
-  //   });
-  // };
+  const fetchSingleRecord = async () => {
+    if (!currentUser) return;
+    const singleRecordCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+      formattedDate as string,
+      'singleRecord'
+    );
+    const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
 
 
-  const goToRecordEditPage = () => {
+    const records = singleRecordQuerySnapshot.docs.map((doc) => {
+      const docId = doc.id;
+      const data = doc.data() as SingleRecord;
+      return { docId, data };
+    });
+  
+    setSingleRecordData(records);
+  };
+
+
+  const goToRecordEditPage = (docId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
-      // query: { recordId: recordId }
+      query: { docId: docId }
     });
   };
 
   const goToRecordCreatePage = () => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/create/`,
+      query: { formattedDate: formattedDate }
     });
   };
 
@@ -304,7 +300,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             {/* 日付 */}
             <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
               <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
                 <Spacer />
 
                 {/* 記入者 */}
@@ -414,27 +410,28 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             borderBottomRadius='md'
             fontSize={{ base: 'sm', md: 'md' }}
           >
-            {/* {todos.map((todo) => ( */}
-            <ListItem
-              key='recordId'
-              className='record'
-              backgroundColor='teal.50'
-              onClick={() => goToRecordEditPage()}
-            >
-              <Badge ml='2' colorScheme='teal'>
-                Good
-              </Badge>
-              <Flex>
-                <Box p='2' w='50%' borderRight='1px'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-                <Box p='2' w='50%'>
-                  テキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入りますテキストが入ります
-                </Box>
-              </Flex>
-            </ListItem>
+            {singleRecordData.map((record) => {
+              const { docId, data } = record;
+              const { situation, support } = data;
 
-            {/* ))} */}
+              return (
+                <ListItem
+                  key={docId}
+                  className='record'
+                  // backgroundColor='teal.50'
+                  onClick={() => goToRecordEditPage(docId)}
+                >
+                  <Flex>
+                    <Box p='2' w='50%' borderRight='1px'>
+                      {situation}
+                    </Box>
+                    <Box p='2' w='50%'>
+                      {support}
+                    </Box>
+                  </Flex>
+                </ListItem>
+              );
+            })}
           </UnorderedList>
           <Flex mt='2'>
             <Button colorScheme='teal' size='sm' onClick={returnList}>
