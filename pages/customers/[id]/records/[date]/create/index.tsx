@@ -119,7 +119,7 @@ export default function RecordPage() {
 
     const data = {
     serialNumber: serialNumber,
-    editor: 'editor',
+    editor: user?.name,
     situation: situation,
     support: support,
     good: good,
