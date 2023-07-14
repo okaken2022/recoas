@@ -15,12 +15,12 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import { useContext, useEffect, useState } from 'react';
+import { ChangeEvent, useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { DocumentData, addDoc, collection, doc, getDocs, setDoc } from 'firebase/firestore';
+import { DocumentData, addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -46,13 +46,10 @@ export default function RecordPage() {
     /* state */
   }
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
-    null,
-  );
-  const [singleRecordData, setSingleRecordData] = useState<
-    { docId: string; data: DocumentData }[] | null
-  >(null);
+  const [singleRecordData, setSingleRecordData] = useState<{
+    docId: string;
+    data: SingleRecord;
+  } | null>(null);
 
   {
     /* ログイン */
@@ -62,6 +59,8 @@ export default function RecordPage() {
   const user = useContext(AuthContext);
 
   const router: NextRouter = useRouter();
+  const { docId } = router.query;
+  console.log(docId);
 
   {
     /* 日付情報 */
@@ -81,33 +80,43 @@ export default function RecordPage() {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchSingleRecord();
     }
-  }, [customerId, setValue]);
+    if (docId) {
+      updateSingleRecordData(docId as string);
+    }
+  }, [customerId, docId, setValue]);
   console.log(customerId);
 
   {
     /* singleRecord取得 */
   }
-  const fetchSingleRecord = async () => {
-    if (!currentUser) return;
-    const singleRecordCollectionRef = collection(
+  const updateSingleRecordData = async (docId: string) => {
+    const singleRecordRef = doc(
       db,
       'customers',
-      customerId as string,
+      customerId,
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
-      formattedDate as string,
+      formattedDate,
       'singleRecord',
+      docId,
     );
-    const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
+    const docSnapshot = await getDoc(singleRecordRef);
+    if (docSnapshot.exists()) {
+      const data = docSnapshot.data();
 
-    singleRecordQuerySnapshot.forEach((doc) => {
-      const docId = doc.id;
-      const data = doc.data();
-      setSingleRecordData([{ docId, data }]);
-    });
+      setValue('situation', data.situation);
+      setValue('support', data.support);
+      setValue('good', data.good);
+      setValue('notice', data.notice);
+      setValue('editor', data.editor);
+      setValue('serialNumber', data.serialNumber);
+
+      setSingleRecordData({ docId, data: data as SingleRecord });
+    } else {
+      setSingleRecordData(null);
+    }
   };
 
   {
@@ -115,10 +124,10 @@ export default function RecordPage() {
   }
 
   const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
-    console.log('発火');
+    console.log(singleRecordData);
     try {
       if (singleRecordData) {
-        const { docId } = singleRecordData[0];
+        const { docId } = singleRecordData;
         const singleRecordDocumentRef = doc(
           db,
           'customers',
@@ -153,6 +162,13 @@ export default function RecordPage() {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/`,
     });
+  };
+
+  // チェックボックスの状態をトグルするハンドラー関数
+  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    setValue('good', checked);
+    setValue('notice', checked);
   };
   return (
     <>
@@ -201,10 +217,20 @@ export default function RecordPage() {
               />
             </Flex>
             <Stack spacing={5} direction='row' p='2'>
-              <Checkbox colorScheme='blue' {...register('good')}>
+              <Checkbox
+                colorScheme='blue'
+                {...register('good')}
+                defaultChecked={singleRecordData?.data.good || false}
+                onChange={(e) => setValue('good', e.target.checked)}
+              >
                 Good
               </Checkbox>
-              <Checkbox colorScheme='red' {...register('notice')}>
+              <Checkbox
+                colorScheme='red'
+                {...register('notice')}
+                defaultChecked={singleRecordData?.data.notice || false}
+                onChange={(e) => setValue('notice', e.target.checked)}
+              >
                 特記事項
               </Checkbox>
             </Stack>
