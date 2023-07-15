@@ -20,7 +20,7 @@ import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { DocumentData, addDoc, collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import { DocumentData, addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -46,6 +46,8 @@ export default function RecordPage() {
     /* state */
   }
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
+  const [isGood, setIsGood] = useState(false);
+  const [hasNotice, setHasNotice] = useState(false);
   const [singleRecordData, setSingleRecordData] = useState<{
     docId: string;
     data: SingleRecord;
@@ -108,10 +110,10 @@ export default function RecordPage() {
 
       setValue('situation', data.situation);
       setValue('support', data.support);
-      setValue('good', data.good);
-      setValue('notice', data.notice);
       setValue('editor', data.editor);
       setValue('serialNumber', data.serialNumber);
+      setIsGood(data.good);
+      setHasNotice(data.notice);
 
       setSingleRecordData({ docId, data: data as SingleRecord });
     } else {
@@ -120,9 +122,18 @@ export default function RecordPage() {
   };
 
   {
+    /* good, noticeのトグル */
+  }
+  const handleGoodToggle = () => {
+    setIsGood((prevValue) => !prevValue);
+  };
+  const handleNoticeToggle = () => {
+    setHasNotice((prevValue) => !prevValue);
+  };
+
+  {
     /* singleRecord編集、保存 */
   }
-
   const onSubmitSingleRecord: SubmitHandler<SingleRecord> = async (data) => {
     console.log(singleRecordData);
     try {
@@ -158,18 +169,35 @@ export default function RecordPage() {
     }
   };
 
+  const handleDelete = async (docId :string) => {
+  try {
+    const singleRecordRef = doc(
+      db,
+      'customers',
+      customerId,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+      formattedDate,
+      'singleRecord',
+      docId
+    );
+    await deleteDoc(singleRecordRef);
+
+    // 削除成功時の処理（例: リダイレクトなど）
+    console.log('削除が完了しました');
+  } catch (error) {
+    // 削除失敗時の処理
+    console.error('削除に失敗しました', error);
+  }
+};
+
   const goToDailyRecordPage = () => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/`,
     });
   };
 
-  // チェックボックスの状態をトグルするハンドラー関数
-  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = event.target;
-    setValue('good', checked);
-    setValue('notice', checked);
-  };
   return (
     <>
       <Layout>
@@ -220,16 +248,16 @@ export default function RecordPage() {
               <Checkbox
                 colorScheme='blue'
                 {...register('good')}
-                defaultChecked={singleRecordData?.data.good || false}
-                onChange={(e) => setValue('good', e.target.checked)}
+                isChecked={isGood}
+                onChange={handleGoodToggle}
               >
                 Good
               </Checkbox>
               <Checkbox
                 colorScheme='red'
                 {...register('notice')}
-                defaultChecked={singleRecordData?.data.notice || false}
-                onChange={(e) => setValue('notice', e.target.checked)}
+                isChecked={hasNotice}
+                onChange={handleNoticeToggle}
               >
                 特記事項
               </Checkbox>
@@ -241,6 +269,9 @@ export default function RecordPage() {
               戻る
             </Button>
             <Spacer />
+            <Button size="sm" colorScheme="red" onClick={() => handleDelete(docId as string)}>
+              削除
+            </Button>
             <Button
               ml='2'
               size='sm'
