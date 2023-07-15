@@ -6,9 +6,16 @@ import {
   Button,
   Checkbox,
   Stack,
-  useDisclosure,
   Textarea,
   useToast,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  useDisclosure
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -26,6 +33,7 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
 
+
 export default function RecordPage() {
   {
     /* useForm */
@@ -39,9 +47,11 @@ export default function RecordPage() {
   } = useForm<SingleRecord>();
 
   {
-    /* toast */
+    /* toast, modal */
   }
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   {
     /* state */
   }
@@ -169,6 +179,14 @@ export default function RecordPage() {
     }
   };
 
+  {
+    /* singleRecord削除 */
+  }
+  const openDeleteModal = async () => {
+    // モーダルを開く
+    onOpen();
+  };
+
   const handleDelete = async (docId :string) => {
   try {
     const singleRecordRef = doc(
@@ -269,9 +287,28 @@ export default function RecordPage() {
               戻る
             </Button>
             <Spacer />
-            <Button size="sm" colorScheme="red" onClick={() => handleDelete(docId as string)}>
+
+            <Button size="sm" colorScheme="red" onClick={openDeleteModal}>
               削除
             </Button>
+
+            <Modal isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>削除の確認</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody>本当に削除しますか？</ModalBody>
+                <ModalFooter>
+                  <Button colorScheme="red" onClick={() => handleDelete(docId as string)}>
+                    削除
+                  </Button>
+                  <Button variant="ghost" onClick={onClose}>
+                    キャンセル
+                  </Button>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+            
             <Button
               ml='2'
               size='sm'
