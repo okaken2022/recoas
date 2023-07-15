@@ -138,6 +138,9 @@ export default function RecordPage() {
         duration: 3000,
         isClosable: true,
       });
+      router.push({
+        pathname: `/customers/${customerId}/records/${formattedDate}/`,
+      });
     } catch (e) {
       console.error(e);
       toast({
