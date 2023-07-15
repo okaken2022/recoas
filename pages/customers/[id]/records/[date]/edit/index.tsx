@@ -167,6 +167,10 @@ export default function RecordPage() {
           duration: 3000,
           isClosable: true,
         });
+        
+        router.push({
+          pathname: `/customers/${customerId}/records/${formattedDate}/`,
+        });
       }
     } catch (e) {
       console.error(e);
@@ -202,10 +206,17 @@ export default function RecordPage() {
     );
     await deleteDoc(singleRecordRef);
 
-    // 削除成功時の処理（例: リダイレクトなど）
     console.log('削除が完了しました');
+    router.push({
+      pathname: `/customers/${customerId}/records/${formattedDate}/`,
+    });
+    toast({
+      title: '記録を削除しました。',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
   } catch (error) {
-    // 削除失敗時の処理
     console.error('削除に失敗しました', error);
   }
 };
@@ -308,7 +319,7 @@ export default function RecordPage() {
                 </ModalFooter>
               </ModalContent>
             </Modal>
-            
+
             <Button
               ml='2'
               size='sm'
