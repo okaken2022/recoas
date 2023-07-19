@@ -128,6 +128,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
 
+
   const router: NextRouter = useRouter();
 
   {
@@ -148,7 +149,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchBasiRecordInfo();
+      fetchBasicRecordInfo();
       fetchSingleRecord();
     }
   }, [customerId, setValue]);
@@ -207,8 +208,8 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* 基本情報取得 */
   }
-  const fetchBasiRecordInfo = async () => {
-    if (!currentUser) return;
+  const fetchBasicRecordInfo = async () => {
+    // if (!currentUser) return;
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -251,7 +252,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* singleRecord取得 */
   }
   const fetchSingleRecord = async () => {
-    if (!currentUser) return;
     const singleRecordCollectionRef = collection(
       db,
       'customers',
