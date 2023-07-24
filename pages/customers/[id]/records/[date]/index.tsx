@@ -1,7 +1,6 @@
 import {
   Heading,
   Spacer,
-  VStack,
   Text,
   Box,
   Grid,
@@ -11,22 +10,11 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  ButtonGroup,
   Badge,
-  Checkbox,
   Radio,
   RadioGroup,
   Stack,
   FormErrorMessage,
-  useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Textarea,
   useToast,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
@@ -34,62 +22,23 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
-import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
-import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
+import { AddIcon } from '@chakra-ui/icons';
+import { BasicInfoOfRecord } from '@/types/record';
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
-  getDocs,
-  orderBy,
-  query,
   setDoc,
 } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
-
-// export async function getStaticProps() {
-//   // 日付を取得
-//   const date = new Date();
-//   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
-
-//   return {
-//     props: {
-//       formattedDateJa,
-//     },
-//   };
-// }
-
-// export async function getStaticPaths() {
-//   const customerIds: string[] = [];
-
-//   try {
-//     const querySnapshot = await getDocs(collection(db, 'customers'));
-//     querySnapshot.forEach((doc) => {
-//       customerIds.push(doc.id);
-//     });
-//   } catch (error) {
-//     console.error('Error fetching customerIds:', error);
-//   }
-
-//   const paths = customerIds.map((id) => ({
-//     params: { id },
-//   }));
-
-//   return {
-//     paths,
-//     fallback: false,
-//   };
-// }
+import useFetchBasicRecordInfo from '@/hooks/useFetchBasicRecordInfo';
+import useFetchSingleRecord from '@/hooks/useFetchSingleRecord';
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
@@ -106,20 +55,13 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* modal, toast */
   }
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
   {
     /* state */
   }
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
-    null,
-  );
-  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
-    [],
-  );
 
   {
     /* ログイン */
@@ -127,7 +69,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
-
 
   const router: NextRouter = useRouter();
 
@@ -144,15 +85,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* 利用者情報取得 */
   }
   const { id: customerId } = router.query as { id: string }; // クエリパラメーターからcustomerIdを取得
-
-  useEffect(() => {
-    if (customerId) {
-      const id = Array.isArray(customerId) ? customerId[0] : customerId;
-      fetchCustomer(id, setCustomer);
-      fetchBasicRecordInfo();
-      fetchSingleRecord();
-    }
-  }, [customerId, setValue]);
 
   {
     /* 基本情報保存 */
@@ -208,32 +140,20 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* 基本情報取得 */
   }
-  const fetchBasicRecordInfo = async () => {
-    // if (!currentUser) return;
-    const recordsCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-    );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const recordSnapshot = await getDoc(dailyDocumentRef);
+  const { loading, basicInfoOfRecordData } = useFetchBasicRecordInfo(
+    customerId as string,
+    formattedMonth,
+    formattedDate,
+  );
 
-    if (recordSnapshot.exists()) {
-      const data = recordSnapshot.data() as BasicInfoOfRecord;
-      setbasicInfoOfRecordData(data);
-
-      // フォームの各フィールドに値を設定
-      setValue('author', data.author);
-      setValue('amWork', data.amWork);
-      setValue('pmWork', data.pmWork);
-      setValue('timeAdjustment', data.timeAdjustment);
-    }
-
-    setLoading(false);
-  };
+  {
+    /* 支援記録取得 */
+  }
+  const singleRecordData = useFetchSingleRecord(
+    customerId as string,
+    formattedMonth,
+    formattedDate,
+  );
 
   {
     /* 時間変更のラジオボタン */
@@ -249,32 +169,8 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   };
 
   {
-    /* singleRecord取得 */
+    /* rooting */
   }
-  const fetchSingleRecord = async () => {
-    const singleRecordCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-      formattedDate as string,
-      'singleRecord',
-    );
-    const singleRecordQuerySnapshot = await getDocs(
-      query(singleRecordCollectionRef, orderBy('serialNumber')),
-    );
-
-    const records = singleRecordQuerySnapshot.docs.map((doc) => {
-      const docId = doc.id;
-      const data = doc.data() as SingleRecord;
-      return { docId, data };
-    });
-
-    setSingleRecordData(records);
-  };
-
   const goToRecordEditPage = (docId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
@@ -288,6 +184,23 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       query: { formattedDate: formattedDate },
     });
   };
+
+  {
+    /* useEffect */
+  }
+  useEffect(() => {
+    if (customerId) {
+      const id = Array.isArray(customerId) ? customerId[0] : customerId;
+      fetchCustomer(id, setCustomer);
+    }
+    if (basicInfoOfRecordData) {
+      const { author, amWork, pmWork, timeAdjustment } = basicInfoOfRecordData;
+      setValue('author', author);
+      setValue('amWork', amWork);
+      setValue('pmWork', pmWork);
+      setValue('timeAdjustment', timeAdjustment);
+    }
+  }, [basicInfoOfRecordData, customerId, setValue]);
 
   return (
     <>
@@ -315,10 +228,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Spacer />
 
                 {/* 記入者 */}
-                <Text>記入者：</Text>
+                <Text>支援員：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='岡田'
+                  // placeholder='岡田'
                   width='30%'
                   bg='white'
                   type='text'
@@ -337,7 +250,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Text>午前：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='コーヒー'
+                  // placeholder='コーヒー'
                   width='60%'
                   bg='white'
                   type='text'
@@ -352,7 +265,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Text>午後：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='菓子製造'
+                  // placeholder='菓子製造'
                   width='60%'
                   bg='white'
                   type='text'
@@ -434,16 +347,22 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                   backgroundColor={backgroundColor}
                   onClick={() => goToRecordEditPage(docId)}
                 >
-                  {good && (
-                    <Badge ml='2' colorScheme='teal'>
-                      Good
+                  <Flex pt='2' pr='2'>
+                    <Badge ml='2' variant='outline'>
+                      {record.data.editor}
                     </Badge>
-                  )}
-                  {notice && (
-                    <Badge ml='2' colorScheme='red'>
-                      特記事項
-                    </Badge>
-                  )}
+                    <Spacer/>
+                    {good && (
+                      <Badge ml='2' colorScheme='teal'>
+                        Good
+                      </Badge>
+                    )}
+                    {notice && (
+                      <Badge ml='2' colorScheme='red'>
+                        特記事項
+                      </Badge>
+                    )}
+                  </Flex>
                   <Flex>
                     <Box p='2' w='50%' borderRight='1px'>
                       {situation}

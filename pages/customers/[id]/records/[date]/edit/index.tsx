@@ -15,7 +15,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  useDisclosure
+  useDisclosure,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -27,12 +27,20 @@ import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import { DocumentData, addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
+import {
+  DocumentData,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Link from 'next/link';
-
 
 export default function RecordPage() {
   {
@@ -167,7 +175,7 @@ export default function RecordPage() {
           duration: 3000,
           isClosable: true,
         });
-        
+
         router.push({
           pathname: `/customers/${customerId}/records/${formattedDate}/`,
         });
@@ -191,35 +199,35 @@ export default function RecordPage() {
     onOpen();
   };
 
-  const handleDelete = async (docId :string) => {
-  try {
-    const singleRecordRef = doc(
-      db,
-      'customers',
-      customerId,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-      formattedDate,
-      'singleRecord',
-      docId
-    );
-    await deleteDoc(singleRecordRef);
+  const handleDelete = async (docId: string) => {
+    try {
+      const singleRecordRef = doc(
+        db,
+        'customers',
+        customerId,
+        'monthlyRecords',
+        formattedMonth,
+        'dailyRecords',
+        formattedDate,
+        'singleRecord',
+        docId,
+      );
+      await deleteDoc(singleRecordRef);
 
-    console.log('削除が完了しました');
-    router.push({
-      pathname: `/customers/${customerId}/records/${formattedDate}/`,
-    });
-    toast({
-      title: '記録を削除しました。',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-    });
-  } catch (error) {
-    console.error('削除に失敗しました', error);
-  }
-};
+      console.log('削除が完了しました');
+      router.push({
+        pathname: `/customers/${customerId}/records/${formattedDate}/`,
+      });
+      toast({
+        title: '記録を削除しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error('削除に失敗しました', error);
+    }
+  };
 
   const goToDailyRecordPage = () => {
     router.push({
@@ -299,7 +307,7 @@ export default function RecordPage() {
             </Button>
             <Spacer />
 
-            <Button size="sm" colorScheme="red" onClick={openDeleteModal}>
+            <Button size='sm' colorScheme='red' onClick={openDeleteModal}>
               削除
             </Button>
 
@@ -310,10 +318,10 @@ export default function RecordPage() {
                 <ModalCloseButton />
                 <ModalBody>本当に削除しますか？</ModalBody>
                 <ModalFooter>
-                  <Button colorScheme="red" onClick={() => handleDelete(docId as string)}>
+                  <Button colorScheme='red' onClick={() => handleDelete(docId as string)}>
                     削除
                   </Button>
-                  <Button variant="ghost" onClick={onClose}>
+                  <Button variant='ghost' onClick={onClose}>
                     キャンセル
                   </Button>
                 </ModalFooter>
