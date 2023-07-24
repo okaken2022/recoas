@@ -57,6 +57,7 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 import useFetchBasicRecordInfo from '@/hooks/useFetchBasicRecordInfo';
+import useFetchSingleRecord from '@/hooks/useFetchSingleRecord';
 
 // export async function getStaticProps() {
 //   // 日付を取得
@@ -109,14 +110,12 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   }
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
   {
     /* state */
   }
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
-    [],
-  );
 
   {
     /* ログイン */
@@ -201,7 +200,15 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     formattedMonth,
     formattedDate,
   );
-  
+
+  {
+    /* 支援記録取得 */
+  }
+  const singleRecordData = useFetchSingleRecord(
+    customerId as string,
+    formattedMonth,
+    formattedDate,
+  )
 
   {
     /* 時間変更のラジオボタン */
@@ -217,32 +224,8 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   };
 
   {
-    /* singleRecord取得 */
+    /* rooting */
   }
-  const fetchSingleRecord = async () => {
-    const singleRecordCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-      formattedDate as string,
-      'singleRecord',
-    );
-    const singleRecordQuerySnapshot = await getDocs(
-      query(singleRecordCollectionRef, orderBy('serialNumber')),
-    );
-
-    const records = singleRecordQuerySnapshot.docs.map((doc) => {
-      const docId = doc.id;
-      const data = doc.data() as SingleRecord;
-      return { docId, data };
-    });
-
-    setSingleRecordData(records);
-  };
-
   const goToRecordEditPage = (docId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
@@ -257,11 +240,13 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     });
   };
 
+  {
+    /* useEffect */
+  }
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchSingleRecord();
     }
     if (basicInfoOfRecordData) {
       const { author, amWork, pmWork, timeAdjustment } = basicInfoOfRecordData;
@@ -271,7 +256,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       setValue('timeAdjustment', timeAdjustment);
     }
   }, [basicInfoOfRecordData, customerId, setValue]);
-
 
   return (
     <>
