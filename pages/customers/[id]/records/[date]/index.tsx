@@ -56,6 +56,7 @@ import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
+import useFetchBasicRecordInfo from '@/hooks/useFetchBasicRecordInfo';
 
 // export async function getStaticProps() {
 //   // 日付を取得
@@ -113,10 +114,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   }
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [basicInfoOfRecordData, setbasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
-    null,
-  );
   const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
     [],
   );
@@ -144,15 +141,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* 利用者情報取得 */
   }
   const { id: customerId } = router.query as { id: string }; // クエリパラメーターからcustomerIdを取得
-
-  useEffect(() => {
-    if (customerId) {
-      const id = Array.isArray(customerId) ? customerId[0] : customerId;
-      fetchCustomer(id, setCustomer);
-      fetchBasicRecordInfo();
-      fetchSingleRecord();
-    }
-  }, [customerId, setValue]);
 
   {
     /* 基本情報保存 */
@@ -208,32 +196,12 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* 基本情報取得 */
   }
-  const fetchBasicRecordInfo = async () => {
-    // if (!currentUser) return;
-    const recordsCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-      formattedMonth,
-      'dailyRecords',
-    );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const recordSnapshot = await getDoc(dailyDocumentRef);
-
-    if (recordSnapshot.exists()) {
-      const data = recordSnapshot.data() as BasicInfoOfRecord;
-      setbasicInfoOfRecordData(data);
-
-      // フォームの各フィールドに値を設定
-      setValue('author', data.author);
-      setValue('amWork', data.amWork);
-      setValue('pmWork', data.pmWork);
-      setValue('timeAdjustment', data.timeAdjustment);
-    }
-
-    setLoading(false);
-  };
+  const { loading, basicInfoOfRecordData } = useFetchBasicRecordInfo(
+    customerId as string,
+    formattedMonth,
+    formattedDate,
+  );
+  
 
   {
     /* 時間変更のラジオボタン */
@@ -288,6 +256,22 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       query: { formattedDate: formattedDate },
     });
   };
+
+  useEffect(() => {
+    if (customerId) {
+      const id = Array.isArray(customerId) ? customerId[0] : customerId;
+      fetchCustomer(id, setCustomer);
+      fetchSingleRecord();
+    }
+    if (basicInfoOfRecordData) {
+      const { author, amWork, pmWork, timeAdjustment } = basicInfoOfRecordData;
+      setValue('author', author);
+      setValue('amWork', amWork);
+      setValue('pmWork', pmWork);
+      setValue('timeAdjustment', timeAdjustment);
+    }
+  }, [basicInfoOfRecordData, customerId, setValue]);
+
 
   return (
     <>
