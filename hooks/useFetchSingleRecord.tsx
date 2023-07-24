@@ -5,8 +5,14 @@ import { collection, doc, getDoc, query, orderBy, getDocs } from 'firebase/fires
 import { SingleRecord } from '@/types/record';
 import { db } from './firebase';
 
-const useFetchSingleRecord = (customerId: string, formattedMonth: string, formattedDate: string) => {
-  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>([]);
+const useFetchSingleRecord = (
+  customerId: string,
+  formattedMonth: string,
+  formattedDate: string,
+) => {
+  const [singleRecordData, setSingleRecordData] = useState<{ docId: string; data: SingleRecord }[]>(
+    [],
+  );
 
   const fetchSingleRecord = async () => {
     try {
@@ -20,7 +26,9 @@ const useFetchSingleRecord = (customerId: string, formattedMonth: string, format
         formattedDate,
         'singleRecord',
       );
-      const singleRecordQuerySnapshot = await getDocs(query(singleRecordCollectionRef, orderBy('serialNumber')));
+      const singleRecordQuerySnapshot = await getDocs(
+        query(singleRecordCollectionRef, orderBy('serialNumber')),
+      );
 
       const records = singleRecordQuerySnapshot.docs.map((doc) => {
         const docId = doc.id;
@@ -35,7 +43,6 @@ const useFetchSingleRecord = (customerId: string, formattedMonth: string, format
   };
   useEffect(() => {
     fetchSingleRecord();
-
   }, [customerId, formattedMonth, formattedDate]);
 
   return singleRecordData;

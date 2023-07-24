@@ -4,10 +4,15 @@ import { collection, doc, getDoc } from 'firebase/firestore';
 import { useToast } from '@chakra-ui/react';
 import { db } from '@/hooks/firebase';
 
-
-const useFetchBasicRecordInfo = (customerId: string, formattedMonth: string, formattedDate: string) => {
+const useFetchBasicRecordInfo = (
+  customerId: string,
+  formattedMonth: string,
+  formattedDate: string,
+) => {
   const [loading, setLoading] = useState(true);
-  const [basicInfoOfRecordData, setBasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(null);
+  const [basicInfoOfRecordData, setBasicInfoOfRecordData] = useState<BasicInfoOfRecord | null>(
+    null,
+  );
   const toast = useToast();
 
   const fetchBasicRecordInfo = async () => {
@@ -42,7 +47,6 @@ const useFetchBasicRecordInfo = (customerId: string, formattedMonth: string, for
 
   useEffect(() => {
     fetchBasicRecordInfo();
-
   }, [customerId, formattedMonth, formattedDate]);
 
   return { loading, basicInfoOfRecordData };

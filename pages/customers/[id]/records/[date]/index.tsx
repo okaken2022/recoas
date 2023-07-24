@@ -124,7 +124,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
 
-
   const router: NextRouter = useRouter();
 
   {
@@ -208,7 +207,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     customerId as string,
     formattedMonth,
     formattedDate,
-  )
+  );
 
   {
     /* 時間変更のラジオボタン */
