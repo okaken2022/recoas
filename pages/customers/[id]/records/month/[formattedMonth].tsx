@@ -36,7 +36,7 @@ import { CustomerInfoType } from '@/types/customerInfo';
 import CustomerInfo from '@/components/CustomerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 
-export default function Customer() {
+export default function RecordMonthPage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [monthlyRecords, setMonthlyRecords] = useState<string[]>([]);
 
@@ -177,11 +177,6 @@ export default function Customer() {
     router.push(`/customers/${customerId}/records/month/${formattedMonth}/`);
   };
 
-  const formatJapaneseMonth = (formattedMonth: string) => {
-    const date = moment(formattedMonth, 'YYYY-MM');
-    return date.format('YYYY年M月');
-  };
-
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
@@ -221,16 +216,16 @@ export default function Customer() {
             </TabPanel>
             <TabPanel>
             <UnorderedList>
-                {monthlyRecords.map((month) => (
-                  <ListItem key={month}>
+                {monthlyRecords.map((formattedMonth) => (
+                  <ListItem key={formattedMonth}>
                     {/* リンクを追加 */}
                     <Link
                       onClick={() =>
-                        handleMonthlyItemClick(month)
+                        handleMonthlyItemClick(formattedMonth)
                       }
                       style={{ cursor: 'pointer' }}
                     >
-                      {formatJapaneseMonth(month)}
+                      {formattedMonth}
                     </Link>
                   </ListItem>
                 ))}

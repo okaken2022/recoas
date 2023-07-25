@@ -137,6 +137,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const { date } = router.query as { date: string };
   moment.locale('ja');
   const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
+  const formattedMonthJa = moment(date).format('YYYY年MM月'); //月の文字列
   const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
 
