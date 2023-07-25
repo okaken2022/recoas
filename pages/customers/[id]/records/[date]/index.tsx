@@ -128,7 +128,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
 
-
   const router: NextRouter = useRouter();
 
   {
@@ -316,10 +315,9 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Spacer />
 
                 {/* 記入者 */}
-                <Text>記入者：</Text>
+                <Text>支援員：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='岡田'
                   width='30%'
                   bg='white'
                   type='text'
@@ -338,7 +336,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Text>午前：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='コーヒー'
                   width='60%'
                   bg='white'
                   type='text'
@@ -353,7 +350,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                 <Text>午後：</Text>
                 <Input
                   size={{ base: 'sm', md: 'md' }}
-                  placeholder='菓子製造'
                   width='60%'
                   bg='white'
                   type='text'
@@ -435,16 +431,22 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                   backgroundColor={backgroundColor}
                   onClick={() => goToRecordEditPage(docId)}
                 >
-                  {good && (
-                    <Badge ml='2' colorScheme='teal'>
-                      Good
+                  <Flex pt='2' pr='2'>
+                    <Badge ml='2' variant='outline'>
+                      {record.data.editor}
                     </Badge>
-                  )}
-                  {notice && (
-                    <Badge ml='2' colorScheme='red'>
-                      特記事項
-                    </Badge>
-                  )}
+                    <Spacer />
+                    {good && (
+                      <Badge ml='2' colorScheme='teal'>
+                        Good
+                      </Badge>
+                    )}
+                    {notice && (
+                      <Badge ml='2' colorScheme='red'>
+                        特記事項
+                      </Badge>
+                    )}
+                  </Flex>
                   <Flex>
                     <Box p='2' w='50%' borderRight='1px'>
                       {situation}
