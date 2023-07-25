@@ -1,13 +1,7 @@
 import {
   Text,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  UnorderedList,
-  ListItem,
-  Link,
+  Heading,
+  Spinner
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -18,12 +12,10 @@ import {
   setDoc,
   getDoc,
   getDocs,
+  DocumentData,
 } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
-
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
@@ -35,6 +27,7 @@ import jaLocale from '@fullcalendar/core/locales/ja';
 import { CustomerInfoType } from '@/types/customerInfo';
 import CustomerInfo from '@/components/CustomerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
+import { format } from 'path';
 
 export default function RecordMonthPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -51,188 +44,81 @@ export default function RecordMonthPage() {
   {
     /* 利用者情報取得 */
   }
-  const { id: customerId } = router.query; // クエリパラメーターからcustomerIdを取得
+  const { id: customerId, formattedMonth } = router.query; 
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-
-  const fetchHolidays = async () => {
-    // Google Calendar APIで祝日情報を取得
-    const response = await axios.get(
-      'https://www.googleapis.com/calendar/v3/calendars/ja.japanese%23holiday%40group.v.calendar.google.com/events',
-      {
-        params: {
-          key: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
-          timeMin: moment().startOf('year').toISOString(),
-          timeMax: moment().endOf('year').toISOString(),
-          singleEvents: true,
-          orderBy: 'startTime',
-        },
-      },
-    );
-
-    // 取得した祝日情報から日付の配列を作成
-    const holidays = response.data.items.map((item: any) =>
-      moment(item.start.date).format('YYYY-MM-DD'),
-    );
-
-    // 土日と祝日を除いた日付の配列を作成
-    const dates = [];
-    const currentDate = moment().startOf('year');
-    const endDate = moment().endOf('year');
-    while (currentDate.isSameOrBefore(endDate)) {
-      const dayOfWeek = currentDate.day();
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      const isHoliday = holidays.includes(currentDate.format('YYYY-MM-DD'));
-      if (!isWeekend && !isHoliday) {
-        dates.push(currentDate.format('YYYY-MM-DD'));
-      }
-      currentDate.add(1, 'day');
-    }
-
-    // 日付ごとにイベントオブジェクトを作成
-    const newEvents: Event[] = dates.map((date) => ({
-      title: '',
-      start: date,
-    }));
-
-    setEvents(newEvents);
-  };
-
-  {
-    /* FullCalendar 土日祝日を除いた日付をイベントとして配列を作成 */
-  }
-  interface Event {
-    title: string;
-    start: string;
-  }
-
-  {
-    /* FullCalendar 月別のコレクション追加 */
-  }
-  const handleEventClick = async (eventInfo: EventContentArg) => {
-    const clickedDate = eventInfo.event.start as Date; // クリックされたイベントの日付を取得
-    const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
-    const formattedDate = moment(clickedDate).format('YYYY-MM-DD'); //日付の文字列
-    // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
-    router.push({
-      pathname: `/customers/${customerId}/records/${formattedDate}/`, // ルーティング先のパスを指定
-    });
-
-    // Firestoreのコレクションを作成
-    const db = getFirestore();
-    const recordsCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-    );
-    const monthDocumentRef = doc(recordsCollectionRef, clickedMonth);
-
-    // コレクションが存在しない場合のみ追加
-    const monthSnapshot = await getDoc(monthDocumentRef);
-    if (!monthSnapshot.exists()) {
-      await setDoc(monthDocumentRef, {});
-    }
-  };
-
-  //カレンダー設定で指定した閉所日を、イベント一覧の配列から削除し、新たな配列を作成。その後カレンダーに表示。
-
-  const renderEventContent = (eventInfo: EventContentArg) => {
-    return (
-      <div>
-        <b>{eventInfo.timeText}</b>
-        <p
-          style={{ backgroundColor: 'skyblue', height: '50px', cursor: 'pointer' }}
-          onClick={() => handleEventClick(eventInfo)}
-        >
-          {eventInfo.event.title}
-        </p>
-      </div>
-    );
-  };
 
   {
     /* 月別記録リスト */
   }
+// dailyRecordDataの型定義を修正
+const [dailyRecordData, setDailyRecordData] = useState<{ singleRecord: DocumentData[]; }[]>([]);
 
+  const fetchData = async () => {
+    try {
+      // dailyRecordsコレクション内のドキュメントを取得
+      const dailyRecordsCollectionRef = collection(
+        db,
+        'customers',
+        customerId as string,
+        'monthlyRecords',
+        formattedMonth as string,
+        'dailyRecords'
+      );
+      const dailyRecordsQuerySnapshot = await getDocs(dailyRecordsCollectionRef);
 
-  const fetchMonthlyRecords = async () => {
-    // Firestoreのコレクションを作成
-    const recordsCollectionRef = collection(
-      db,
-      'customers',
-      customerId as string,
-      'monthlyRecords',
-    );
+      // dailyRecordsコレクション内の各ドキュメントに対して、singleRecordコレクション内のドキュメントを取得
+      const dailyRecordPromises = dailyRecordsQuerySnapshot.docs.map(async (doc) => {
+        const dailyRecordData = doc.data();
+        const singleRecordCollectionRef = collection(
+          db,
+          'customers',
+          customerId as string,
+          'monthlyRecords',
+          formattedMonth as string,
+          'dailyRecords',
+          doc.id,
+          'singleRecord'
+          );
+          const singleRecordQuerySnapshot = await getDocs(singleRecordCollectionRef);
+        const singleRecordData = singleRecordQuerySnapshot.docs.map((doc) => doc.data());
+        return { ...dailyRecordData, singleRecord: singleRecordData };
+      });
 
-    // コレクション内のドキュメントを取得
-    const querySnapshot = await getDocs(recordsCollectionRef);
+      // データをセット
+      const dailyRecordData = await Promise.all(dailyRecordPromises);
+      setDailyRecordData(dailyRecordData);
 
-    // ドキュメントが存在する月のリストを取得
-    const records: string[] = querySnapshot.docs.map((doc) => doc.id);
-
-    setMonthlyRecords(records);
+    } catch (error) {
+      console.error('Error fetching dailyRecordData:', error);
+    }
   };
-
-  const handleMonthlyItemClick = (formattedMonth: string) => {
-    router.push(`/customers/${customerId}/records/month/${formattedMonth}/`);
-  };
-
+  
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      fetchHolidays();
-      fetchMonthlyRecords();
+      console.log(customerId);
+      console.log(formattedMonth);
+      fetchData();
     }
-  }, [customerId]);
-  
-  if (!customer) {
-    return <div>Loading...</div>;
+  }, [customerId, formattedMonth]);
+  console.log(dailyRecordData);
+  if (!customer || dailyRecordData.length === 0) {
+    return <Spinner />; 
   }
 
   return (
     <>
       <Layout>
-        <CustomerInfo customer={customer} />
+        <Heading className='title' color='color.sub' as='h2' mb='8' size='xl' noOfLines={1}>
+          {customer.customerName}さん
+        </Heading>
 
         {/* 利用日カレンダー */}
         <Text className='head' fontSize='2xl' mb='4'>
           記録一覧
         </Text>
-        <Tabs size='md' variant='enclosed'>
-          <TabList>
-            <Tab>カレンダー</Tab>
-            <Tab>リスト表示</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <FullCalendar
-                plugins={[dayGridPlugin]}
-                initialView='dayGridMonth'
-                events={events}
-                eventContent={renderEventContent}
-                locale={jaLocale} // FullCalendarの日本語表示
-              />
-            </TabPanel>
-            <TabPanel>
-            <UnorderedList>
-                {monthlyRecords.map((formattedMonth) => (
-                  <ListItem key={formattedMonth}>
-                    {/* リンクを追加 */}
-                    <Link
-                      onClick={() =>
-                        handleMonthlyItemClick(formattedMonth)
-                      }
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {formattedMonth}
-                    </Link>
-                  </ListItem>
-                ))}
-              </UnorderedList>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        
       </Layout>
     </>
   );
