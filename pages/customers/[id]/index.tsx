@@ -11,14 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-} from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 
@@ -154,7 +147,6 @@ export default function Customer() {
     /* 月別記録リスト */
   }
 
-
   const fetchMonthlyRecords = async () => {
     // Firestoreのコレクションを作成
     const recordsCollectionRef = collection(
@@ -190,7 +182,7 @@ export default function Customer() {
       fetchMonthlyRecords();
     }
   }, [customerId]);
-  
+
   if (!customer) {
     return <div>Loading...</div>;
   }
@@ -220,14 +212,12 @@ export default function Customer() {
               />
             </TabPanel>
             <TabPanel>
-            <UnorderedList>
+              <UnorderedList>
                 {monthlyRecords.map((month) => (
                   <ListItem key={month}>
                     {/* リンクを追加 */}
                     <Link
-                      onClick={() =>
-                        handleMonthlyItemClick(month)
-                      }
+                      onClick={() => handleMonthlyItemClick(month)}
                       style={{ cursor: 'pointer' }}
                     >
                       {formatJapaneseMonth(month)}

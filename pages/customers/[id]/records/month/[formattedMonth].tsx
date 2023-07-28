@@ -9,7 +9,7 @@ import {
   UnorderedList,
   ListItem,
   Grid,
-  GridItem
+  GridItem,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -54,22 +54,29 @@ export default function RecordMonthPage() {
   {
     /* 利用者情報取得 */
   }
-  const { id: customerId, formattedMonth } = router.query; 
+  const { id: customerId, formattedMonth } = router.query;
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
   {
     /* 月別記録リスト */
   }
-// dailyRecordDataの型定義を修正
-const [dailyRecordData, setDailyRecordData] = useState<{
-  formattedDate: string;
-  author: string;
-  amWork: string;
-  pmWork: string;
-  timeAdjustment: number;
-  singleRecord: DocumentData[];
-}[]>([]);
+  type SingleRecordData = {
+    editor: string;
+    good: boolean;
+    notice: boolean;
+    situation: string;
+    support: string;
+  };
 
+  type DailyRecordData = {
+    id: string;
+    author: string;
+    amWork: string;
+    pmWork: string;
+    timeAdjustment: number;
+    singleRecord: SingleRecordData[];
+  };
+  const [dailyRecordData, setDailyRecordData] = useState<DailyRecordData[]>([]);
 
   const fetchData = async () => {
     try {
@@ -80,7 +87,7 @@ const [dailyRecordData, setDailyRecordData] = useState<{
         customerId as string,
         'monthlyRecords',
         formattedMonth as string,
-        'dailyRecords'
+        'dailyRecords',
       );
       const dailyRecordsQuerySnapshot = await getDocs(dailyRecordsCollectionRef);
 
@@ -95,22 +102,29 @@ const [dailyRecordData, setDailyRecordData] = useState<{
           formattedMonth as string,
           'dailyRecords',
           doc.id,
-          'singleRecord'
-          );
-          const singleRecordQuerySnapshot = await getDocs(query(singleRecordCollectionRef, orderBy('serialNumber')));
+          'singleRecord',
+        );
+        const singleRecordQuerySnapshot = await getDocs(
+          query(singleRecordCollectionRef, orderBy('serialNumber')),
+        );
         const singleRecordData = singleRecordQuerySnapshot.docs.map((doc) => doc.data());
-        return { ...dailyRecordData, singleRecord: singleRecordData };
+        const dailyRecordWithData = {
+          ...dailyRecordData,
+          singleRecord: singleRecordData,
+          id: doc.id,
+        };
+
+        return dailyRecordWithData;
       });
 
       // データをセット
       const dailyRecordData = await Promise.all(dailyRecordPromises);
       setDailyRecordData(dailyRecordData);
-
     } catch (error) {
       console.error('Error fetching dailyRecordData:', error);
     }
   };
-  
+
   useEffect(() => {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
@@ -122,117 +136,113 @@ const [dailyRecordData, setDailyRecordData] = useState<{
   }, [customerId, formattedMonth]);
   console.log(dailyRecordData);
   if (!customer || dailyRecordData.length === 0) {
-    return <Spinner />; 
+    return <Spinner />;
   }
 
   return (
     <>
-    <Layout>
-      {dailyRecordData.map((dailyRecord, index) => (
-        <Flex key={index} flexDirection='column' bg='white' p={2} my={2}>
-                    {/* 基本情報 */}
-                    <Grid
-            h='auto'
-            templateRows='repeat(3, 1fr)'
-            templateColumns='repeat(2, 1fr)'
-            // gap={2}
-            border='1px'
-            borderTopRadius='md'
-          >
-            {/* 日付 */}
-            <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
-              <Flex alignItems='center'>
-                <Text mr='8' fontSize={{ base: 'md', md: 'xl' }}>日付が入ります</Text>
-                {/* 記入者 */}
-                <Text>支援員：</Text>
-                <Box bg='white' p="1" borderRadius={4}>
-                <Text
-                  size={{ base: 'sm', md: 'md' }}
-                >{dailyRecord.author}</Text>
-                </Box>
-                <Spacer/>
-                {/* 活動 */}
-                <Flex  alignItems='center' mr='4'>
-                  <Text>午前：</Text>
-                  <Box bg='white' p="1" borderRadius={4}> 
-                    <Text
-                      size={{ base: 'sm', md: 'md' }}
-                      bg='white'
-                    >{dailyRecord.amWork}</Text>
-                  </Box>
-                </Flex>
-                <Flex  alignItems='center'>
-                  <Text>午後：</Text>
-                  <Box bg='white' p="1" borderRadius={4}> 
-                    <Text
-                      size={{ base: 'sm', md: 'md' }}
-                      bg='white'
-                    >{dailyRecord.pmWork}</Text>
-                  </Box>
-                </Flex>
-
-              </Flex>
-            </GridItem>
-            {/* 記録 */}
-            <GridItem
-              rowSpan={1}
-              colSpan={1}
-              bg='white'
-              alignItems='center'
-              textAlign='center'
-              borderRight='1px'
+      <Layout>
+        <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
+          {customer?.customerName}さん
+        </Heading>
+        {dailyRecordData.map((dailyRecord, index) => (
+          <Flex key={index} flexDirection='column' bg='white' p={2} my={2}>
+            {/* 基本情報 */}
+            <Grid
+              h='auto'
+              templateRows='repeat(3, 1fr)'
+              templateColumns='repeat(2, 1fr)'
+              // gap={2}
+              border='1px'
+              borderTopRadius='md'
             >
-              ご本人の様子
-            </GridItem>
-            <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center'>
-              支援、考察
-            </GridItem>
-          </Grid>
-          <UnorderedList
-            listStyleType='none'
-            ml='0'
-            border='1px'
-            borderBottomRadius='md'
-            fontSize={{ base: 'sm', md: 'md' }}
-          >
-            {dailyRecord.singleRecord.map((record, index) => {
-              const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
-              return (
-                <ListItem
-                  key={index}
-                  className='record'
-                  backgroundColor={backgroundColor}
-                >
-                  <Flex pt='2' pr='2'>
-                    <Badge ml='2' variant='outline'>
-                      {record.editor}
-                    </Badge>
-                    <Spacer />
-                    {record.good && (
-                      <Badge ml='2' colorScheme='teal'>
-                        Good
-                      </Badge>
-                    )}
-                    {record.notice && (
-                      <Badge ml='2' colorScheme='red'>
-                        特記事項
-                      </Badge>
-                    )}
-                  </Flex>
-                  <Flex>
-                    <Box p='2' w='50%' borderRight='1px'>
-                      {record.situation}
-                    </Box>
-                    <Box p='2' w='50%'>
-                      {record.support}
+              {/* 日付 */}
+              <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
+                <Flex alignItems='center'>
+                  <Text mr='8' fontSize={{ base: 'md', md: 'xl' }}>
+                    {moment(dailyRecord.id).format('YYYY年M月D日(ddd)')}
+                  </Text>
+                  {/* 記入者 */}
+                  <Text>支援員：</Text>
+                  <Box bg='white' p='1' borderRadius={4}>
+                    <Text size={{ base: 'sm', md: 'md' }}>{dailyRecord.author}</Text>
+                  </Box>
+                  <Spacer />
+                  {/* 活動 */}
+                  <Flex alignItems='center' mr='4'>
+                    <Text>午前：</Text>
+                    <Box bg='white' p='1' borderRadius={4}>
+                      <Text size={{ base: 'sm', md: 'md' }} bg='white'>
+                        {dailyRecord.amWork}
+                      </Text>
                     </Box>
                   </Flex>
-                </ListItem>
-              );
-            })}
-          </UnorderedList>
-        </Flex>
-      ))}
+                  <Flex alignItems='center'>
+                    <Text>午後：</Text>
+                    <Box bg='white' p='1' borderRadius={4}>
+                      <Text size={{ base: 'sm', md: 'md' }} bg='white'>
+                        {dailyRecord.pmWork}
+                      </Text>
+                    </Box>
+                  </Flex>
+                </Flex>
+              </GridItem>
+              {/* 記録 */}
+              <GridItem
+                rowSpan={1}
+                colSpan={1}
+                bg='white'
+                alignItems='center'
+                textAlign='center'
+                borderRight='1px'
+              >
+                ご本人の様子
+              </GridItem>
+              <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center'>
+                支援、考察
+              </GridItem>
+            </Grid>
+            <UnorderedList
+              listStyleType='none'
+              ml='0'
+              border='1px'
+              borderBottomRadius='md'
+              fontSize={{ base: 'sm', md: 'md' }}
+            >
+              {dailyRecord.singleRecord.map((record, index) => {
+                const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
+                return (
+                  <ListItem key={index} className='record' backgroundColor={backgroundColor}>
+                    <Flex pt='2' pr='2'>
+                      <Badge ml='2' variant='outline'>
+                        {record.editor}
+                      </Badge>
+                      <Spacer />
+                      {record.good && (
+                        <Badge ml='2' colorScheme='teal'>
+                          Good
+                        </Badge>
+                      )}
+                      {record.notice && (
+                        <Badge ml='2' colorScheme='red'>
+                          特記事項
+                        </Badge>
+                      )}
+                    </Flex>
+                    <Flex>
+                      <Box p='2' w='50%' borderRight='1px'>
+                        {record.situation}
+                      </Box>
+                      <Box p='2' w='50%'>
+                        {record.support}
+                      </Box>
+                    </Flex>
+                  </ListItem>
+                );
+              })}
+            </UnorderedList>
+          </Flex>
+        ))}
       </Layout>
     </>
   );
