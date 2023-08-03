@@ -76,7 +76,7 @@ export default function RecordMonthPage() {
     timeAdjustment: number;
     singleRecord: SingleRecordData[];
   };
-  const [dailyRecordData, setDailyRecordData] = useState<DailyRecordData[]>([]);
+  const [allRecordData, setAllRecordData] = useState<DailyRecordData[]>([]);
 
   const fetchData = async () => {
     try {
@@ -109,7 +109,10 @@ export default function RecordMonthPage() {
         );
         const singleRecordData = singleRecordQuerySnapshot.docs.map((doc) => doc.data());
         const dailyRecordWithData = {
-          ...dailyRecordData,
+          author: dailyRecordData.author,
+          amWork: dailyRecordData.amWork,
+          pmWork: dailyRecordData.pmWork,
+          timeAdjustment: dailyRecordData.timeAdjustment,
           singleRecord: singleRecordData,
           id: doc.id,
         };
@@ -118,8 +121,9 @@ export default function RecordMonthPage() {
       });
 
       // データをセット
-      const dailyRecordData = await Promise.all(dailyRecordPromises);
-      setDailyRecordData(dailyRecordData);
+      const aallRecordData = await Promise.all(dailyRecordPromises);
+      console.log('テスト', aallRecordData);
+      setAllRecordData(allRecordData);
     } catch (error) {
       console.error('Error fetching dailyRecordData:', error);
     }
@@ -134,8 +138,8 @@ export default function RecordMonthPage() {
       fetchData();
     }
   }, [customerId, formattedMonth]);
-  console.log(dailyRecordData);
-  if (!customer || dailyRecordData.length === 0) {
+  console.log('記録', allRecordData);
+  if (!customer || allRecordData.length === 0) {
     return <Spinner />;
   }
 
@@ -145,7 +149,7 @@ export default function RecordMonthPage() {
         <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
           {customer?.customerName}さん
         </Heading>
-        {dailyRecordData.map((dailyRecord, index) => (
+        {allRecordData.map((dailyRecord, index) => (
           <Flex key={index} flexDirection='column' bg='white' p={2} my={2}>
             {/* 基本情報 */}
             <Grid
