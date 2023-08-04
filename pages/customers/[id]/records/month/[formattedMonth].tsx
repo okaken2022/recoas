@@ -107,12 +107,21 @@ export default function RecordMonthPage() {
         const singleRecordQuerySnapshot = await getDocs(
           query(singleRecordCollectionRef, orderBy('serialNumber')),
         );
-        const singleRecordData = singleRecordQuerySnapshot.docs.map((doc) => doc.data());
+        const singleRecordData: SingleRecordData[] = dailyRecordData.singleRecord.map(
+          (record: any) => ({
+            editor: record.editor,
+            good: record.good,
+            notice: record.notice,
+            situation: record.situation,
+            support: record.support,
+          }),
+        );
+
         const dailyRecordWithData = {
-          author: dailyRecordData.author,
-          amWork: dailyRecordData.amWork,
-          pmWork: dailyRecordData.pmWork,
-          timeAdjustment: dailyRecordData.timeAdjustment,
+          author: dailyRecordData.author as string,
+          amWork: dailyRecordData.amWork as string,
+          pmWork: dailyRecordData.pmWork as string,
+          timeAdjustment: dailyRecordData.timeAdjustment as number,
           singleRecord: singleRecordData,
           id: doc.id,
         };
@@ -121,9 +130,9 @@ export default function RecordMonthPage() {
       });
 
       // データをセット
-      const aallRecordData = await Promise.all(dailyRecordPromises);
-      console.log('テスト', aallRecordData);
-      setAllRecordData(allRecordData);
+      const recordData = await Promise.all(dailyRecordPromises);
+      console.log('テスト', allRecordData);
+      setAllRecordData(recordData);
     } catch (error) {
       console.error('Error fetching dailyRecordData:', error);
     }
