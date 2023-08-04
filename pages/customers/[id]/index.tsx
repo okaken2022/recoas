@@ -1,28 +1,17 @@
 import {
-  Heading,
-  Spacer,
-  VStack,
   Text,
   Tabs,
   TabList,
   Tab,
   TabPanels,
   TabPanel,
+  UnorderedList,
+  ListItem,
+  Link,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-  getDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  DocumentData,
-} from 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 
@@ -42,6 +31,7 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 
 export default function Customer() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [monthlyRecords, setMonthlyRecords] = useState<string[]>([]);
 
   {
     /* ログイン */
@@ -100,18 +90,6 @@ export default function Customer() {
     setEvents(newEvents);
   };
 
-  useEffect(() => {
-    if (customerId) {
-      const id = Array.isArray(customerId) ? customerId[0] : customerId;
-      fetchCustomer(id, setCustomer);
-      fetchHolidays();
-    }
-  }, [customerId]);
-
-  if (!customer) {
-    return <div>Loading...</div>;
-  }
-
   {
     /* FullCalendar 土日祝日を除いた日付をイベントとして配列を作成 */
   }
@@ -165,6 +143,50 @@ export default function Customer() {
     );
   };
 
+  {
+    /* 月別記録リスト */
+  }
+
+  const fetchMonthlyRecords = async () => {
+    // Firestoreのコレクションを作成
+    const recordsCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+    );
+
+    // コレクション内のドキュメントを取得
+    const querySnapshot = await getDocs(recordsCollectionRef);
+
+    // ドキュメントが存在する月のリストを取得
+    const records: string[] = querySnapshot.docs.map((doc) => doc.id);
+
+    setMonthlyRecords(records);
+  };
+
+  const handleMonthlyItemClick = (formattedMonth: string) => {
+    router.push(`/customers/${customerId}/records/month/${formattedMonth}/`);
+  };
+
+  const formatJapaneseMonth = (formattedMonth: string) => {
+    const date = moment(formattedMonth, 'YYYY-MM');
+    return date.format('YYYY年M月');
+  };
+
+  useEffect(() => {
+    if (customerId) {
+      const id = Array.isArray(customerId) ? customerId[0] : customerId;
+      fetchCustomer(id, setCustomer);
+      fetchHolidays();
+      fetchMonthlyRecords();
+    }
+  }, [customerId]);
+
+  if (!customer) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <Layout>
@@ -190,7 +212,19 @@ export default function Customer() {
               />
             </TabPanel>
             <TabPanel>
-              <p>リスト表示予定</p>
+              <UnorderedList>
+                {monthlyRecords.map((month) => (
+                  <ListItem key={month}>
+                    {/* リンクを追加 */}
+                    <Link
+                      onClick={() => handleMonthlyItemClick(month)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {formatJapaneseMonth(month)}
+                    </Link>
+                  </ListItem>
+                ))}
+              </UnorderedList>
             </TabPanel>
           </TabPanels>
         </Tabs>
