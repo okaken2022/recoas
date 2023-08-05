@@ -135,6 +135,12 @@ export default function RecordMonthPage() {
     return <Spinner />;
   }
 
+  const handleRecordItemClick = (dailyRecord: DailyRecordData) => {
+    router.push({
+      pathname: `/customers/${customerId}/records/${dailyRecord.id}/`,
+    });
+  };
+
   return (
     <>
       <Layout>
@@ -142,7 +148,15 @@ export default function RecordMonthPage() {
           {customer?.customerName}さん
         </Heading>
         {allRecordData.map((dailyRecord, index) => (
-          <Flex key={index} flexDirection='column' bg='white' p={2} my={2}>
+          <Flex
+            key={index}
+            flexDirection='column'
+            bg='white'
+            p={2}
+            my={2}
+            onClick={() => handleRecordItemClick(dailyRecord)}
+            cursor='pointer'
+          >
             {/* 基本情報 */}
             <Grid
               h='auto'
