@@ -319,14 +319,14 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
           </Heading>
           {/* ページネーション */}
           <Flex mt='2' mb={4} fontSize={{ base: 'md', md: 'xl' }}>
-            <Flex alignItems='center' onClick={navigateToPreviousDay}>
+            <Flex alignItems='center' onClick={navigateToPreviousDay} cursor='pointer'>
               <ArrowBackIcon mr='1' />
               <Text fontSize='l'>前の日</Text>
             </Flex>
             <Spacer />
             <Text fontSize='l'>{formattedDateJa}</Text>
             <Spacer />
-            <Flex alignItems='center' onClick={navigateToNextDay}>
+            <Flex alignItems='center' onClick={navigateToNextDay}  cursor='pointer'>
               <Text fontSize='l'>次の日</Text>
               <ArrowForwardIcon ml='1' />
             </Flex>
