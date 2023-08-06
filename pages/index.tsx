@@ -87,10 +87,11 @@ export default function Home() {
       <Layout>
         {/* お知らせ */}
         <Text className='head' fontSize='2xl'>
-          更新
+          更新情報
         </Text>
         <Box mt='4' p='4'>
           <Text>8/5 月別のリストが見られるようになりました。</Text>
+          <Text>8/6 ページネーション機能を追加しました。</Text>
         </Box>
 
         {/* 利用者一覧 */}

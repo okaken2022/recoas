@@ -40,7 +40,13 @@ import { useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import { AddIcon, EditIcon } from '@chakra-ui/icons';
+import {
+  AddIcon,
+  ArrowBackIcon,
+  ArrowForwardIcon,
+  ArrowLeftIcon,
+  EditIcon,
+} from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
 import {
   addDoc,
@@ -56,6 +62,7 @@ import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
+import Link from 'next/link';
 
 // export async function getStaticProps() {
 //   // 日付を取得
@@ -152,7 +159,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       fetchBasicRecordInfo();
       fetchSingleRecord();
     }
-  }, [customerId, setValue]);
+  }, [customerId, setValue, formattedDate]);
 
   {
     /* 基本情報保存 */
@@ -275,6 +282,20 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     setSingleRecordData(records);
   };
 
+  {
+    /* ルーティング */
+  }
+  // ページネーションのリンクを作成する関数
+  const navigateToPreviousDay = () => {
+    const prevDate = moment(formattedDate).subtract(1, 'day').format('YYYY-MM-DD');
+    router.push(`/customers/${customerId}/records/${prevDate}`);
+  };
+
+  const navigateToNextDay = () => {
+    const nextDate = moment(formattedDate).add(1, 'day').format('YYYY-MM-DD');
+    router.push(`/customers/${customerId}/records/${nextDate}`);
+  };
+
   const goToRecordEditPage = (docId: string) => {
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/edit/`,
@@ -296,6 +317,20 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
           <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
             {customer?.customerName}さん
           </Heading>
+          {/* ページネーション */}
+          <Flex mt='2' mb={4} fontSize={{ base: 'md', md: 'xl' }}>
+            <Flex alignItems='center' onClick={navigateToPreviousDay}>
+              <ArrowBackIcon mr='1' />
+              <Text fontSize='l'>前の日</Text>
+            </Flex>
+            <Spacer />
+            <Text fontSize='l'>{formattedDateJa}</Text>
+            <Spacer />
+            <Flex alignItems='center' onClick={navigateToNextDay}>
+              <Text fontSize='l'>次の日</Text>
+              <ArrowForwardIcon ml='1' />
+            </Flex>
+          </Flex>
           <Text color='color.main' fontWeight={'bold'}>
             ※各記録をタップすると編集できます
           </Text>
@@ -311,7 +346,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             {/* 日付 */}
             <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
               <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDate}</Text>
+                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
                 <Spacer />
 
                 {/* 記入者 */}
