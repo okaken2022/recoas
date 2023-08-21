@@ -8,6 +8,8 @@ import {
   UnorderedList,
   ListItem,
   Link,
+  Center,
+  Spinner,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -128,7 +130,6 @@ export default function Customer() {
   };
 
   //カレンダー設定で指定した閉所日を、イベント一覧の配列から削除し、新たな配列を作成。その後カレンダーに表示。
-
   const renderEventContent = (eventInfo: EventContentArg) => {
     return (
       <div>
@@ -146,7 +147,6 @@ export default function Customer() {
   {
     /* 月別記録リスト */
   }
-
   const fetchMonthlyRecords = async () => {
     // Firestoreのコレクションを作成
     const recordsCollectionRef = collection(
@@ -184,7 +184,11 @@ export default function Customer() {
   }, [customerId]);
 
   if (!customer) {
-    return <div>Loading...</div>;
+    return (
+      <Center height='100vh'>
+        <Spinner color='color.main' size='xl' />
+      </Center>
+    );
   }
 
   return (

@@ -10,39 +10,21 @@ import {
   ListItem,
   Grid,
   GridItem,
+  Center,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import {
-  getFirestore,
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  getDocs,
-  DocumentData,
-  query,
-  orderBy,
-} from 'firebase/firestore';
+import { collection, getDocs, DocumentData, query, orderBy } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 
-import axios from 'axios';
 import moment from 'moment';
-import { EventContentArg } from '@fullcalendar/core';
-//momentは削除
 import 'moment/locale/ja';
-import jaLocale from '@fullcalendar/core/locales/ja';
 import { CustomerInfoType } from '@/types/customerInfo';
-import CustomerInfo from '@/components/CustomerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
-import { format } from 'path';
 
 export default function RecordMonthPage() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const [monthlyRecords, setMonthlyRecords] = useState<string[]>([]);
-
   {
     /* ログイン */
   }
@@ -72,16 +54,16 @@ export default function RecordMonthPage() {
   const [allRecordData, setAllRecordData] = useState<DailyRecordData[]>([]);
 
   const fetchData = async () => {
-    if (Array.isArray(customerId) || Array.isArray(formattedMonth)) return
+    if (Array.isArray(customerId) || Array.isArray(formattedMonth)) return;
     try {
       // dailyRecordsコレクション内のドキュメントを取得
       // as string はできるだけ使わない。関数で型ガードするのがベター？if文使うか、
       const dailyRecordsCollectionRef = collection(
         db,
         'customers',
-        customerId ?? "",
+        customerId ?? '',
         'monthlyRecords',
-        formattedMonth ?? "",
+        formattedMonth ?? '',
         'dailyRecords',
       );
       const dailyRecordsQuerySnapshot = await getDocs(dailyRecordsCollectionRef);
@@ -92,9 +74,9 @@ export default function RecordMonthPage() {
         const singleRecordCollectionRef = collection(
           db,
           'customers',
-          customerId ?? "",
+          customerId ?? '',
           'monthlyRecords',
-          formattedMonth ?? "",
+          formattedMonth ?? '',
           'dailyRecords',
           doc.id,
           'singleRecord',
@@ -134,7 +116,11 @@ export default function RecordMonthPage() {
   }, [customerId, formattedMonth]);
   console.log('記録', allRecordData);
   if (!customer || allRecordData.length === 0) {
-    return <Spinner />;
+    return (
+      <Center height='100vh'>
+        <Spinner color='color.main' size='xl' />
+      </Center>
+    );
   }
 
   const handleRecordItemClick = (dailyRecord: DailyRecordData) => {

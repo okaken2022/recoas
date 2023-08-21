@@ -28,6 +28,8 @@ import {
   ModalFooter,
   Textarea,
   useToast,
+  Center,
+  Spinner,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -310,6 +312,14 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     });
   };
 
+  if (!singleRecordData) {
+    return (
+      <Center height='100vh'>
+        <Spinner color='color.main' size='xl' />
+      </Center>
+    );
+  }
+
   return (
     <>
       <Layout>
@@ -326,7 +336,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             <Spacer />
             <Text fontSize='l'>{formattedDateJa}</Text>
             <Spacer />
-            <Flex alignItems='center' onClick={navigateToNextDay}  cursor='pointer'>
+            <Flex alignItems='center' onClick={navigateToNextDay} cursor='pointer'>
               <Text fontSize='l'>次の日</Text>
               <ArrowForwardIcon ml='1' />
             </Flex>

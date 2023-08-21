@@ -1,13 +1,12 @@
-import { Button, Box, Select, Wrap, WrapItem, Text } from '@chakra-ui/react';
+import { Button, Box, Select, Wrap, WrapItem, Text, Spinner, Center } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 import { useState, useContext, useEffect } from 'react';
-import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { Customer, CustomersByService, ServiceType } from '@/types/customer';
+import { CustomersByService, ServiceType } from '@/types/customer';
 import CustomerList from '@/components/CustomerList';
 import Link from 'next/link';
 
@@ -82,6 +81,18 @@ export default function Home() {
     }
   }
 
+  const goToAddCustomer = () => {
+    router.push('/administrator/addCustomer');
+  };
+
+  if (!currentUser) {
+    return (
+      <Center height='100vh'>
+        <Spinner color='color.main' size='xl' />
+      </Center>
+    );
+  }
+
   return (
     <>
       <Layout>
@@ -112,66 +123,24 @@ export default function Home() {
           </Text>
           <Wrap mt='4' spacing='3%' justify='center'>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button w='100%'>
-                {/* <FontAwesomeIcon icon={faUser}>
-                  <i className="fa-solid fa-user" />
-                </FontAwesomeIcon> */}
-                ユーザー一覧
-              </Button>
-            </WrapItem>
-            <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button w='100%'>
-                <CalendarIcon mr='2' />
-                カレンダー設定
-              </Button>
-            </WrapItem>
-            <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button w='100%'>
+              <Button onClick={goToAddCustomer} w='100%'>
                 <AddIcon mr='2' />
                 利用者を追加する
               </Button>
             </WrapItem>
+            <WrapItem w={{ base: '100%', md: '30%' }}>
+              <Button isDisabled={true} w='100%'>
+                ユーザー一覧
+              </Button>
+            </WrapItem>
+            <WrapItem w={{ base: '100%', md: '30%' }}>
+              <Button isDisabled={true} w='100%'>
+                <CalendarIcon mr='2' />
+                カレンダー設定
+              </Button>
+            </WrapItem>
           </Wrap>
         </Box>
-        {/* 開発用リンク */}
-        <Text fontSize='2xl' mt='20'>
-          開発用リンク
-        </Text>
-
-        {/* HOME */}
-        <Link href='/'>
-          <Text fontSize='l' color='blue'>
-            HOME
-          </Text>
-        </Link>
-
-        {/* 利用者詳細 */}
-        <Link href='/customers/customer'>
-          <Text fontSize='l' color='blue'>
-            利用者詳細
-          </Text>
-        </Link>
-
-        {/* 記録詳細 */}
-        <Link href='/customers/records/dailyRecord'>
-          <Text fontSize='l' color='blue'>
-            記録詳細
-          </Text>
-        </Link>
-
-        {/* 利用者追加 */}
-        <Link href='/administrator/addCustomer'>
-          <Text fontSize='l' color='blue'>
-            利用者追加
-          </Text>
-        </Link>
-
-        <Text fontSize='2xl' mt='20'>
-          やること
-        </Text>
-        <Text fontSize='l'>記録のCRUD</Text>
-        <Text fontSize='l'>利用者別のルーティング</Text>
-        <Text fontSize='l'>ぱんくずリスト</Text>
       </Layout>
     </>
   );
