@@ -72,14 +72,16 @@ export default function RecordMonthPage() {
   const [allRecordData, setAllRecordData] = useState<DailyRecordData[]>([]);
 
   const fetchData = async () => {
+    if (Array.isArray(customerId) || Array.isArray(formattedMonth)) return
     try {
       // dailyRecordsコレクション内のドキュメントを取得
+      // as string はできるだけ使わない。関数で型ガードするのがベター？if文使うか、
       const dailyRecordsCollectionRef = collection(
         db,
         'customers',
-        customerId as string,
+        customerId ?? "",
         'monthlyRecords',
-        formattedMonth as string,
+        formattedMonth ?? "",
         'dailyRecords',
       );
       const dailyRecordsQuerySnapshot = await getDocs(dailyRecordsCollectionRef);
@@ -90,9 +92,9 @@ export default function RecordMonthPage() {
         const singleRecordCollectionRef = collection(
           db,
           'customers',
-          customerId as string,
+          customerId ?? "",
           'monthlyRecords',
-          formattedMonth as string,
+          formattedMonth ?? "",
           'dailyRecords',
           doc.id,
           'singleRecord',
@@ -102,10 +104,10 @@ export default function RecordMonthPage() {
         );
         const singleRecordData = singleRecordQuerySnapshot.docs.map((doc) => doc.data());
         const dailyRecordWithData = {
-          author: dailyRecordData.author as string,
-          amWork: dailyRecordData.amWork as string,
-          pmWork: dailyRecordData.pmWork as string,
-          timeAdjustment: dailyRecordData.timeAdjustment as number,
+          author: dailyRecordData.author,
+          amWork: dailyRecordData.amWork,
+          pmWork: dailyRecordData.pmWork,
+          timeAdjustment: dailyRecordData.timeAdjustment,
           singleRecord: singleRecordData,
           id: doc.id,
         };
