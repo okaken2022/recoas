@@ -6,7 +6,6 @@ import {
   Button,
   Checkbox,
   Stack,
-  useDisclosure,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -24,7 +23,6 @@ import { addDoc, collection, getDocs } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Link from 'next/link';
 
 export default function RecordPage() {
   {

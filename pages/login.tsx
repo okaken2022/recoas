@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Button, FormLabel, Input, VStack, useToast } from '@chakra-ui/react';
-import NextLink from 'next/link';
 import { Header } from '@/components/Header';
 
 import { useAuth, useUser } from '@/hooks/firebase';

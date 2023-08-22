@@ -8,7 +8,6 @@ import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
 import { CustomersByService, ServiceType } from '@/types/customer';
 import CustomerList from '@/components/CustomerList';
-import Link from 'next/link';
 
 export default function Home() {
   const [allCustomersByService, setAllCustomersByService] = useState<CustomersByService>({

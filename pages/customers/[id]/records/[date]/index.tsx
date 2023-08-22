@@ -1,7 +1,6 @@
 import {
   Heading,
   Spacer,
-  VStack,
   Text,
   Box,
   Grid,
@@ -11,22 +10,12 @@ import {
   UnorderedList,
   ListItem,
   Button,
-  ButtonGroup,
   Badge,
-  Checkbox,
   Radio,
   RadioGroup,
   Stack,
   FormErrorMessage,
   useDisclosure,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Textarea,
   useToast,
   Center,
   Spinner,
@@ -35,23 +24,16 @@ import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
-
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
-import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
 import {
   AddIcon,
   ArrowBackIcon,
   ArrowForwardIcon,
-  ArrowLeftIcon,
-  EditIcon,
 } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
 import {
-  addDoc,
   collection,
   doc,
   getDoc,
@@ -64,41 +46,7 @@ import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
-import Link from 'next/link';
 
-// export async function getStaticProps() {
-//   // 日付を取得
-//   const date = new Date();
-//   const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
-
-//   return {
-//     props: {
-//       formattedDateJa,
-//     },
-//   };
-// }
-
-// export async function getStaticPaths() {
-//   const customerIds: string[] = [];
-
-//   try {
-//     const querySnapshot = await getDocs(collection(db, 'customers'));
-//     querySnapshot.forEach((doc) => {
-//       customerIds.push(doc.id);
-//     });
-//   } catch (error) {
-//     console.error('Error fetching customerIds:', error);
-//   }
-
-//   const paths = customerIds.map((id) => ({
-//     params: { id },
-//   }));
-
-//   return {
-//     paths,
-//     fallback: false,
-//   };
-// }
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {

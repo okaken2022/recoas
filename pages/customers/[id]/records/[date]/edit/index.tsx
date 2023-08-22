@@ -22,25 +22,20 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import { ChangeEvent, useContext, useEffect, useState } from 'react';
+import {  useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
+import {  SingleRecord } from '@/types/record';
 import {
-  DocumentData,
-  addDoc,
-  collection,
   deleteDoc,
   doc,
   getDoc,
-  getDocs,
   setDoc,
 } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Link from 'next/link';
 
 export default function RecordPage() {
   {
