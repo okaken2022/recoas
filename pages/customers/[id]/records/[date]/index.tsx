@@ -26,6 +26,7 @@ import { NextRouter, useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 
+import dayjs from 'dayjs';
 import moment from 'moment';
 import {
   AddIcon,
@@ -46,6 +47,7 @@ import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
+import { useDateFormatter } from '@/hooks/useDateFormatter';
 
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
@@ -63,7 +65,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* modal, toast */
   }
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
   {
     /* state */
@@ -92,10 +93,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   }
   const { date } = router.query as { date: string };
   moment.locale('ja');
-  const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
-  const formattedMonthJa = moment(date).format('YYYY年MM月'); //月の文字列
-  const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
-  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)');
+  const { formattedMonth, formattedMonthJa, formattedDate, formattedDateJa } = useDateFormatter(date);
 
   {
     /* 利用者情報取得 */
