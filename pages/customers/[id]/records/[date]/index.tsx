@@ -15,7 +15,6 @@ import {
   RadioGroup,
   Stack,
   FormErrorMessage,
-  useDisclosure,
   useToast,
   Center,
   Spinner,
@@ -27,7 +26,7 @@ import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 
 import dayjs from 'dayjs';
-import moment from 'moment';
+
 import {
   AddIcon,
   ArrowBackIcon,
@@ -48,6 +47,7 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
+
 
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
@@ -92,8 +92,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
-  moment.locale('ja');
-  const { formattedMonth, formattedMonthJa, formattedDate, formattedDateJa } = useDateFormatter(date);
+  const { formattedMonth, formattedDate, formattedDateJa } = useDateFormatter(date);
 
   {
     /* 利用者情報取得 */
@@ -233,14 +232,13 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
     /* ルーティング */
   }
-  // ページネーションのリンクを作成する関数
   const navigateToPreviousDay = () => {
-    const prevDate = moment(formattedDate).subtract(1, 'day').format('YYYY-MM-DD');
+    const prevDate = dayjs(formattedDate).subtract(1, 'day').format('YYYY-MM-DD');
     router.push(`/customers/${customerId}/records/${prevDate}`);
   };
 
   const navigateToNextDay = () => {
-    const nextDate = moment(formattedDate).add(1, 'day').format('YYYY-MM-DD');
+    const nextDate = dayjs(formattedDate).add(1, 'day').format('YYYY-MM-DD');
     router.push(`/customers/${customerId}/records/${nextDate}`);
   };
 
