@@ -11,6 +11,6 @@ export function useDateFormatter(date: string) {
     formattedMonth,
     formattedMonthJa,
     formattedDate,
-    formattedDateJa
+    formattedDateJa,
   };
 }

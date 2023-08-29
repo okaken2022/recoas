@@ -22,17 +22,12 @@ import { NextRouter, useRouter } from 'next/router';
 
 import Layout from '@/components/Layout';
 
-import {  useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
 import moment from 'moment';
-import {  SingleRecord } from '@/types/record';
-import {
-  deleteDoc,
-  doc,
-  getDoc,
-  setDoc,
-} from 'firebase/firestore';
+import { SingleRecord } from '@/types/record';
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';

@@ -27,28 +27,14 @@ import { useContext, useEffect, useState } from 'react';
 
 import dayjs from 'dayjs';
 
-import {
-  AddIcon,
-  ArrowBackIcon,
-  ArrowForwardIcon,
-} from '@chakra-ui/icons';
+import { AddIcon, ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 import { BasicInfoOfRecord, SingleRecord } from '@/types/record';
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  setDoc,
-} from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
-
-
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
