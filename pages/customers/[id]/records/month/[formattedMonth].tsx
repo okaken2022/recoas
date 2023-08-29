@@ -21,6 +21,11 @@ import { useContext, useEffect, useState } from 'react';
 
 import moment from 'moment';
 import 'moment/locale/ja';
+
+import dayjs from 'dayjs';
+import 'dayjs/locale/ja';
+dayjs.locale('ja');
+
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 
@@ -109,12 +114,9 @@ export default function RecordMonthPage() {
     if (customerId) {
       const id = Array.isArray(customerId) ? customerId[0] : customerId;
       fetchCustomer(id, setCustomer);
-      console.log(customerId);
-      console.log(formattedMonth);
       fetchData();
     }
   }, [customerId, formattedMonth]);
-  console.log('記録', allRecordData);
   if (!customer || allRecordData.length === 0) {
     return (
       <Center height='100vh'>
@@ -158,7 +160,7 @@ export default function RecordMonthPage() {
               <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
                 <Flex alignItems='center'>
                   <Text mr='8' fontSize={{ base: 'md', md: 'xl' }}>
-                    {moment(dailyRecord.id).format('YYYY年M月D日(ddd)')}
+                    {dayjs(dailyRecord.id).format('YYYY年M月D日(ddd)')}
                   </Text>
                   {/* 記入者 */}
                   <Text>支援員：</Text>
