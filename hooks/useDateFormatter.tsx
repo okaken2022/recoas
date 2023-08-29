@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import 'dayjs/locale/ja';
+dayjs.locale('ja');
 
 export function useDateFormatter(date: string) {
   const formattedMonth = dayjs(date).format('YYYY-MM');
