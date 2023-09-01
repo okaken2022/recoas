@@ -22,14 +22,16 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import { useContext, useEffect, useState } from 'react';
 
 import axios from 'axios';
-import moment from 'moment';
+
 import { EventContentArg } from '@fullcalendar/core';
-//momentは削除
-import 'moment/locale/ja';
+
 import jaLocale from '@fullcalendar/core/locales/ja';
 import { CustomerInfoType } from '@/types/customerInfo';
 import CustomerInfo from '@/components/CustomerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ja';
+dayjs.locale('ja');
 
 export default function Customer() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -50,14 +52,13 @@ export default function Customer() {
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
 
   const fetchHolidays = async () => {
-    // Google Calendar APIで祝日情報を取得
     const response = await axios.get(
       'https://www.googleapis.com/calendar/v3/calendars/ja.japanese%23holiday%40group.v.calendar.google.com/events',
       {
         params: {
           key: process.env.NEXT_PUBLIC_FIREBASE_APIKEY,
-          timeMin: moment().startOf('year').toISOString(),
-          timeMax: moment().endOf('year').toISOString(),
+          timeMin: dayjs().startOf('year').toISOString(),
+          timeMax: dayjs().endOf('year').toISOString(),
           singleEvents: true,
           orderBy: 'startTime',
         },
@@ -66,22 +67,26 @@ export default function Customer() {
 
     // 取得した祝日情報から日付の配列を作成
     const holidays = response.data.items.map((item: any) =>
-      moment(item.start.date).format('YYYY-MM-DD'),
+      dayjs(item.start.date).format('YYYY-MM-DD'),
     );
 
     // 土日と祝日を除いた日付の配列を作成
     const dates = [];
-    const currentDate = moment().startOf('year');
-    const endDate = moment().endOf('year');
-    while (currentDate.isSameOrBefore(endDate)) {
+    let currentDate = dayjs().startOf('year');
+    console.log(currentDate);
+    const endDate = dayjs().endOf('year');
+    console.log(endDate);
+
+    while (currentDate.isBefore(endDate) || currentDate.isSame(endDate)) {
       const dayOfWeek = currentDate.day();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const isHoliday = holidays.includes(currentDate.format('YYYY-MM-DD'));
       if (!isWeekend && !isHoliday) {
         dates.push(currentDate.format('YYYY-MM-DD'));
       }
-      currentDate.add(1, 'day');
+      currentDate = currentDate.add(1, 'day');
     }
+    console.log(dates);
 
     // 日付ごとにイベントオブジェクトを作成
     const newEvents: Event[] = dates.map((date) => ({
@@ -105,8 +110,8 @@ export default function Customer() {
   }
   const handleEventClick = async (eventInfo: EventContentArg) => {
     const clickedDate = eventInfo.event.start as Date; // クリックされたイベントの日付を取得
-    const clickedMonth = moment(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
-    const formattedDate = moment(clickedDate).format('YYYY-MM-DD'); //日付の文字列
+    const clickedMonth = dayjs(clickedDate).format('YYYY-MM'); // クリックされた日付から年月を取得
+    const formattedDate = dayjs(clickedDate).format('YYYY-MM-DD'); //日付の文字列
     // ルーティング先のパスを指定し、日付情報をクエリパラメータとして渡す
     router.push({
       pathname: `/customers/${customerId}/records/${formattedDate}/`, // ルーティング先のパスを指定
@@ -170,7 +175,7 @@ export default function Customer() {
   };
 
   const formatJapaneseMonth = (formattedMonth: string) => {
-    const date = moment(formattedMonth, 'YYYY-MM');
+    const date = dayjs(formattedMonth, 'YYYY-MM');
     return date.format('YYYY年M月');
   };
 
