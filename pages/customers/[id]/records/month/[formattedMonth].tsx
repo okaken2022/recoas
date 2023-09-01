@@ -19,9 +19,6 @@ import { collection, getDocs, DocumentData, query, orderBy } from 'firebase/fire
 import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 
-import moment from 'moment';
-import 'moment/locale/ja';
-
 import dayjs from 'dayjs';
 import 'dayjs/locale/ja';
 dayjs.locale('ja');
@@ -159,18 +156,18 @@ export default function RecordMonthPage() {
               {/* 日付 */}
               <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
                 <Flex alignItems='center'>
-                  <Text mr='8' fontSize={{ base: 'md', md: 'xl' }}>
+                  <Text mr='8' fontSize={{ base: 'sm', md: 'xl' }}>
                     {dayjs(dailyRecord.id).format('YYYY年M月D日(ddd)')}
                   </Text>
                   {/* 記入者 */}
-                  <Text>支援員：</Text>
+                  <Text fontSize={{ base: 'sm', md: 'xl' }}>支援員：</Text>
                   <Box bg='white' p='1' borderRadius={4}>
                     <Text size={{ base: 'sm', md: 'md' }}>{dailyRecord.author}</Text>
                   </Box>
                   <Spacer />
                   {/* 活動 */}
                   <Flex alignItems='center' mr='4'>
-                    <Text>午前：</Text>
+                    <Text fontSize={{ base: 'sm', md: 'xl' }}>午前：</Text>
                     <Box bg='white' p='1' borderRadius={4}>
                       <Text size={{ base: 'sm', md: 'md' }} bg='white'>
                         {dailyRecord.amWork}
@@ -178,7 +175,7 @@ export default function RecordMonthPage() {
                     </Box>
                   </Flex>
                   <Flex alignItems='center'>
-                    <Text>午後：</Text>
+                    <Text fontSize={{ base: 'sm', md: 'xl' }}>午後：</Text>
                     <Box bg='white' p='1' borderRadius={4}>
                       <Text size={{ base: 'sm', md: 'md' }} bg='white'>
                         {dailyRecord.pmWork}

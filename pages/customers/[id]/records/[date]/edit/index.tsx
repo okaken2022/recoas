@@ -25,12 +25,12 @@ import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 import ResizeTextarea from 'react-textarea-autosize';
 
-import moment from 'moment';
 import { SingleRecord } from '@/types/record';
 import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { useDateFormatter } from '@/hooks/useDateFormatter';
 
 export default function RecordPage() {
   {
@@ -71,15 +71,11 @@ export default function RecordPage() {
   const router: NextRouter = useRouter();
   const { docId } = router.query;
   console.log(docId);
-
   {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
-  const formattedDateJa = moment(date).format('YYYY年M月D日 (ddd)'); //日本語表記の文字列
-  const formattedMonth = moment(date).format('YYYY-MM'); //月の文字列
-  const formattedDate = moment(date).format('YYYY-MM-DD'); //日付の文字列
-  console.log(formattedDate);
+  const { formattedMonth, formattedDate } = useDateFormatter(date);
 
   {
     /* 利用者情報取得 */

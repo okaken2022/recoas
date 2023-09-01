@@ -76,7 +76,7 @@ export default function Customer() {
     console.log(currentDate);
     const endDate = dayjs().endOf('year');
     console.log(endDate);
-    // ここがおかしい
+
     while (currentDate.isBefore(endDate) || currentDate.isSame(endDate)) {
       const dayOfWeek = currentDate.day();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
