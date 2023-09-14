@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAnyAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /{document=**} {
+      // ログイン済みのユーザーに対してreadとcreateを許可
+      allow read, create, update, delete: if isAnyAuthenticated();
+    }
+    
+    // match /customers/{customerId} {
+    //   match /monthlyRecords/{month} {
+    //     match /dailyRecords/{day} {
+    //       match /singleRecords/{recordId} {
+    //         // リクエストしたユーザーがドキュメントのUIDと一致する場合にupdateとdeleteを許可
+    //         allow update, delete: if isAnyAuthenticated() && request.auth.uid == request.resource.data.uid;
+    //       }
+    //     }
+    //   }
+    // }
+  }
+}
