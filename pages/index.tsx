@@ -64,22 +64,6 @@ export default function Home() {
     router.push(`/customers/${customerId}`);
   };
 
-  {
-    /* サービスごとに異なる背景色をあてる */
-  }
-  function getServiceBackgroundColor(service: string) {
-    switch (service) {
-      case '生活介護':
-        return 'red.200';
-      case '多機能生活介護':
-        return 'blue.200';
-      case '就労継続支援B型':
-        return 'green.200';
-      default:
-        return 'gray.200';
-    }
-  }
-
   const goToAddCustomer = () => {
     router.push('/administrator/addCustomer');
   };
