@@ -28,7 +28,7 @@ export default function Home() {
     /* サービスごとに分けた配列を持つオブジェクトを作成 */
   }
   useEffect(() => {
-    if (!currentUser) return;
+    if (!currentUser) router.push('/login');
     const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
     const unSub = onSnapshot(q, async (snapshot) => {
       const customersByService: CustomersByService = {
@@ -60,7 +60,6 @@ export default function Home() {
     /* 利用者名をクリックして、記録一覧ページに遷移 */
   }
   const handleCustomerClick = (customerId: string | undefined) => {
-    console.log(customerId);
     router.push(`/customers/${customerId}`);
   };
 
@@ -68,13 +67,8 @@ export default function Home() {
     router.push('/administrator/addCustomer');
   };
 
-  if (!currentUser) {
-    return (
-      <Center height='100vh'>
-        <Spinner color='color.main' size='xl' />
-      </Center>
-    );
-  }
+
+
 
   return (
     <>
