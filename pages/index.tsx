@@ -67,9 +67,6 @@ export default function Home() {
     router.push('/administrator/addCustomer');
   };
 
-
-
-
   return (
     <>
       <Layout>
