@@ -54,12 +54,6 @@ export default function RecordPage() {
     /* state */
   }
   const [customer, setCustomer] = useState<CustomerInfoType | null>(null);
-  const [isGood, setIsGood] = useState(false);
-  const [hasNotice, setHasNotice] = useState(false);
-  const [singleRecordData, setSingleRecordData] = useState<{
-    docId: string;
-    data: SingleRecord;
-  } | null>(null);
 
   {
     /* ログイン */
@@ -111,19 +105,23 @@ export default function RecordPage() {
     const docSnapshot = await getDoc(singleRecordRef);
     if (docSnapshot.exists()) {
       const data = docSnapshot.data();
-
-      setValue('situation', data.situation);
-      setValue('support', data.support);
-      setValue('editor', data.editor);
-      setValue('serialNumber', data.serialNumber);
+      reset(data);
       setIsGood(data.good);
       setHasNotice(data.notice);
-
       setSingleRecordData({ docId, data: data as SingleRecord });
     } else {
       setSingleRecordData(null);
     }
   };
+
+  const [singleRecordData, setSingleRecordData] = useState<{
+    docId: string;
+    data: SingleRecord;
+  } | null>(null);
+  const [isGood, setIsGood] = useState(singleRecordData?.data.good);
+  console.log(isGood);
+  const [hasNotice, setHasNotice] = useState(singleRecordData?.data.notice);
+  console.log(hasNotice);
 
   {
     /* good, noticeのトグル */
@@ -134,7 +132,6 @@ export default function RecordPage() {
   const handleNoticeToggle = () => {
     setHasNotice((prevValue) => !prevValue);
   };
-
   {
     /* singleRecord編集、保存 */
   }
@@ -270,16 +267,16 @@ export default function RecordPage() {
             <Stack spacing={5} direction='row' p='2'>
               <Checkbox
                 colorScheme='blue'
-                {...register('good')}
                 isChecked={isGood}
+                {...register('good')}
                 onChange={handleGoodToggle}
               >
                 Good
               </Checkbox>
               <Checkbox
                 colorScheme='red'
-                {...register('notice')}
                 isChecked={hasNotice}
+                {...register('notice')}
                 onChange={handleNoticeToggle}
               >
                 特記事項

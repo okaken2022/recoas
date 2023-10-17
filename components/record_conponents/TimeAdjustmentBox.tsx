@@ -9,8 +9,12 @@ interface TimeAdjustmentBoxProps {
   timeAdjustmentValue: number | undefined;
 }
 
-const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({ isCustomTime, onRadioChange,onChangeTimeAdjustment,  timeAdjustmentValue, }) => {
-
+const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
+  isCustomTime,
+  onRadioChange,
+  onChangeTimeAdjustment,
+  timeAdjustmentValue,
+}) => {
   const { register, setValue } = useForm(); // useForm フックを使用
 
   // フォームの初期化時に setValue を使用して初期値を設定

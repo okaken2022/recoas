@@ -68,7 +68,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const minutesOptions = Array.from({ length: 13 }, (_, i) => i * 5); // 0から60までの5の倍数の配列を作成
   const hoursOptions = Array.from({ length: 25 }, (_, i) => String(i).padStart(2, '0'));
 
-
   {
     /* ログイン */
   }
@@ -287,7 +286,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
               authorError={errors.author && errors.author.message}
             />
 
-
             {/* バイタル */}
             <Box bg='white' p={2} borderBottom='1px solid #ddd'>
               <Flex alignItems='center'>
@@ -363,22 +361,21 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             {/* トイレ */}
             <Box bg='white' p={2} borderBottom='1px solid #ddd'>
               <Flex alignItems='center'>
-                
                 <Text width='120px'>トイレ</Text>
                 <Wrap width='90%' spacing='3%' justify='right'>
                   <WrapItem>
-                      <Flex alignItems='center'>
-                        <Text mr='2'>内容：</Text>
-                        <Select width="100px" size={{ base: 'sm', md: 'md' }}>
-                          <option value='便'>尿</option>
-                          <option value='尿'>便</option>
-                          <option value='パット'>パット</option>
-                        </Select>
-                      </Flex>
-                    </WrapItem>
+                    <Flex alignItems='center'>
+                      <Text mr='2'>内容：</Text>
+                      <Select width='100px' size={{ base: 'sm', md: 'md' }}>
+                        <option value='便'>尿</option>
+                        <option value='尿'>便</option>
+                        <option value='パット'>パット</option>
+                      </Select>
+                    </Flex>
+                  </WrapItem>
                   <WrapItem>
                     <Flex alignItems='center'>
-                      <Select width="80px" size={{ base: 'sm', md: 'md' }} >
+                      <Select width='80px' size={{ base: 'sm', md: 'md' }}>
                         {hoursOptions.map((value) => (
                           <option key={value} value={value}>
                             {value}
@@ -391,7 +388,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
 
                   <WrapItem>
                     <Flex alignItems='center'>
-                      <Select width="64px" size={{ base: 'sm', md: 'md' }} >
+                      <Select width='64px' size={{ base: 'sm', md: 'md' }}>
                         {minutesOptions.map((value) => (
                           <option key={value} value={value}>
                             {value}
@@ -401,8 +398,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
                       <Text mr='2'>分</Text>
                     </Flex>
                   </WrapItem>
-
-
                 </Wrap>
               </Flex>
             </Box>
@@ -420,7 +415,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
               onChangeTimeAdjustment={(value) => setValue('timeAdjustment', value)}
               timeAdjustmentValue={basicInfoOfRecordData?.timeAdjustment || undefined}
             />
-
 
             {/* ボタン */}
             <Flex bg='white' p={2} borderBottom='1px' justifyContent='right'>

@@ -51,7 +51,7 @@ const RecordList: React.FC<RecordHeaderProps> = ({ singleRecordData, goToRecordE
               className='record'
               backgroundColor={backgroundColor}
               onClick={() => goToRecordEditPage(docId)}
-              whiteSpace="pre-line"
+              whiteSpace='pre-line'
             >
               <Flex pt='2' pr='2'>
                 <Badge ml='2' variant='outline'>
