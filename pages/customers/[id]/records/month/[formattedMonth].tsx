@@ -205,6 +205,7 @@ export default function RecordMonthPage() {
               border='1px'
               borderBottomRadius='md'
               fontSize={{ base: 'sm', md: 'md' }}
+              whiteSpace='pre-line'
             >
               {dailyRecord.singleRecord.map((record, index) => {
                 const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
