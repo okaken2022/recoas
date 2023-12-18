@@ -44,7 +44,7 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
           bg='white'
           type='text'
           id='timeAdjustment'
-          {...register('timeAdjustment')}
+          {...register('timeAdjustment', {valueAsNumber : true})}
           defaultValue={0}
           readOnly={!isCustomTime}
           onChange={(e) => onChangeTimeAdjustment(e.target.valueAsNumber)}

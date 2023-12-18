@@ -12,9 +12,6 @@ import {
   Wrap,
   WrapItem,
   Select,
-  RadioGroup,
-  Stack,
-  Radio,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';

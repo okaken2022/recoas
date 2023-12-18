@@ -1,4 +1,6 @@
 import { Box, Flex, Input, Text, Spacer, FormErrorMessage } from '@chakra-ui/react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
 interface RecordHeaderProps {
   formattedDateJa: string;
@@ -13,6 +15,12 @@ const RecordHeader: React.FC<RecordHeaderProps> = ({
   onAuthorChange,
   authorError,
 }) => {
+  const { register, setValue } = useForm(); // useForm フックを使用
+    // フォームの初期化時に setValue を使用して初期値を設定
+    useEffect(() => {
+      setValue('author', authorValue);
+    }, [authorValue, setValue]);
+
   return (
     <Box bg='color.mainTransparent1' p={2}>
       <Flex alignItems='center'>
@@ -28,7 +36,7 @@ const RecordHeader: React.FC<RecordHeaderProps> = ({
           bg='white'
           type='text'
           id='author'
-          value={authorValue}
+          {...register('author')} // フォームフィールドをバインド
           onChange={(e) => onAuthorChange(e.target.value)}
         />
         {authorError && <FormErrorMessage>{authorError}</FormErrorMessage>}
