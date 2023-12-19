@@ -3,18 +3,8 @@ import {
   Spacer,
   Text,
   Box,
-  Grid,
-  GridItem,
   Flex,
-  Input,
-  UnorderedList,
-  ListItem,
   Button,
-  Badge,
-  Radio,
-  RadioGroup,
-  Stack,
-  FormErrorMessage,
   useToast,
   Center,
   Spinner,
@@ -35,6 +25,10 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NextPage } from 'next';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
+import RecordHeader from '@/components/record_conponents/RecordHeader';
+import ActivityBox from '@/components/record_conponents/ActivityBox';
+import TimeAdjustmentBox from '@/components/record_conponents/TimeAdjustmentBox';
+import RecordList from '@/components/record_conponents/RecordList';
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   {
@@ -46,7 +40,23 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     setValue,
     formState: { errors },
     reset,
-  } = useForm<BasicInfoOfRecord>();
+  } = useForm<BasicInfoOfRecord>({
+    defaultValues: {
+      author: '',
+      amWork: '',
+      pmWork: '',
+      timeAdjustment: {
+        amStartTimeHours: 9,
+        amStartTimeMinutes: 30,
+        amFinishTimeHours: 12,
+        amFinishTimeMinutes: 0,
+        pmStartTimeHours: 13,
+        pmStartTimeMinutes: 30,
+        pmFinishTimeHours: 15,
+        pmFinishTimeMinutes: 15,
+      },
+    },
+  });
 
   {
     /* modal, toast */
@@ -101,10 +111,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     author: string,
     amWork: string,
     pmWork: string,
-    timeAdjustment: number,
+    amStartTimeHours: number,
+    amStartTimeMinutes: number,
+    amFinishTimeHours: number,
+    amFinishTimeMinutes: number,
+    pmStartTimeHours: number,
+    pmStartTimeMinutes: number,
+    pmFinishTimeHours: number,
+    pmFinishTimeMinutes: number,
   ) => {
     if (!currentUser) return;
-    console.log('onSubmit fired2');
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -115,6 +131,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     );
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
+    const timeAdjustment = {
+      amStartTimeHours: amStartTimeHours,
+      amStartTimeMinutes: amStartTimeMinutes,
+      amFinishTimeHours: amFinishTimeHours,
+      amFinishTimeMinutes: amFinishTimeMinutes,
+      pmStartTimeHours: pmStartTimeHours,
+      pmStartTimeMinutes: pmStartTimeMinutes,
+      pmFinishTimeHours: pmFinishTimeHours,
+      pmFinishTimeMinutes: pmFinishTimeMinutes,
+    };
     const data = {
       author: author,
       amWork: amWork,
@@ -127,13 +153,26 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
 
   const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
     try {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+      await createBasicInfo(
+        data.author,
+        data.amWork,
+        data.pmWork,
+        data.timeAdjustment.amStartTimeHours,
+        data.timeAdjustment.amStartTimeMinutes,
+        data.timeAdjustment.amFinishTimeHours,
+        data.timeAdjustment.amFinishTimeMinutes,
+        data.timeAdjustment.pmStartTimeHours,
+        data.timeAdjustment.pmStartTimeMinutes,
+        data.timeAdjustment.pmFinishTimeHours,
+        data.timeAdjustment.pmFinishTimeMinutes
+      );
       toast({
         title: '基本情報を保存しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
+      console.log(data)
     } catch (e) {
       console.error(e);
       toast({
@@ -145,11 +184,26 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     }
   };
 
+  // const initializeForm = () => {
+  //   setValue('author', '');
+  //   setValue('amWork', '');
+  //   setValue('pmWork', '');
+  //   setValue('timeAdjustment.amStartTimeHours', 9);
+  //   setValue('timeAdjustment.amStartTimeMinutes', 30);
+  //   setValue('timeAdjustment.amFinishTimeHours', 12);
+  //   setValue('timeAdjustment.amFinishTimeMinutes', 0);
+  //   setValue('timeAdjustment.pmStartTimeHours', 13);
+  //   setValue('timeAdjustment.pmStartTimeMinutes', 30);
+  //   setValue('timeAdjustment.pmFinishTimeHours', 15);
+  //   setValue('timeAdjustment.pmFinishTimeMinutes', 15);
+  // };
+
   {
     /* 基本情報取得 */
   }
   const fetchBasicRecordInfo = async () => {
-    // if (!currentUser) return;
+    setLoading(true);
+    reset();
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -157,10 +211,11 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
-    );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const recordSnapshot = await getDoc(dailyDocumentRef);
-
+      );
+      const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+      const recordSnapshot = await getDoc(dailyDocumentRef);
+      
+      
     if (recordSnapshot.exists()) {
       const data = recordSnapshot.data() as BasicInfoOfRecord;
       setbasicInfoOfRecordData(data);
@@ -169,17 +224,17 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       setValue('author', data.author);
       setValue('amWork', data.amWork);
       setValue('pmWork', data.pmWork);
-      setValue('timeAdjustment', data.timeAdjustment);
+      setValue('timeAdjustment.amStartTimeHours', data.timeAdjustment.amStartTimeHours);
+      setValue('timeAdjustment.amStartTimeMinutes', data.timeAdjustment.amStartTimeMinutes);
+      setValue('timeAdjustment.amFinishTimeHours', data.timeAdjustment.amFinishTimeHours);
+      setValue('timeAdjustment.amFinishTimeMinutes', data.timeAdjustment.amFinishTimeMinutes);
+      setValue('timeAdjustment.pmStartTimeHours', data.timeAdjustment.pmStartTimeHours);
+      setValue('timeAdjustment.pmStartTimeMinutes', data.timeAdjustment.pmStartTimeMinutes);
+      setValue('timeAdjustment.pmFinishTimeHours', data.timeAdjustment.pmFinishTimeHours);
+      setValue('timeAdjustment.pmFinishTimeMinutes', data.timeAdjustment.pmFinishTimeMinutes);
     }
 
     setLoading(false);
-  };
-
-  {
-    /* 時間変更のラジオボタン */
-  }
-  const handleRadioChange = (value: string) => {
-    setIsCustomTime(value === '変更');
   };
 
   const returnList = () => {
@@ -249,7 +304,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       </Center>
     );
   }
-
+console.log(basicInfoOfRecordData)
   return (
     <>
       <Layout>
@@ -274,167 +329,44 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
           <Text color='color.main' fontWeight={'bold'}>
             ※各記録をタップすると編集できます
           </Text>
+
           {/* 基本情報 */}
-          <Grid
-            h='auto'
-            templateRows='repeat(9, 1fr)'
-            templateColumns='repeat(2, 1fr)'
-            // gap={2}
-            border='1px'
-            borderTopRadius='md'
-          >
-            {/* 日付 */}
-            <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
-              <Flex alignItems='center'>
-                <Text fontSize={{ base: 'md', md: 'xl' }}>{formattedDateJa}</Text>
-                <Spacer />
-
-                {/* 記入者 */}
-                <Text>支援員：</Text>
-                <Input
-                  size={{ base: 'sm', md: 'md' }}
-                  width='30%'
-                  bg='white'
-                  type='text'
-                  id='author'
-                  {...register('author')}
-                />
-                {errors.author && <FormErrorMessage>{errors.author.message}</FormErrorMessage>}
-              </Flex>
-            </GridItem>
-
+          <Box h='auto' border='1px' borderTopRadius='md'>
+            {/* Record Header */}
+            <RecordHeader
+              formattedDateJa={formattedDateJa}
+              authorValue={basicInfoOfRecordData?.author || ''}
+              onAuthorChange={(value) => setValue('author', value)}
+              authorError={errors.author && errors.author.message}
+            />
             {/* 活動 */}
-            <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
-              <Flex alignItems='center'>
-                <Text>活動</Text>
-                <Spacer />
-                <Text>午前：</Text>
-                <Input
-                  size={{ base: 'sm', md: 'md' }}
-                  width='60%'
-                  bg='white'
-                  type='text'
-                  id='amWork'
-                  {...register('amWork')}
-                />
-              </Flex>
-            </GridItem>
-            <GridItem rowSpan={2} colSpan={2} bg='white' p={2}>
-              <Flex alignItems='center'>
-                <Spacer />
-                <Text>午後：</Text>
-                <Input
-                  size={{ base: 'sm', md: 'md' }}
-                  width='60%'
-                  bg='white'
-                  type='text'
-                  id='pmWork'
-                  {...register('pmWork')}
-                />
-              </Flex>
-            </GridItem>
+            <ActivityBox
+              amWorkValue={basicInfoOfRecordData?.amWork || ''}
+              pmWorkValue={basicInfoOfRecordData?.pmWork || ''}
+              onChangeAmWork={(value) => setValue('amWork', value)}
+              onChangePmWork={(value) => setValue('pmWork', value)}
+            />
+            {/* 作業時間 */}
+            <TimeAdjustmentBox
+              onChangeTimeAdjustment={(value) => setValue('timeAdjustment', value)}
+              timeAdjustmentValue={basicInfoOfRecordData?.timeAdjustment}
+            />
 
-            <GridItem rowSpan={2} colSpan={2} bg='white' p={2} borderBottom='1px'>
-              <Flex alignItems='center' gap='2'>
-                <Text>工賃</Text>
-                <Spacer />
-                <RadioGroup onChange={handleRadioChange} value={isCustomTime ? '変更' : '通常'}>
-                  <Stack spacing={3} direction='row'>
-                    <Radio colorScheme='green' defaultChecked value='通常'>
-                      通常
-                    </Radio>
-                    <Radio colorScheme='red' value='変更'>
-                      変更
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-                <Input
-                  size={{ base: 'sm', md: 'md' }}
-                  placeholder='0'
-                  width='20%'
-                  bg='white'
-                  type='text'
-                  id='timeAdjustment'
-                  {...register('timeAdjustment', { valueAsNumber: true })}
-                  defaultValue={0}
-                  readOnly={!isCustomTime} // '変更'が選択されていない場合は読み取り専用にする
-                />
-                分
-                <Button
-                  colorScheme='teal'
-                  size={{ base: 'xs', md: 'md' }}
-                  onClick={handleSubmit(onSubmitBasicInfo)}
-                >
-                  保存
-                </Button>
-              </Flex>
-            </GridItem>
+            {/* ボタン */}
+            <Flex bg='white' p={2} borderBottom='1px' justifyContent='right'>
+              <Button
+                colorScheme='facebook'
+                size={{ base: 'xs', md: 'md' }}
+                onClick={handleSubmit(onSubmitBasicInfo)}
+              >
+                基本情報の保存
+              </Button>
+            </Flex>
+          </Box>
 
-            {/* 記録 */}
-            <GridItem
-              rowSpan={1}
-              colSpan={1}
-              bg='white'
-              alignItems='center'
-              textAlign='center'
-              borderRight='1px'
-            >
-              ご本人の様子
-            </GridItem>
-            <GridItem rowSpan={1} colSpan={1} bg='white' alignItems='center' textAlign='center'>
-              支援、考察
-            </GridItem>
-          </Grid>
+          {/* 記録 */}
+          <RecordList singleRecordData={singleRecordData} goToRecordEditPage={goToRecordEditPage} />
 
-          <UnorderedList
-            listStyleType='none'
-            ml='0'
-            border='1px'
-            borderBottomRadius='md'
-            fontSize={{ base: 'sm', md: 'md' }}
-          >
-            {singleRecordData.map((record, index) => {
-              const { docId, data } = record;
-              const { situation, support, good, notice } = data;
-
-              const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
-
-              return (
-                <ListItem
-                  key={docId}
-                  className='record'
-                  backgroundColor={backgroundColor}
-                  onClick={() => goToRecordEditPage(docId)}
-                  whiteSpace='pre-line'
-                >
-                  <Flex pt='2' pr='2'>
-                    <Badge ml='2' variant='outline'>
-                      {record.data.editor}
-                    </Badge>
-                    <Spacer />
-                    {good && (
-                      <Badge ml='2' colorScheme='teal'>
-                        Good
-                      </Badge>
-                    )}
-                    {notice && (
-                      <Badge ml='2' colorScheme='red'>
-                        特記事項
-                      </Badge>
-                    )}
-                  </Flex>
-                  <Flex>
-                    <Box p='2' w='50%' borderRight='1px'>
-                      {situation}
-                    </Box>
-                    <Box p='2' w='50%'>
-                      {support}
-                    </Box>
-                  </Flex>
-                </ListItem>
-              );
-            })}
-          </UnorderedList>
           <Flex mt='2'>
             <Button colorScheme='teal' size='sm' onClick={returnList}>
               一覧へ戻る

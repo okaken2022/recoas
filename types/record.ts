@@ -2,8 +2,18 @@ export type BasicInfoOfRecord = {
   author: string;
   amWork: string;
   pmWork: string;
-  timeAdjustment: number;
+  timeAdjustment: {
+    amStartTimeHours: number;
+    amStartTimeMinutes: number;
+    amFinishTimeHours: number;
+    amFinishTimeMinutes: number;
+    pmStartTimeHours: number;
+    pmStartTimeMinutes: number;
+    pmFinishTimeHours: number;
+    pmFinishTimeMinutes: number;
+  };
 };
+
 
 export type SingleRecord = {
   serialNumber: number | null;

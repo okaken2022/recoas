@@ -174,6 +174,10 @@ export default function Customer() {
     router.push(`/customers/${customerId}/records/month/${formattedMonth}/`);
   };
 
+  const handleMonthlyFeeClick = (formattedMonth: string) => {
+    router.push(`/customers/${customerId}/records/monthlyFee/${formattedMonth}/`);
+  };
+
   const formatJapaneseMonth = (formattedMonth: string) => {
     const date = dayjs(formattedMonth, 'YYYY-MM');
     return date.format('YYYY年M月');
@@ -208,7 +212,8 @@ export default function Customer() {
         <Tabs size='md' variant='enclosed'>
           <TabList>
             <Tab>カレンダー</Tab>
-            <Tab>リスト表示</Tab>
+            <Tab>工賃表</Tab>
+            <Tab>記録月別リスト</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -219,6 +224,21 @@ export default function Customer() {
                 eventContent={renderEventContent}
                 locale={jaLocale} // FullCalendarの日本語表示
               />
+            </TabPanel>
+            <TabPanel>
+              <UnorderedList>
+                {monthlyRecords.map((month) => (
+                  <ListItem key={month}>
+                    {/* リンクを追加 */}
+                    <Link
+                      onClick={() => handleMonthlyFeeClick(month)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {formatJapaneseMonth(month)}
+                    </Link>
+                  </ListItem>
+                ))}
+              </UnorderedList>
             </TabPanel>
             <TabPanel>
               <UnorderedList>

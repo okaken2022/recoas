@@ -12,9 +12,6 @@ import {
   Wrap,
   WrapItem,
   Select,
-  RadioGroup,
-  Stack,
-  Radio,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -104,7 +101,14 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     author: string,
     amWork: string,
     pmWork: string,
-    timeAdjustment: number,
+    amStartTimeHours: number,
+    amStartTimeMinutes: number,
+    amFinishTimeHours: number,
+    amFinishTimeMinutes: number,
+    pmStartTimeHours: number,
+    pmStartTimeMinutes: number,
+    pmFinishTimeHours: number,
+    pmFinishTimeMinutes: number,
   ) => {
     if (!currentUser) return;
     console.log('onSubmit fired2');
@@ -118,6 +122,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     );
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
+    const timeAdjustment = {
+      amStartTimeHours: amStartTimeHours,
+      amStartTimeMinutes: amStartTimeMinutes,
+      amFinishTimeHours: amFinishTimeHours,
+      amFinishTimeMinutes: amFinishTimeMinutes,
+      pmStartTimeHours: pmStartTimeHours,
+      pmStartTimeMinutes: pmStartTimeMinutes,
+      pmFinishTimeHours: pmFinishTimeHours,
+      pmFinishTimeMinutes: pmFinishTimeMinutes,
+    };
     const data = {
       author: author,
       amWork: amWork,
@@ -130,7 +144,19 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
 
   const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
     try {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+      await createBasicInfo(
+        data.author,
+        data.amWork,
+        data.pmWork,
+        data.timeAdjustment.amStartTimeHours,
+        data.timeAdjustment.amStartTimeMinutes,
+        data.timeAdjustment.amFinishTimeHours,
+        data.timeAdjustment.amFinishTimeMinutes,
+        data.timeAdjustment.pmStartTimeHours,
+        data.timeAdjustment.pmStartTimeMinutes,
+        data.timeAdjustment.pmFinishTimeHours,
+        data.timeAdjustment.pmFinishTimeMinutes
+      );
       toast({
         title: '基本情報を保存しました。',
         status: 'success',
@@ -410,8 +436,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
             />
             {/* 作業時間 */}
             <TimeAdjustmentBox
-              isCustomTime={isCustomTime}
-              onRadioChange={handleRadioChange}
               onChangeTimeAdjustment={(value) => setValue('timeAdjustment', value)}
               timeAdjustmentValue={basicInfoOfRecordData?.timeAdjustment || undefined}
             />
