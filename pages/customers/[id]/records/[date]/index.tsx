@@ -95,10 +95,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     author: string,
     amWork: string,
     pmWork: string,
-    timeAdjustment: number,
+    amStartTimeHours: number,
+    amStartTimeMinutes: number,
+    amFinishTimeHours: number,
+    amFinishTimeMinutes: number,
+    pmStartTimeHours: number,
+    pmStartTimeMinutes: number,
+    pmFinishTimeHours: number,
+    pmFinishTimeMinutes: number,
   ) => {
     if (!currentUser) return;
-    console.log('onSubmit fired2');
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -109,6 +115,16 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     );
     const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
     const monthSnapshot = await getDoc(dailyDocumentRef);
+    const timeAdjustment = {
+      amStartTimeHours: amStartTimeHours,
+      amStartTimeMinutes: amStartTimeMinutes,
+      amFinishTimeHours: amFinishTimeHours,
+      amFinishTimeMinutes: amFinishTimeMinutes,
+      pmStartTimeHours: pmStartTimeHours,
+      pmStartTimeMinutes: pmStartTimeMinutes,
+      pmFinishTimeHours: pmFinishTimeHours,
+      pmFinishTimeMinutes: pmFinishTimeMinutes,
+    };
     const data = {
       author: author,
       amWork: amWork,
@@ -121,13 +137,26 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
 
   const onSubmitBasicInfo: SubmitHandler<BasicInfoOfRecord> = async (data) => {
     try {
-      await createBasicInfo(data.author, data.amWork, data.pmWork, data.timeAdjustment);
+      await createBasicInfo(
+        data.author,
+        data.amWork,
+        data.pmWork,
+        data.timeAdjustment.amStartTimeHours,
+        data.timeAdjustment.amStartTimeMinutes,
+        data.timeAdjustment.amFinishTimeHours,
+        data.timeAdjustment.amFinishTimeMinutes,
+        data.timeAdjustment.pmStartTimeHours,
+        data.timeAdjustment.pmStartTimeMinutes,
+        data.timeAdjustment.pmFinishTimeHours,
+        data.timeAdjustment.pmFinishTimeMinutes
+      );
       toast({
         title: '基本情報を保存しました。',
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
+      console.log(data)
     } catch (e) {
       console.error(e);
       toast({
@@ -139,11 +168,27 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     }
   };
 
+  // const initializeForm = () => {
+  //   setValue('author', '');
+  //   setValue('amWork', '');
+  //   setValue('pmWork', '');
+  //   setValue('timeAdjustment.amStartTimeHours', 9);
+  //   setValue('timeAdjustment.amStartTimeMinutes', 30);
+  //   setValue('timeAdjustment.amFinishTimeHours', 12);
+  //   setValue('timeAdjustment.amFinishTimeMinutes', 0);
+  //   setValue('timeAdjustment.pmStartTimeHours', 13);
+  //   setValue('timeAdjustment.pmStartTimeMinutes', 30);
+  //   setValue('timeAdjustment.pmFinishTimeHours', 15);
+  //   setValue('timeAdjustment.pmFinishTimeMinutes', 15);
+  // };
+
   {
     /* 基本情報取得 */
   }
   const fetchBasicRecordInfo = async () => {
-    // if (!currentUser) return;
+    setLoading(true);
+    reset();
+    
     const recordsCollectionRef = collection(
       db,
       'customers',
@@ -151,10 +196,11 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
-    );
-    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-    const recordSnapshot = await getDoc(dailyDocumentRef);
-
+      );
+      const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+      const recordSnapshot = await getDoc(dailyDocumentRef);
+      
+      
     if (recordSnapshot.exists()) {
       const data = recordSnapshot.data() as BasicInfoOfRecord;
       setbasicInfoOfRecordData(data);
@@ -163,17 +209,17 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       setValue('author', data.author);
       setValue('amWork', data.amWork);
       setValue('pmWork', data.pmWork);
-      setValue('timeAdjustment', data.timeAdjustment);
+      setValue('timeAdjustment.amStartTimeHours', data.timeAdjustment.amStartTimeHours);
+      setValue('timeAdjustment.amStartTimeMinutes', data.timeAdjustment.amStartTimeMinutes);
+      setValue('timeAdjustment.amFinishTimeHours', data.timeAdjustment.amFinishTimeHours);
+      setValue('timeAdjustment.amFinishTimeMinutes', data.timeAdjustment.amFinishTimeMinutes);
+      setValue('timeAdjustment.pmStartTimeHours', data.timeAdjustment.pmStartTimeHours);
+      setValue('timeAdjustment.pmStartTimeMinutes', data.timeAdjustment.pmStartTimeMinutes);
+      setValue('timeAdjustment.pmFinishTimeHours', data.timeAdjustment.pmFinishTimeHours);
+      setValue('timeAdjustment.pmFinishTimeMinutes', data.timeAdjustment.pmFinishTimeMinutes);
     }
 
     setLoading(false);
-  };
-
-  {
-    /* 時間変更のラジオボタン */
-  }
-  const handleRadioChange = (value: string) => {
-    setIsCustomTime(value === '変更');
   };
 
   const returnList = () => {
@@ -287,10 +333,8 @@ console.log(basicInfoOfRecordData)
             />
             {/* 作業時間 */}
             <TimeAdjustmentBox
-              isCustomTime={isCustomTime}
-              onRadioChange={handleRadioChange}
               onChangeTimeAdjustment={(value) => setValue('timeAdjustment', value)}
-              timeAdjustmentValue={basicInfoOfRecordData?.timeAdjustment || undefined}
+              timeAdjustmentValue={basicInfoOfRecordData?.timeAdjustment}
             />
 
             {/* ボタン */}

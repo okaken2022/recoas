@@ -39,10 +39,6 @@ const RecordList: React.FC<RecordHeaderProps> = ({ singleRecordData, goToRecordE
         {singleRecordData.map((record, index) => {
           const { docId, data } = record;
           const { situation, support, good, notice } = data;
-          //改行を反映させる
-          const newLineSituation = situation.replaceAll('\\n', '\n');
-          const newLineSupport = support.replaceAll('\\n', '\n');
-
           const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
 
           return (
@@ -71,10 +67,10 @@ const RecordList: React.FC<RecordHeaderProps> = ({ singleRecordData, goToRecordE
               </Flex>
               <Flex>
                 <Box p='2' w='50%' borderRight='1px'>
-                  {newLineSituation}
+                  {situation}
                 </Box>
                 <Box p='2' w='50%'>
-                  {newLineSupport}
+                  {support}
                 </Box>
               </Flex>
             </ListItem>
