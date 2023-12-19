@@ -161,7 +161,7 @@ export default function RecordMonthPage() {
 
         {/* 工賃表 */}
         <Grid
-          align="center"
+          // align="center"
           border='1px'
           h='50px'
           templateRows='repeat(2, 1fr)'
