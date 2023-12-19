@@ -40,7 +40,23 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     setValue,
     formState: { errors },
     reset,
-  } = useForm<BasicInfoOfRecord>();
+  } = useForm<BasicInfoOfRecord>({
+    defaultValues: {
+      author: '',
+      amWork: '',
+      pmWork: '',
+      timeAdjustment: {
+        amStartTimeHours: 9,
+        amStartTimeMinutes: 30,
+        amFinishTimeHours: 12,
+        amFinishTimeMinutes: 0,
+        pmStartTimeHours: 13,
+        pmStartTimeMinutes: 30,
+        pmFinishTimeHours: 15,
+        pmFinishTimeMinutes: 15,
+      },
+    },
+  });
 
   {
     /* modal, toast */
@@ -188,7 +204,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
   const fetchBasicRecordInfo = async () => {
     setLoading(true);
     reset();
-    
     const recordsCollectionRef = collection(
       db,
       'customers',
