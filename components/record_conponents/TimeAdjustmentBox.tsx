@@ -1,5 +1,5 @@
 import { BasicInfoOfRecord } from '@/types/record';
-import { Box, Flex, Input, Spacer, Text, RadioGroup, Radio, Stack, Wrap } from '@chakra-ui/react';
+import { Box, Flex, Input, Spacer, Text, Wrap } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -44,6 +44,7 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='amStartTimeHours'
+              defaultValue='9'
               {...register('timeAdjustment.amStartTimeHours')}
               // onChange={(e) => onChangeTimeAdjustment({
               //   ...timeAdjustmentValue,
@@ -58,11 +59,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='amStartTimeMinutes'
+              defaultValue='30'
               {...register('timeAdjustment.amStartTimeMinutes')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   amStartTimeMinutes: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('amStartTimeMinutes', e.target.value)}
             />
             <Text>〜</Text>
@@ -72,11 +70,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='amFinishTimeHours'
+              defaultValue='12'
               {...register('timeAdjustment.amFinishTimeHours')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   amFinishTimeHours: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('amFinishTimeHours', e.target.value)}
             />
             <Text>：</Text>
@@ -86,11 +81,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='amFinishTimeMinutes'
+              defaultValue='0'
               {...register('timeAdjustment.amFinishTimeMinutes')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   amFinishTimeMinutes: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('amFinishTimeMinutes', e.target.value)}
             />
           </Flex>
@@ -102,11 +94,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='pmStartTimeHours'
+              defaultValue='13'
               {...register('timeAdjustment.pmStartTimeHours')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   pmStartTimeHours: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('pmStartTimeHours', e.target.value)}
             />
             <Text>：</Text>
@@ -116,11 +105,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='pmStartTimeMinutes'
+              defaultValue='30'
               {...register('timeAdjustment.pmStartTimeMinutes')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   pmStartTimeMinutes: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('pmStartTimeMinutes', e.target.value)}
 
             />
@@ -131,11 +117,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='pmFinishTimeHours'
+              defaultValue='15'
               {...register('timeAdjustment.pmFinishTimeHours')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   pmFinishTimeHours: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('pmFinishTimeHours', e.target.value)}
             />
             <Text>：</Text>
@@ -145,11 +128,8 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               bg='white'
               type='text'
               id='pmFinishTimeMinutes'
+              defaultValue='15'
               {...register('timeAdjustment.pmFinishTimeMinutes')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   pmFinishTimeMinutes: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
               onChange={(e) => handleInputChange('pmFinishTimeMinutes', e.target.value)}
             />
           </Flex>
