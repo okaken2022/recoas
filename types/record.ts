@@ -14,7 +14,6 @@ export type BasicInfoOfRecord = {
   };
 };
 
-
 export type SingleRecord = {
   serialNumber: number | null;
   editor: string | null;
