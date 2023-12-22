@@ -14,6 +14,7 @@ import {
   WrapItem,
   Text,
   Textarea,
+  useToast,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
@@ -63,6 +64,8 @@ export default function Home() {
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
 
+  const toast = useToast();
+
   {
     /* 利用者追加 */
     // try, catch
@@ -80,18 +83,34 @@ export default function Home() {
   ) => {
     if (!currentUser) return;
     if (customerName === '') return;
-    await addDoc(collection(db, 'customers'), {
-      customerName: customerName,
-      romaji: romaji,
-      service: service,
-      targetOfSupport1: targetOfSupport1,
-      targetOfSupport2: targetOfSupport2,
-      targetOfSupport3: targetOfSupport3,
-      detailOfSupport1: detailOfSupport1,
-      detailOfSupport2: detailOfSupport2,
-      detailOfSupport3: detailOfSupport3,
-    });
-    console.log(customers);
+
+    try {
+      await addDoc(collection(db, 'customers'), {
+        customerName: customerName,
+        romaji: romaji,
+        service: service,
+        targetOfSupport1: targetOfSupport1,
+        targetOfSupport2: targetOfSupport2,
+        targetOfSupport3: targetOfSupport3,
+        detailOfSupport1: detailOfSupport1,
+        detailOfSupport2: detailOfSupport2,
+        detailOfSupport3: detailOfSupport3,
+      });
+      toast({
+        title: '利用者を追加しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: '追加に失敗しました。',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   const onSubmit = ({
