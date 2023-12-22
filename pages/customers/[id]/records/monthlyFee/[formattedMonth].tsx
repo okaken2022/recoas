@@ -3,27 +3,15 @@ import {
   Heading,
   Spinner,
   Flex,
-  Spacer,
-  Badge,
-  Box,
-  UnorderedList,
-  ListItem,
   Grid,
   GridItem,
   Center,
-  TableContainer,
-  Table,
-  TableCaption,
-  Thead,
-  Tr,
-  Td,
-  Tfoot,
-  Th,
-  Tbody,
+  Box,
+  Spacer,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import { collection, getDocs, DocumentData, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
 import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
@@ -34,7 +22,6 @@ dayjs.locale('ja');
 
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
-import { BasicInfoOfRecord } from '@/types/record';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
 
 export default function RecordMonthPage() {
@@ -56,12 +43,11 @@ export default function RecordMonthPage() {
     /* 日付情報 */
   }
   const { date } = router.query as { date: string };
-  const { formattedDate, formattedMonthJa } = useDateFormatter(date);
+  const { formattedMonthJa } = useDateFormatter(date);
 
   {
-    /* 月別記録リスト */
+    /* 月別工賃表リスト取得 */
   }
-
   type DailyRecordData = {
     id: string;
     author: string;
@@ -126,6 +112,12 @@ export default function RecordMonthPage() {
       console.error('Error fetching dailyRecordData:', error);
     }
   };
+
+  // dailyRecord.timeAdjustment.amStartTimeMinutesを0埋めして表示する関数
+  const formatMinutes = (minutes: number) => {
+  // 2桁の文字列に変換し、0で埋める
+  return String(minutes).padStart(2, '0');
+};
 
   useEffect(() => {
     if (customerId) {
@@ -201,7 +193,7 @@ export default function RecordMonthPage() {
           <Grid
             key='index'
             border='1px'
-            // h='25px'
+            borderColor='#333'
             templateRows='1fr'
             templateColumns='repeat(10, 1fr)'
           >
@@ -211,10 +203,12 @@ export default function RecordMonthPage() {
             <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px' >
               {dailyRecord.timeAdjustment.amStartTimeHours}:
               {dailyRecord.timeAdjustment.amStartTimeMinutes}
+              {/* {formatMinutes(dailyRecord.timeAdjustment.amStartTimeMinutes)} */}
             </GridItem>
             <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
               {dailyRecord.timeAdjustment.amFinishTimeHours}:
               {dailyRecord.timeAdjustment.amFinishTimeMinutes}
+              {/* {formatMinutes(dailyRecord.timeAdjustment.amFinishTimeMinutes)} */}
             </GridItem>
             <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
               {dailyRecord.amWork}
@@ -222,16 +216,22 @@ export default function RecordMonthPage() {
             <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>
               {dailyRecord.timeAdjustment.pmStartTimeHours}:
               {dailyRecord.timeAdjustment.pmStartTimeMinutes}
+              {/* {formatMinutes(dailyRecord.timeAdjustment.pmStartTimeMinutes)} */}
             </GridItem>
             <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
               {dailyRecord.timeAdjustment.pmFinishTimeHours}:
               {dailyRecord.timeAdjustment.pmFinishTimeMinutes}
+              {/* {formatMinutes(dailyRecord.timeAdjustment.pmFinishTimeMinutes)} */}
             </GridItem>
             <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
               {dailyRecord.pmWork}
             </GridItem>
           </Grid>
         ))}
+        <Flex mt="8">
+          <Spacer />
+          {/* <Text borderBottom='1px'>出勤日数：{allRecordData.length}日</Text> */}
+        </Flex>
       </Layout>
     </>
   );
