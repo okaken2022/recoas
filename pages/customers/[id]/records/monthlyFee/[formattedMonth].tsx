@@ -112,8 +112,8 @@ export default function RecordMonthPage() {
             pmStartTimeHours: dailyRecordData.timeAdjustment.pmStartTimeHours,
             pmStartTimeMinutes: dailyRecordData.timeAdjustment.pmStartTimeMinutes,
             pmFinishTimeHours: dailyRecordData.timeAdjustment.pmFinishTimeHours,
-            pmFinishTimeMinutes: dailyRecordData.timeAdjustment.pmFinishTimeMinutes
-          }
+            pmFinishTimeMinutes: dailyRecordData.timeAdjustment.pmFinishTimeMinutes,
+          },
         };
 
         return dailyRecordBasicData;
@@ -148,6 +148,8 @@ export default function RecordMonthPage() {
     });
   };
 
+
+
   return (
     <>
       <Layout>
@@ -176,18 +178,60 @@ export default function RecordMonthPage() {
           <GridItem rowSpan={1} colSpan={4} bg='color.mainTransparent2' border='1px'>
             午後
           </GridItem>
-          <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>開始時間</GridItem>
-          <GridItem rowSpan={1} colSpan={1} borderRight='1px'>終了時間</GridItem>
-          <GridItem rowSpan={1} colSpan={2} borderRight='1px'>作業内容</GridItem>
-          <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>開始時間</GridItem>
-          <GridItem rowSpan={1} colSpan={1} borderRight='1px'>終了時間</GridItem>
-          <GridItem rowSpan={1} colSpan={2} borderRight='1px'>作業内容</GridItem>
+          <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>
+            開始
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
+            終了
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
+            作業内容
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>
+            開始
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
+            終了
+          </GridItem>
+          <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
+            作業内容
+          </GridItem>
         </Grid>
-        {allRecordData.map((dailyRecord, index) => 
-          <Flex key="index">
-            <Text align="center" w="100%" backgroundColor="gray.200" border='1px'>日付</Text>
-          </Flex>
-        )}
+        {allRecordData.map((dailyRecord, index) => (
+          <Grid
+            key='index'
+            border='1px'
+            // h='25px'
+            templateRows='1fr'
+            templateColumns='repeat(10, 1fr)'
+          >
+            <GridItem colSpan={2} bg='color.mainTransparent1'>
+              {dayjs(dailyRecord.id).format('M月D日(ddd)')}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px' >
+              {dailyRecord.timeAdjustment.amStartTimeHours}:
+              {dailyRecord.timeAdjustment.amStartTimeMinutes}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
+              {dailyRecord.timeAdjustment.amFinishTimeHours}:
+              {dailyRecord.timeAdjustment.amFinishTimeMinutes}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
+              {dailyRecord.amWork}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>
+              {dailyRecord.timeAdjustment.pmStartTimeHours}:
+              {dailyRecord.timeAdjustment.pmStartTimeMinutes}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={1} borderRight='1px'>
+              {dailyRecord.timeAdjustment.pmFinishTimeHours}:
+              {dailyRecord.timeAdjustment.pmFinishTimeMinutes}
+            </GridItem>
+            <GridItem rowSpan={1} colSpan={2} borderRight='1px'>
+              {dailyRecord.pmWork}
+            </GridItem>
+          </Grid>
+        ))}
       </Layout>
     </>
   );
