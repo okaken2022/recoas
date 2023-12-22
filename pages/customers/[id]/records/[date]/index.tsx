@@ -164,7 +164,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         data.timeAdjustment.pmStartTimeHours,
         data.timeAdjustment.pmStartTimeMinutes,
         data.timeAdjustment.pmFinishTimeHours,
-        data.timeAdjustment.pmFinishTimeMinutes
+        data.timeAdjustment.pmFinishTimeMinutes,
       );
       toast({
         title: '基本情報を保存しました。',
@@ -172,7 +172,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         duration: 3000,
         isClosable: true,
       });
-      console.log(data)
+      console.log(data);
     } catch (e) {
       console.error(e);
       toast({
@@ -211,11 +211,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       'monthlyRecords',
       formattedMonth,
       'dailyRecords',
-      );
-      const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
-      const recordSnapshot = await getDoc(dailyDocumentRef);
-      
-      
+    );
+    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+    const recordSnapshot = await getDoc(dailyDocumentRef);
+
     if (recordSnapshot.exists()) {
       const data = recordSnapshot.data() as BasicInfoOfRecord;
       setbasicInfoOfRecordData(data);
@@ -304,7 +303,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       </Center>
     );
   }
-console.log(basicInfoOfRecordData)
+  console.log(basicInfoOfRecordData);
   return (
     <>
       <Layout>

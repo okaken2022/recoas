@@ -16,10 +16,10 @@ const RecordHeader: React.FC<RecordHeaderProps> = ({
   authorError,
 }) => {
   const { register, setValue } = useForm(); // useForm フックを使用
-    // フォームの初期化時に setValue を使用して初期値を設定
-    useEffect(() => {
-      setValue('author', authorValue);
-    }, [authorValue, setValue]);
+  // フォームの初期化時に setValue を使用して初期値を設定
+  useEffect(() => {
+    setValue('author', authorValue);
+  }, [authorValue, setValue]);
 
   return (
     <Box bg='color.mainTransparent1' p={2}>

@@ -19,16 +19,16 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
     setValue('timeAdjustment', timeAdjustmentValue);
   }, [timeAdjustmentValue, setValue]);
 
-    // 各Inputの値が変更されるたびにonChangeTimeAdjustmentを呼ぶ
+  // 各Inputの値が変更されるたびにonChangeTimeAdjustmentを呼ぶ
   const handleInputChange = async (key: string, value: string) => {
-      // 文字列から数値へ変換
-      const numericValue = value !== '' ? parseInt(value, 10) : 0;
-      // setValueをawaitで実行して非同期処理が完了するまで待つ
-      await setValue(`timeAdjustment.${key}`, numericValue);
-      // timeAdjustmentの最新の値を取得してonChangeTimeAdjustmentに渡す
-      const updatedTimeAdjustment = getValues('timeAdjustment');
-      onChangeTimeAdjustment(updatedTimeAdjustment);
-    };
+    // 文字列から数値へ変換
+    const numericValue = value !== '' ? parseInt(value, 10) : 0;
+    // setValueをawaitで実行して非同期処理が完了するまで待つ
+    await setValue(`timeAdjustment.${key}`, numericValue);
+    // timeAdjustmentの最新の値を取得してonChangeTimeAdjustmentに渡す
+    const updatedTimeAdjustment = getValues('timeAdjustment');
+    onChangeTimeAdjustment(updatedTimeAdjustment);
+  };
 
   return (
     <Box bg='white' p={2} borderBottom='1px solid #ddd'>
@@ -108,7 +108,6 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
               defaultValue='30'
               {...register('timeAdjustment.pmStartTimeMinutes')}
               onChange={(e) => handleInputChange('pmStartTimeMinutes', e.target.value)}
-
             />
             <Text>〜</Text>
             <Input

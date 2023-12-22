@@ -155,7 +155,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         data.timeAdjustment.pmStartTimeHours,
         data.timeAdjustment.pmStartTimeMinutes,
         data.timeAdjustment.pmFinishTimeHours,
-        data.timeAdjustment.pmFinishTimeMinutes
+        data.timeAdjustment.pmFinishTimeMinutes,
       );
       toast({
         title: '基本情報を保存しました。',
