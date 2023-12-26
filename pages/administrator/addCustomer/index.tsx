@@ -37,12 +37,20 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { AddCustomer, ServiceType } from '@/types/customer';
+import { AddCustomer, CustomersByService, ServiceType } from '@/types/customer';
+import CustomerList from '@/components/CustomerList';
 
 export default function Home() {
   {
     /* state */
   }
+  const [allCustomersByService, setAllCustomersByService] = useState<CustomersByService>({
+    生活介護: [],
+    多機能生活介護: [],
+    就労継続支援B型: [],
+  });
+  
+
   const [customers, setCustomers] = useState<AddCustomer[]>([]);
   const [addCustomer, setAddCustomer] = useState<AddCustomer>({
     customerName: '',
@@ -66,6 +74,37 @@ export default function Home() {
 
   const toast = useToast();
 
+  {
+    /* サービスごとに分けた配列を持つオブジェクトを作成 */
+  }
+  useEffect(() => {
+    if (!currentUser) router.push('/login');
+    const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
+    const unSub = onSnapshot(q, async (snapshot) => {
+      const customersByService: CustomersByService = {
+        生活介護: [],
+        多機能生活介護: [],
+        就労継続支援B型: [],
+      };
+
+      snapshot.docs.forEach((doc) => {
+        const customer = {
+          uid: doc.id,
+          customerName: doc.data().customerName,
+          romaji: doc.data().romaji,
+          service: doc.data().service as ServiceType,
+        };
+
+        customersByService[customer.service as keyof typeof customersByService].push(customer);
+      });
+
+      setAllCustomersByService(customersByService);
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [currentUser]);
   {
     /* 利用者追加 */
     // try, catch
@@ -187,6 +226,10 @@ export default function Home() {
       unSub();
     };
   }, [currentUser]);
+
+  const handleCustomerClick = (customerId: string | undefined) => {
+    router.push(`/administrator/addCustomer/edit/${customerId}`);
+  };
 
   return (
     <>
@@ -354,14 +397,20 @@ export default function Home() {
         <Text className='head' fontSize='2xl'>
           利用者情報の編集
         </Text>
-        <UnorderedList listStyleType='none'>
+        <CustomerList
+          allCustomersByService={allCustomersByService}
+          handleCustomerClick={handleCustomerClick}
+        />
+        {/* <UnorderedList listStyleType='none'>
           {customers.map((customer) => (
             <ListItem key={customer.uid} p={4} ml={0}>
-              <Heading size='md'>{customer.customerName}</Heading>
+              <Heading size='md'
+                onClick={() => {onSubmit(addCustomer);
+              }}>{customer.customerName}</Heading>
               <Divider orientation='horizontal' mt='4' />
             </ListItem>
           ))}
-        </UnorderedList>
+        </UnorderedList> */}
       </Layout>
     </>
   );
