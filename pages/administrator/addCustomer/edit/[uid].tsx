@@ -67,6 +67,41 @@ export default function Home() {
   const toast = useToast();
 
   {
+    /* 利用者情報取得 */
+  }
+  const fetchBasicRecordInfo = async () => {
+    const recordsCollectionRef = collection(
+      db,
+      'customers',
+      customerId as string,
+      'monthlyRecords',
+      formattedMonth,
+      'dailyRecords',
+    );
+    const dailyDocumentRef = doc(recordsCollectionRef, formattedDate);
+    const recordSnapshot = await getDoc(dailyDocumentRef);
+
+    if (recordSnapshot.exists()) {
+      const data = recordSnapshot.data() as BasicInfoOfRecord;
+      setbasicInfoOfRecordData(data);
+
+      // フォームの各フィールドに値を設定
+      setValue('author', data.author);
+      setValue('amWork', data.amWork);
+      setValue('pmWork', data.pmWork);
+      setValue('timeAdjustment.amStartTimeHours', data.timeAdjustment.amStartTimeHours);
+      setValue('timeAdjustment.amStartTimeMinutes', data.timeAdjustment.amStartTimeMinutes);
+      setValue('timeAdjustment.amFinishTimeHours', data.timeAdjustment.amFinishTimeHours);
+      setValue('timeAdjustment.amFinishTimeMinutes', data.timeAdjustment.amFinishTimeMinutes);
+      setValue('timeAdjustment.pmStartTimeHours', data.timeAdjustment.pmStartTimeHours);
+      setValue('timeAdjustment.pmStartTimeMinutes', data.timeAdjustment.pmStartTimeMinutes);
+      setValue('timeAdjustment.pmFinishTimeHours', data.timeAdjustment.pmFinishTimeHours);
+      setValue('timeAdjustment.pmFinishTimeMinutes', data.timeAdjustment.pmFinishTimeMinutes);
+    }
+
+    setLoading(false);
+  };
+  {
     /* 利用者追加 */
     // try, catch
   }
@@ -192,7 +227,7 @@ export default function Home() {
     <>
       <Layout>
         <Text className='head' fontSize='2xl'>
-          利用者の追加
+          利用者の編集
         </Text>
         {/* 利用者の追加フォーム */}
         <Text className='lead' fontSize='xl' m='4'>

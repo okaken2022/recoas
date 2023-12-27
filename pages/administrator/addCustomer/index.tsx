@@ -1,44 +1,33 @@
 import {
   Input,
   Button,
-  UnorderedList,
-  ListItem,
   Box,
   Divider,
   Flex,
-  Heading,
   Spacer,
-  ButtonGroup,
   Select,
-  Wrap,
-  WrapItem,
   Text,
   Textarea,
   useToast,
+  Stack,
+  Checkbox,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import { Header } from '@/components/Header';
 import {
   onSnapshot,
   collection,
-  doc,
-  setDoc,
   orderBy,
   query,
-  DocumentData,
-  updateDoc,
   addDoc,
 } from 'firebase/firestore';
 
-import { v4 as uuidv4 } from 'uuid';
-import { useState, useContext, useEffect, ChangeEvent } from 'react';
-import Link from 'next/link';
-import { Todo, firestoreTodo } from '@/types/todo';
-import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { useState, useContext, useEffect } from 'react';
+import { AddIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { AddCustomer, CustomersByService, ServiceType } from '@/types/customer';
+import { Customer, CustomersByService, ServiceType } from '@/types/customer';
 import CustomerList from '@/components/CustomerList';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 export default function Home() {
   {
@@ -49,20 +38,41 @@ export default function Home() {
     多機能生活介護: [],
     就労継続支援B型: [],
   });
-  
 
-  const [customers, setCustomers] = useState<AddCustomer[]>([]);
-  const [addCustomer, setAddCustomer] = useState<AddCustomer>({
+  {
+    /* useForm */
+  }
+const {
+  handleSubmit,
+  register,
+  setValue,
+  formState: { errors },
+} = useForm<Customer>({
+  defaultValues: {
     customerName: '',
-    romaji: '',
+    hurigana: '',
     service: '生活介護',
-    targetOfSupport1: '',
-    targetOfSupport2: '',
-    targetOfSupport3: '',
-    detailOfSupport1: '',
-    detailOfSupport2: '',
-    detailOfSupport3: '',
-  });
+    recordFormat: '',
+    dateOfUse: {
+      Monday: true,
+      Tuesday: true,
+      Wednesday: true,
+      Thursday: true,
+      Friday: true,
+    },
+    targetOfSupport: {
+      targetOfSupport1: '',
+      targetOfSupport2: '',
+      targetOfSupport3: '',
+    },
+    detailOfSupport: {
+      detailOfSupport1: '',
+      detailOfSupport2: '',
+      detailOfSupport3: '',
+    },
+  }
+});
+
 
   {
     /* ログイン */
@@ -91,8 +101,26 @@ export default function Home() {
         const customer = {
           uid: doc.id,
           customerName: doc.data().customerName,
-          romaji: doc.data().romaji,
-          service: doc.data().service as ServiceType,
+          hurigana: doc.data().hurigana,
+          service: doc.data().service,
+          recordFormat: doc.data().recordFormat,
+          dateOfUse: {
+            Monday: doc.data().Monday,
+            Tuesday: doc.data().Tuesday,
+            Wednesday: doc.data().Wednesday,
+            Thursday: doc.data().Thursday,
+            Friday: doc.data().Friday,
+          },
+          targetOfSupport: {
+            targetOfSupport1: doc.data().targetOfSupport1,
+            targetOfSupport2: doc.data().targetOfSupport2,
+            targetOfSupport3: doc.data().targetOfSupport3,
+          },
+          detailOfSupport: {
+            detailOfSupport1: doc.data().detailOfSupport1,
+            detailOfSupport2: doc.data().detailOfSupport2,
+            detailOfSupport3: doc.data().detailOfSupport3,
+          }
         };
 
         customersByService[customer.service as keyof typeof customersByService].push(customer);
@@ -105,14 +133,21 @@ export default function Home() {
       unSub();
     };
   }, [currentUser]);
+  
   {
     /* 利用者追加 */
     // try, catch
   }
   const createCustomer = async (
     customerName: string,
-    romaji: string,
+    hurigana: string,
     service: string,
+    recordFormat: string,
+    Monday: boolean,
+    Tuesday: boolean,
+    Wednesday: boolean,
+    Thursday:boolean,
+    Friday:boolean,
     targetOfSupport1: string,
     targetOfSupport2: string,
     targetOfSupport3: string,
@@ -122,18 +157,29 @@ export default function Home() {
   ) => {
     if (!currentUser) return;
     if (customerName === '') return;
-
     try {
       await addDoc(collection(db, 'customers'), {
         customerName: customerName,
-        romaji: romaji,
+        hurigana: hurigana,
         service: service,
-        targetOfSupport1: targetOfSupport1,
-        targetOfSupport2: targetOfSupport2,
-        targetOfSupport3: targetOfSupport3,
-        detailOfSupport1: detailOfSupport1,
-        detailOfSupport2: detailOfSupport2,
-        detailOfSupport3: detailOfSupport3,
+        recordFormat: recordFormat,
+        dateOfUse: {
+          Monday: Monday,
+          Tuesday: Tuesday,
+          Wednesday: Wednesday,
+          Thursday: Thursday,
+          Friday: Friday,
+        },
+        targetOfSupport: {
+          targetOfSupport1: targetOfSupport1,
+          targetOfSupport2: targetOfSupport2,
+          targetOfSupport3: targetOfSupport3,
+        },
+        detailOfSupport: {
+          detailOfSupport1: detailOfSupport1,
+          detailOfSupport2: detailOfSupport2,
+          detailOfSupport3: detailOfSupport3,
+        },
       });
       toast({
         title: '利用者を追加しました。',
@@ -152,80 +198,71 @@ export default function Home() {
     }
   };
 
-  const onSubmit = ({
-    customerName,
-    romaji,
-    service,
-    targetOfSupport1,
-    targetOfSupport2,
-    targetOfSupport3,
-    detailOfSupport1,
-    detailOfSupport2,
-    detailOfSupport3,
-  }: {
-    customerName: string;
-    romaji: string;
-    service: string;
-    targetOfSupport1: string;
-    targetOfSupport2: string;
-    targetOfSupport3: string;
-    detailOfSupport1: string;
-    detailOfSupport2: string;
-    detailOfSupport3: string;
-  }) => {
-    createCustomer(
-      customerName,
-      romaji,
-      service,
-      targetOfSupport1,
-      targetOfSupport2,
-      targetOfSupport3,
-      detailOfSupport1,
-      detailOfSupport2,
-      detailOfSupport3,
-    );
-    setAddCustomer({
-      customerName: '',
-      romaji: '',
-      service: '生活介護',
-      targetOfSupport1: '',
-      targetOfSupport2: '',
-      targetOfSupport3: '',
-      detailOfSupport1: '',
-      detailOfSupport2: '',
-      detailOfSupport3: '',
-    });
-    console.log(addCustomer);
-    setCustomers(customers);
+  const onSubmitCustomer: SubmitHandler<Customer> = async (data) => {
+    try {
+      await createCustomer(
+        data.customerName,
+        data.hurigana,
+        data.service,
+        data.recordFormat,
+        data.dateOfUse.Monday,
+        data.dateOfUse.Tuesday,
+        data.dateOfUse.Wednesday,
+        data.dateOfUse.Thursday,
+        data.dateOfUse.Friday,
+        data.targetOfSupport.targetOfSupport1,
+        data.targetOfSupport.targetOfSupport2,
+        data.targetOfSupport.targetOfSupport3,
+        data.detailOfSupport.detailOfSupport1,
+        data.detailOfSupport.detailOfSupport2,
+        data.detailOfSupport.detailOfSupport3,
+      );
+      toast({
+        title: '基本情報を保存しました。',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      console.log(data);
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: '保存に失敗しました。',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
-  {
-    /* 利用者一覧を取得する */
-    /* orderByで並べ替え */
-  }
-  useEffect(() => {
-    if (!currentUser) return;
-    const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
-    const unSub = onSnapshot(q, async (snapshot) => {
-      setCustomers(
-        snapshot.docs.map((doc) => ({
-          uid: doc.id,
-          customerName: doc.data().customerName,
-          romaji: doc.data().romaji,
-          service: doc.data().service,
-          targetOfSupport1: doc.data().targetOfSupport1,
-          targetOfSupport2: doc.data().targetOfSupport2,
-          targetOfSupport3: doc.data().targetOfSupport3,
-          detailOfSupport1: doc.data().detailOfSupport1,
-          detailOfSupport2: doc.data().detailOfSupport2,
-          detailOfSupport3: doc.data().detailOfSupport3,
-        })),
-      );
-    });
-    return () => {
-      unSub();
-    };
-  }, [currentUser]);
+
+  // {
+  //   /* 利用者一覧を取得する */
+  //   /* orderByで並べ替え */
+  // }
+  // useEffect(() => {
+  //   if (!currentUser) return;
+  //   const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
+  //   const unSub = onSnapshot(q, async (snapshot) => {
+  //     setCustomers(
+  //       snapshot.docs.map((doc) => ({
+  //         uid: doc.id,
+  //         customerName: doc.data().customerName,
+  //         romaji: doc.data().romaji,
+  //         service: doc.data().service,
+  //         targetOfSupport1: doc.data().targetOfSupport1,
+  //         targetOfSupport2: doc.data().targetOfSupport2,
+  //         targetOfSupport3: doc.data().targetOfSupport3,
+  //         detailOfSupport1: doc.data().detailOfSupport1,
+  //         detailOfSupport2: doc.data().detailOfSupport2,
+  //         detailOfSupport3: doc.data().detailOfSupport3,
+  //       })),
+  //     );
+  //   });
+  //   return () => {
+  //     unSub();
+  //   };
+  // }, [currentUser]);
 
   const handleCustomerClick = (customerId: string | undefined) => {
     router.push(`/administrator/addCustomer/edit/${customerId}`);
@@ -238,32 +275,34 @@ export default function Home() {
           利用者の追加
         </Text>
         {/* 利用者の追加フォーム */}
-        <Text className='lead' fontSize='xl' m='4'>
-          利用者情報
-        </Text>
-        <Box mb={12}>
-          <Box className='text_card' p='2'>
+        <Box mb={12} mt={12}>
+          <Box mb={8} backgroundColor='#FFFBDA' className='text_card' p='2'>
+            <Text className='lead' fontSize='xl' m='4'>
+              利用者情報
+            </Text>
             <Flex alignItems='center' m='4'>
               <Text w='20%'>利用者:</Text>
               <Spacer />
               <Input
                 ml={2}
                 w='80%'
-                value={addCustomer.customerName}
-                onChange={(e) => setAddCustomer({ ...addCustomer, customerName: e.target.value })}
+                backgroundColor='#fff'
+                {...register('customerName')}
+                onChange={(e) => setValue('customerName', e.target.value)}
                 type='text'
                 id='customer'
                 placeholder='田中 太郎'
               />
             </Flex>
             <Flex alignItems='center' m='4'>
-              <Text w='20%'>ローマ字:</Text>
+              <Text w='20%'>ふりがな</Text>
               <Spacer />
               <Input
                 ml={2}
                 w='80%'
-                value={addCustomer.romaji}
-                onChange={(e) => setAddCustomer({ ...addCustomer, romaji: e.target.value })}
+                backgroundColor='#fff'
+                {...register('hurigana')}
+                onChange={(e) => setValue('hurigana', e.target.value)}
                 type='text'
                 id='customer'
                 placeholder='Tanaka Taro'
@@ -275,9 +314,9 @@ export default function Home() {
               <Select
                 ml={2}
                 width='200px'
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, service: e.target.value as ServiceType })
-                }
+                backgroundColor='#fff'
+                {...register('service')}
+                onChange={(e) => setValue('service', e.target.value as ServiceType)}
               >
                 <option value='生活介護'>生活介護</option>
                 <option value='多機能生活介護'>多機能生活介護</option>
@@ -285,22 +324,47 @@ export default function Home() {
               </Select>
               <Spacer />
             </Flex>
+            <Flex alignItems='center' m='4'>
+              <Text w='20%'>記録様式:</Text>
+              <Select
+                ml={2}
+                width='200px'
+                backgroundColor='#fff'
+                {...register('recordFormat')}
+                onChange={(e) => setValue('recordFormat', e.target.value as ServiceType)}
+              >
+                <option value='汎用'>汎用</option>
+                <option value='就労継続支援B型'>就労継続支援B型</option>
+                <option value='未来工房'>未来工房</option>
+                <option value='ドルチェ'>ドルチェ</option>
+              </Select>
+              <Spacer />
+            </Flex>
+            <Flex alignItems='center' m='4'>
+              <Text w='20%'>利用日:</Text>
+              <Stack spacing={5} direction='row'>
+                <Checkbox defaultChecked>
+                  月
+                </Checkbox>
+              </Stack>
+              <Spacer />
+            </Flex>
           </Box>
 
-          <Text className='lead' fontSize='xl' m='4'>
-            支援目標
-          </Text>
-          <Box mb='8'>
+          <Box  backgroundColor='#FFFBDA' p='2' mb={8}>
+          <Box mb='8' className='text_card' >
+            <Text className='lead' fontSize='xl' m='4'>
+              支援目標
+            </Text>
             <Flex alignItems='center' m='4'>
               <Text w='20%'>支援目標 1:</Text>
               <Spacer />
               <Input
                 ml={2}
                 w='80%'
-                value={addCustomer.targetOfSupport1}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, targetOfSupport1: e.target.value })
-                }
+                backgroundColor='#fff'
+                {...register('targetOfSupport.targetOfSupport1')}
+                onChange={(e) => setValue('targetOfSupport.targetOfSupport1', e.target.value)}
                 type='text'
                 id='targetOfSupport1'
               />
@@ -310,11 +374,10 @@ export default function Home() {
               <Spacer />
               <Textarea
                 ml={2}
-                w='80%'
-                value={addCustomer.detailOfSupport1}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, detailOfSupport1: e.target.value })
-                }
+                  w='80%'
+                  backgroundColor='#fff'
+                {...register('detailOfSupport.detailOfSupport1')}
+                onChange={(e) => setValue('detailOfSupport.detailOfSupport1', e.target.value)}
                 id='detailOfSupport1'
               />
             </Flex>
@@ -326,11 +389,10 @@ export default function Home() {
               <Spacer />
               <Input
                 ml={2}
-                w='80%'
-                value={addCustomer.targetOfSupport2}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, targetOfSupport2: e.target.value })
-                }
+                  w='80%'
+                  backgroundColor='#fff'
+                {...register('targetOfSupport.targetOfSupport2')}
+                onChange={(e) => setValue('targetOfSupport.targetOfSupport2', e.target.value)}
                 type='text'
                 id='targetOfSupport2'
               />
@@ -340,11 +402,10 @@ export default function Home() {
               <Spacer />
               <Textarea
                 ml={2}
-                w='80%'
-                value={addCustomer.detailOfSupport2}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, detailOfSupport2: e.target.value })
-                }
+                  w='80%'
+                  backgroundColor='#fff'
+                {...register('detailOfSupport.detailOfSupport2')}
+                onChange={(e) => setValue('detailOfSupport.detailOfSupport2', e.target.value)}
                 id='detailOfSupport2'
               />
             </Flex>
@@ -356,11 +417,10 @@ export default function Home() {
               <Spacer />
               <Input
                 ml={2}
-                w='80%'
-                value={addCustomer.targetOfSupport3}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, targetOfSupport3: e.target.value })
-                }
+                  w='80%'
+                  backgroundColor='#fff'
+                {...register('targetOfSupport.targetOfSupport3')}
+                onChange={(e) => setValue('targetOfSupport.targetOfSupport3', e.target.value)}
                 type='text'
                 id='targetOfSupport3'
               />
@@ -370,22 +430,20 @@ export default function Home() {
               <Spacer />
               <Textarea
                 ml={2}
-                w='80%'
-                value={addCustomer.detailOfSupport3}
-                onChange={(e) =>
-                  setAddCustomer({ ...addCustomer, detailOfSupport3: e.target.value })
-                }
+                  w='80%'
+                  backgroundColor='#fff'
+                {...register('detailOfSupport.detailOfSupport3')}
+                onChange={(e) => setValue('detailOfSupport.detailOfSupport3', e.target.value)}
                 id='detailOfSupport3'
               />
             </Flex>
+          </Box>
           </Box>
           <Flex>
             <Spacer />
             <Button
               colorScheme='teal'
-              onClick={() => {
-                onSubmit(addCustomer);
-              }}
+              onClick={handleSubmit(onSubmitCustomer)}
             >
               <AddIcon mr='2' />
               利用者を追加する
@@ -401,16 +459,6 @@ export default function Home() {
           allCustomersByService={allCustomersByService}
           handleCustomerClick={handleCustomerClick}
         />
-        {/* <UnorderedList listStyleType='none'>
-          {customers.map((customer) => (
-            <ListItem key={customer.uid} p={4} ml={0}>
-              <Heading size='md'
-                onClick={() => {onSubmit(addCustomer);
-              }}>{customer.customerName}</Heading>
-              <Divider orientation='horizontal' mt='4' />
-            </ListItem>
-          ))}
-        </UnorderedList> */}
       </Layout>
     </>
   );

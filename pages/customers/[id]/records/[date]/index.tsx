@@ -184,20 +184,6 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     }
   };
 
-  // const initializeForm = () => {
-  //   setValue('author', '');
-  //   setValue('amWork', '');
-  //   setValue('pmWork', '');
-  //   setValue('timeAdjustment.amStartTimeHours', 9);
-  //   setValue('timeAdjustment.amStartTimeMinutes', 30);
-  //   setValue('timeAdjustment.amFinishTimeHours', 12);
-  //   setValue('timeAdjustment.amFinishTimeMinutes', 0);
-  //   setValue('timeAdjustment.pmStartTimeHours', 13);
-  //   setValue('timeAdjustment.pmStartTimeMinutes', 30);
-  //   setValue('timeAdjustment.pmFinishTimeHours', 15);
-  //   setValue('timeAdjustment.pmFinishTimeMinutes', 15);
-  // };
-
   {
     /* 基本情報取得 */
   }
