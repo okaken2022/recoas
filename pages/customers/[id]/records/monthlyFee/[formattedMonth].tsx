@@ -115,9 +115,9 @@ export default function RecordMonthPage() {
 
   // dailyRecord.timeAdjustment.amStartTimeMinutesを0埋めして表示する関数
   const formatMinutes = (minutes: number) => {
-  // 2桁の文字列に変換し、0で埋める
-  return String(minutes).padStart(2, '0');
-};
+    // 2桁の文字列に変換し、0で埋める
+    return String(minutes).padStart(2, '0');
+  };
 
   useEffect(() => {
     if (customerId) {
@@ -139,8 +139,6 @@ export default function RecordMonthPage() {
       pathname: `/customers/${customerId}/records/${dailyRecord.id}/`,
     });
   };
-
-
 
   return (
     <>
@@ -200,7 +198,7 @@ export default function RecordMonthPage() {
             <GridItem colSpan={2} bg='color.mainTransparent1'>
               {dayjs(dailyRecord.id).format('M月D日(ddd)')}
             </GridItem>
-            <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px' >
+            <GridItem rowSpan={1} colSpan={1} borderRight='1px' borderLeft='1px'>
               {dailyRecord.timeAdjustment.amStartTimeHours}:
               {dailyRecord.timeAdjustment.amStartTimeMinutes}
               {/* {formatMinutes(dailyRecord.timeAdjustment.amStartTimeMinutes)} */}
@@ -228,7 +226,7 @@ export default function RecordMonthPage() {
             </GridItem>
           </Grid>
         ))}
-        <Flex mt="8">
+        <Flex mt='8'>
           <Spacer />
           {/* <Text borderBottom='1px'>出勤日数：{allRecordData.length}日</Text> */}
         </Flex>

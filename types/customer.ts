@@ -3,24 +3,24 @@ export type Customer = {
   customerName: string;
   hurigana: string;
   service: ServiceType;
-  recordFormat: string,
+  recordFormat: string;
   dateOfUse: {
-    Monday: boolean,
-    Tuesday: boolean,
-    Wednesday: boolean,
-    Thursday: boolean,
-    Friday: boolean,
-  },
+    monday: boolean;
+    tuesday: boolean;
+    wednesday: boolean;
+    thursday: boolean;
+    friday: boolean;
+  };
   targetOfSupport: {
-    targetOfSupport1: string,
-    targetOfSupport2: string,
-    targetOfSupport3: string,
-  },
+    targetOfSupport1: string;
+    targetOfSupport2: string;
+    targetOfSupport3: string;
+  };
   detailOfSupport: {
-    detailOfSupport1: string,
-    detailOfSupport2: string,
-    detailOfSupport3: string,
-  },
+    detailOfSupport1: string;
+    detailOfSupport2: string;
+    detailOfSupport3: string;
+  };
 };
 
 export type ServiceType = '生活介護' | '多機能生活介護' | '就労継続支援B型';

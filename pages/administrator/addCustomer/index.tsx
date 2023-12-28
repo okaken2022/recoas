@@ -14,13 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
 import { NextRouter, useRouter } from 'next/router';
-import {
-  onSnapshot,
-  collection,
-  orderBy,
-  query,
-  addDoc,
-} from 'firebase/firestore';
+import { onSnapshot, collection, orderBy, query, addDoc } from 'firebase/firestore';
 
 import { useState, useContext, useEffect } from 'react';
 import { AddIcon } from '@chakra-ui/icons';
@@ -31,48 +25,38 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 export default function Home() {
   {
-    /* state */
-  }
-  const [allCustomersByService, setAllCustomersByService] = useState<CustomersByService>({
-    生活介護: [],
-    多機能生活介護: [],
-    就労継続支援B型: [],
-  });
-
-  {
     /* useForm */
   }
-const {
-  handleSubmit,
-  register,
-  setValue,
-  formState: { errors },
-} = useForm<Customer>({
-  defaultValues: {
-    customerName: '',
-    hurigana: '',
-    service: '生活介護',
-    recordFormat: '',
-    dateOfUse: {
-      Monday: true,
-      Tuesday: true,
-      Wednesday: true,
-      Thursday: true,
-      Friday: true,
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm<Customer>({
+    defaultValues: {
+      customerName: '',
+      hurigana: '',
+      service: '生活介護',
+      recordFormat: '',
+      dateOfUse: {
+        monday: true,
+        tuesday: true,
+        wednesday: true,
+        thursday: true,
+        friday: true,
+      },
+      targetOfSupport: {
+        targetOfSupport1: '',
+        targetOfSupport2: '',
+        targetOfSupport3: '',
+      },
+      detailOfSupport: {
+        detailOfSupport1: '',
+        detailOfSupport2: '',
+        detailOfSupport3: '',
+      },
     },
-    targetOfSupport: {
-      targetOfSupport1: '',
-      targetOfSupport2: '',
-      targetOfSupport3: '',
-    },
-    detailOfSupport: {
-      detailOfSupport1: '',
-      detailOfSupport2: '',
-      detailOfSupport3: '',
-    },
-  }
-});
-
+  });
 
   {
     /* ログイン */
@@ -81,12 +65,17 @@ const {
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
-
   const toast = useToast();
 
   {
-    /* サービスごとに分けた配列を持つオブジェクトを作成 */
+    /* サービス別利用者一覧 */
   }
+  const [allCustomersByService, setAllCustomersByService] = useState<CustomersByService>({
+    生活介護: [],
+    多機能生活介護: [],
+    就労継続支援B型: [],
+  });
+
   useEffect(() => {
     if (!currentUser) router.push('/login');
     const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
@@ -105,11 +94,11 @@ const {
           service: doc.data().service,
           recordFormat: doc.data().recordFormat,
           dateOfUse: {
-            Monday: doc.data().Monday,
-            Tuesday: doc.data().Tuesday,
-            Wednesday: doc.data().Wednesday,
-            Thursday: doc.data().Thursday,
-            Friday: doc.data().Friday,
+            monday: doc.data().Monday,
+            tuesday: doc.data().Tuesday,
+            wednesday: doc.data().Wednesday,
+            thursday: doc.data().thursday,
+            friday: doc.data().friday,
           },
           targetOfSupport: {
             targetOfSupport1: doc.data().targetOfSupport1,
@@ -120,7 +109,7 @@ const {
             detailOfSupport1: doc.data().detailOfSupport1,
             detailOfSupport2: doc.data().detailOfSupport2,
             detailOfSupport3: doc.data().detailOfSupport3,
-          }
+          },
         };
 
         customersByService[customer.service as keyof typeof customersByService].push(customer);
@@ -133,21 +122,20 @@ const {
       unSub();
     };
   }, [currentUser]);
-  
+
   {
     /* 利用者追加 */
-    // try, catch
   }
   const createCustomer = async (
     customerName: string,
     hurigana: string,
     service: string,
     recordFormat: string,
-    Monday: boolean,
-    Tuesday: boolean,
-    Wednesday: boolean,
-    Thursday:boolean,
-    Friday:boolean,
+    monday: boolean,
+    tuesday: boolean,
+    wednesday: boolean,
+    thursday: boolean,
+    friday: boolean,
     targetOfSupport1: string,
     targetOfSupport2: string,
     targetOfSupport3: string,
@@ -164,11 +152,11 @@ const {
         service: service,
         recordFormat: recordFormat,
         dateOfUse: {
-          Monday: Monday,
-          Tuesday: Tuesday,
-          Wednesday: Wednesday,
-          Thursday: Thursday,
-          Friday: Friday,
+          monday: monday,
+          tuesday: tuesday,
+          wednesday: wednesday,
+          thursday: thursday,
+          friday: friday,
         },
         targetOfSupport: {
           targetOfSupport1: targetOfSupport1,
@@ -205,11 +193,11 @@ const {
         data.hurigana,
         data.service,
         data.recordFormat,
-        data.dateOfUse.Monday,
-        data.dateOfUse.Tuesday,
-        data.dateOfUse.Wednesday,
-        data.dateOfUse.Thursday,
-        data.dateOfUse.Friday,
+        data.dateOfUse.monday,
+        data.dateOfUse.tuesday,
+        data.dateOfUse.wednesday,
+        data.dateOfUse.thursday,
+        data.dateOfUse.friday,
         data.targetOfSupport.targetOfSupport1,
         data.targetOfSupport.targetOfSupport2,
         data.targetOfSupport.targetOfSupport3,
@@ -235,35 +223,9 @@ const {
     }
   };
 
-
-  // {
-  //   /* 利用者一覧を取得する */
-  //   /* orderByで並べ替え */
-  // }
-  // useEffect(() => {
-  //   if (!currentUser) return;
-  //   const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
-  //   const unSub = onSnapshot(q, async (snapshot) => {
-  //     setCustomers(
-  //       snapshot.docs.map((doc) => ({
-  //         uid: doc.id,
-  //         customerName: doc.data().customerName,
-  //         romaji: doc.data().romaji,
-  //         service: doc.data().service,
-  //         targetOfSupport1: doc.data().targetOfSupport1,
-  //         targetOfSupport2: doc.data().targetOfSupport2,
-  //         targetOfSupport3: doc.data().targetOfSupport3,
-  //         detailOfSupport1: doc.data().detailOfSupport1,
-  //         detailOfSupport2: doc.data().detailOfSupport2,
-  //         detailOfSupport3: doc.data().detailOfSupport3,
-  //       })),
-  //     );
-  //   });
-  //   return () => {
-  //     unSub();
-  //   };
-  // }, [currentUser]);
-
+  {
+    /* 利用者編集ルーティング */
+  }
   const handleCustomerClick = (customerId: string | undefined) => {
     router.push(`/administrator/addCustomer/edit/${customerId}`);
   };
@@ -274,8 +236,9 @@ const {
         <Text className='head' fontSize='2xl'>
           利用者の追加
         </Text>
-        {/* 利用者の追加フォーム */}
+        {/* 利用者の追加 */}
         <Box mb={12} mt={12}>
+          {/* 利用者情報フォーム */}
           <Box mb={8} backgroundColor='#FFFBDA' className='text_card' p='2'>
             <Text className='lead' fontSize='xl' m='4'>
               利用者情報
@@ -343,108 +306,143 @@ const {
             <Flex alignItems='center' m='4'>
               <Text w='20%'>利用日:</Text>
               <Stack spacing={5} direction='row'>
-                <Checkbox defaultChecked>
+                <Checkbox
+                  defaultChecked
+                  mr={2}
+                  {...register('dateOfUse.monday')}
+                  onChange={(e) => setValue('dateOfUse.monday', e.target.checked)}
+                >
                   月
+                </Checkbox>
+                <Checkbox
+                  defaultChecked
+                  mr={2}
+                  {...register('dateOfUse.tuesday')}
+                  onChange={(e) => setValue('dateOfUse.tuesday', e.target.checked)}
+                >
+                  火
+                </Checkbox>
+                <Checkbox
+                  defaultChecked
+                  mr={2}
+                  {...register('dateOfUse.wednesday')}
+                  onChange={(e) => setValue('dateOfUse.wednesday', e.target.checked)}
+                >
+                  水
+                </Checkbox>
+                <Checkbox
+                  defaultChecked
+                  mr={2}
+                  {...register('dateOfUse.thursday')}
+                  onChange={(e) => setValue('dateOfUse.thursday', e.target.checked)}
+                >
+                  木
+                </Checkbox>
+                <Checkbox
+                  defaultChecked
+                  {...register('dateOfUse.friday')}
+                  onChange={(e) => setValue('dateOfUse.friday', e.target.checked)}
+                >
+                  金
                 </Checkbox>
               </Stack>
               <Spacer />
             </Flex>
           </Box>
 
-          <Box  backgroundColor='#FFFBDA' p='2' mb={8}>
-          <Box mb='8' className='text_card' >
-            <Text className='lead' fontSize='xl' m='4'>
-              支援目標
-            </Text>
-            <Flex alignItems='center' m='4'>
-              <Text w='20%'>支援目標 1:</Text>
-              <Spacer />
-              <Input
-                ml={2}
-                w='80%'
-                backgroundColor='#fff'
-                {...register('targetOfSupport.targetOfSupport1')}
-                onChange={(e) => setValue('targetOfSupport.targetOfSupport1', e.target.value)}
-                type='text'
-                id='targetOfSupport1'
-              />
-            </Flex>
-            <Flex alignItems='center' m='4' ml='8'>
-              <Text w='20%'>支援内容 1:</Text>
-              <Spacer />
-              <Textarea
-                ml={2}
+          {/* 支援目標フォーム */}
+          <Box backgroundColor='#FFFBDA' p='2' mb={8}>
+            <Box mb='8' className='text_card'>
+              <Text className='lead' fontSize='xl' m='4'>
+                支援目標
+              </Text>
+              <Flex alignItems='center' m='4'>
+                <Text w='20%'>支援目標 1:</Text>
+                <Spacer />
+                <Input
+                  ml={2}
                   w='80%'
                   backgroundColor='#fff'
-                {...register('detailOfSupport.detailOfSupport1')}
-                onChange={(e) => setValue('detailOfSupport.detailOfSupport1', e.target.value)}
-                id='detailOfSupport1'
-              />
-            </Flex>
+                  {...register('targetOfSupport.targetOfSupport1')}
+                  onChange={(e) => setValue('targetOfSupport.targetOfSupport1', e.target.value)}
+                  type='text'
+                  id='targetOfSupport1'
+                />
+              </Flex>
+              <Flex alignItems='center' m='4' ml='8'>
+                <Text w='20%'>支援内容 1:</Text>
+                <Spacer />
+                <Textarea
+                  ml={2}
+                  w='80%'
+                  backgroundColor='#fff'
+                  {...register('detailOfSupport.detailOfSupport1')}
+                  onChange={(e) => setValue('detailOfSupport.detailOfSupport1', e.target.value)}
+                  id='detailOfSupport1'
+                />
+              </Flex>
+            </Box>
+            <Divider />
+            <Box mb='8'>
+              <Flex alignItems='center' m='4'>
+                <Text w='20%'>支援目標 2:</Text>
+                <Spacer />
+                <Input
+                  ml={2}
+                  w='80%'
+                  backgroundColor='#fff'
+                  {...register('targetOfSupport.targetOfSupport2')}
+                  onChange={(e) => setValue('targetOfSupport.targetOfSupport2', e.target.value)}
+                  type='text'
+                  id='targetOfSupport2'
+                />
+              </Flex>
+              <Flex alignItems='center' m='4' ml='8'>
+                <Text w='20%'>支援内容 2:</Text>
+                <Spacer />
+                <Textarea
+                  ml={2}
+                  w='80%'
+                  backgroundColor='#fff'
+                  {...register('detailOfSupport.detailOfSupport2')}
+                  onChange={(e) => setValue('detailOfSupport.detailOfSupport2', e.target.value)}
+                  id='detailOfSupport2'
+                />
+              </Flex>
+            </Box>
+            <Divider />
+            <Box mb='8'>
+              <Flex alignItems='center' m='4'>
+                <Text w='20%'>支援目標 3:</Text>
+                <Spacer />
+                <Input
+                  ml={2}
+                  w='80%'
+                  backgroundColor='#fff'
+                  {...register('targetOfSupport.targetOfSupport3')}
+                  onChange={(e) => setValue('targetOfSupport.targetOfSupport3', e.target.value)}
+                  type='text'
+                  id='targetOfSupport3'
+                />
+              </Flex>
+              <Flex alignItems='center' m='4' ml='8'>
+                <Text w='20%'>支援内容 3:</Text>
+                <Spacer />
+                <Textarea
+                  ml={2}
+                  w='80%'
+                  backgroundColor='#fff'
+                  {...register('detailOfSupport.detailOfSupport3')}
+                  onChange={(e) => setValue('detailOfSupport.detailOfSupport3', e.target.value)}
+                  id='detailOfSupport3'
+                />
+              </Flex>
+            </Box>
           </Box>
-          <Divider />
-          <Box mb='8'>
-            <Flex alignItems='center' m='4'>
-              <Text w='20%'>支援目標 2:</Text>
-              <Spacer />
-              <Input
-                ml={2}
-                  w='80%'
-                  backgroundColor='#fff'
-                {...register('targetOfSupport.targetOfSupport2')}
-                onChange={(e) => setValue('targetOfSupport.targetOfSupport2', e.target.value)}
-                type='text'
-                id='targetOfSupport2'
-              />
-            </Flex>
-            <Flex alignItems='center' m='4' ml='8'>
-              <Text w='20%'>支援内容 2:</Text>
-              <Spacer />
-              <Textarea
-                ml={2}
-                  w='80%'
-                  backgroundColor='#fff'
-                {...register('detailOfSupport.detailOfSupport2')}
-                onChange={(e) => setValue('detailOfSupport.detailOfSupport2', e.target.value)}
-                id='detailOfSupport2'
-              />
-            </Flex>
-          </Box>
-          <Divider />
-          <Box mb='8'>
-            <Flex alignItems='center' m='4'>
-              <Text w='20%'>支援目標 3:</Text>
-              <Spacer />
-              <Input
-                ml={2}
-                  w='80%'
-                  backgroundColor='#fff'
-                {...register('targetOfSupport.targetOfSupport3')}
-                onChange={(e) => setValue('targetOfSupport.targetOfSupport3', e.target.value)}
-                type='text'
-                id='targetOfSupport3'
-              />
-            </Flex>
-            <Flex alignItems='center' m='4' ml='8'>
-              <Text w='20%'>支援内容 3:</Text>
-              <Spacer />
-              <Textarea
-                ml={2}
-                  w='80%'
-                  backgroundColor='#fff'
-                {...register('detailOfSupport.detailOfSupport3')}
-                onChange={(e) => setValue('detailOfSupport.detailOfSupport3', e.target.value)}
-                id='detailOfSupport3'
-              />
-            </Flex>
-          </Box>
-          </Box>
+          
           <Flex>
             <Spacer />
-            <Button
-              colorScheme='teal'
-              onClick={handleSubmit(onSubmitCustomer)}
-            >
+            <Button colorScheme='teal' onClick={handleSubmit(onSubmitCustomer)}>
               <AddIcon mr='2' />
               利用者を追加する
             </Button>
