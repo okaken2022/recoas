@@ -3,7 +3,7 @@
 ## 機能
 利用者別に支援記録を記録していきます。利用者の詳細ページにはカレンダーを表示し、各営業日をクリックすると、その日の記録を追加していくことができます。
 
-## 使用言語、技術
+## 使用言語、フレームワーク、ライブラリ
 React.js, TypeScript, Next.js, Firebase, vercel
 <br/>
 Fullcallendar, Chakra UI, day.js
