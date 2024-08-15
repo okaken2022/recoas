@@ -17,7 +17,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
-import { NextRouter, useRouter } from 'next/router';
+import { type NextRouter, useRouter } from 'next/router';
 import { Header } from '@/components/Header';
 import {
   onSnapshot,
@@ -37,12 +37,10 @@ import Link from 'next/link';
 import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { AddCustomer, ServiceType } from '@/types/customer';
+import type { AddCustomer, ServiceType } from '@/types/customer';
 
 export default function Home() {
-  {
-    /* state */
-  }
+  /* state */
   const [customers, setCustomers] = useState<AddCustomer[]>([]);
   const [addCustomer, setAddCustomer] = useState<AddCustomer>({
     customerName: '',
@@ -56,9 +54,7 @@ export default function Home() {
     detailOfSupport3: '',
   });
 
-  {
-    /* ログイン */
-  }
+  /* ログイン */
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
@@ -66,10 +62,7 @@ export default function Home() {
 
   const toast = useToast();
 
-  {
-    /* 利用者追加 */
-    // try, catch
-  }
+  /* 利用者追加 */
   const createCustomer = async (
     customerName: string,
     romaji: string,
@@ -160,10 +153,7 @@ export default function Home() {
     setCustomers(customers);
   };
 
-  {
-    /* 利用者一覧を取得する */
-    /* orderByで並べ替え */
-  }
+  /* 利用者一覧を取得する */
   useEffect(() => {
     if (!currentUser) return;
     const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));

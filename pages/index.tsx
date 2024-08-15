@@ -1,12 +1,12 @@
 import { Button, Box, Select, Wrap, WrapItem, Text, Spinner, Center } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
-import { NextRouter, useRouter } from 'next/router';
+import { type NextRouter, useRouter } from 'next/router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 import { useState, useContext, useEffect } from 'react';
 import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
-import { CustomersByService, ServiceType } from '@/types/customer';
+import type { CustomersByService, ServiceType } from '@/types/customer';
 import CustomerList from '@/components/CustomerList';
 
 export default function Home() {
@@ -16,17 +16,14 @@ export default function Home() {
     就労継続支援B型: [],
   });
 
-  {
-    /* ログイン */
-  }
+  /* ログイン */
   const auth = useAuth();
   const currentUser = auth.currentUser;
   const user = useContext(AuthContext);
   const router: NextRouter = useRouter();
 
-  {
-    /* サービスごとに分けた配列を持つオブジェクトを作成 */
-  }
+  /* サービスごとに分けた配列を持つオブジェクトを作成 */
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (!currentUser) router.push('/login');
     const q = query(collection(db, 'customers'), orderBy('romaji', 'asc'));
@@ -37,6 +34,7 @@ export default function Home() {
         就労継続支援B型: [],
       };
 
+      // biome-ignore lint/complexity/noForEach: <explanation>
       snapshot.docs.forEach((doc) => {
         const customer = {
           uid: doc.id,
@@ -56,15 +54,17 @@ export default function Home() {
     };
   }, [currentUser]);
 
-  {
-    /* 利用者名をクリックして、記録一覧ページに遷移 */
-  }
+  /* 利用者名をクリックして、記録一覧ページに遷移 */
   const handleCustomerClick = (customerId: string | undefined) => {
     router.push(`/customers/${customerId}`);
   };
 
   const goToAddCustomer = () => {
     router.push('/administrator/addCustomer');
+  };
+
+  const goToEditCustomer = () => {
+    router.push('/administrator/editCustomer');
   };
 
   return (
@@ -98,12 +98,12 @@ export default function Home() {
             <WrapItem w={{ base: '100%', md: '30%' }}>
               <Button onClick={goToAddCustomer} w='100%'>
                 <AddIcon mr='2' />
-                利用者を追加する
+                利用者の追加
               </Button>
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button isDisabled={true} w='100%'>
-                ユーザー一覧
+              <Button onClick={goToEditCustomer} w='100%'>
+                利用者の編集、削除
               </Button>
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
