@@ -9,7 +9,6 @@ interface RecordHeaderProps {
   }[];
   goToRecordEditPage: (value: string) => void;
 }
-
 const RecordList: React.FC<RecordHeaderProps> = ({ singleRecordData, goToRecordEditPage }) => {
   return (
     <>
