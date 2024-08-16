@@ -4,17 +4,13 @@ import {
   Text,
   Box,
   Flex,
-  Input,
   Button,
   useToast,
   Center,
   Spinner,
-  Wrap,
-  WrapItem,
-  Select,
 } from '@chakra-ui/react';
 import { useAuth, db, AuthContext } from '@/hooks/firebase';
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout';
 import { useContext, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
@@ -28,6 +24,7 @@ import {
   orderBy,
   query,
   setDoc,
+  updateDoc,
   Timestamp,
 } from 'firebase/firestore';
 import type { CustomerInfoType } from '@/types/customerInfo';
@@ -35,6 +32,8 @@ import { fetchCustomer } from '@/utils/fetchCustomer';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import type { NextPage } from 'next';
 import { useDateFormatter } from '@/hooks/useDateFormatter';
+import { arrayMove } from '@dnd-kit/sortable';
+import type { DragEndEvent } from '@dnd-kit/core';
 import ActivityBox from '@/components/record_conponents/ActivityBox';
 import RecordHeader from '@/components/record_conponents/RecordHeader';
 import RecordList from '@/components/record_conponents/RecordList';
@@ -242,6 +241,43 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
     });
   const returnList = () => router.push(`/customers/${customerId}/`);
 
+  // 並べ替えの順番をFirestoreに保存するロジック
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = singleRecordData.findIndex((record) => record.docId === active.id);
+      const newIndex = singleRecordData.findIndex((record) => record.docId === over?.id);
+
+      const newOrder = arrayMove(singleRecordData, oldIndex, newIndex);
+      setSingleRecordData(newOrder);
+
+      // 新しい順序を Firestore に保存
+      try {
+        for (let i = 0; i < newOrder.length; i++) {
+          const record = newOrder[i];
+          const recordRef = doc(
+            db,
+            'customers',
+            customerId as string,
+            'monthlyRecords',
+            formattedMonth,
+            'dailyRecords',
+            formattedDate as string,
+            'singleRecord',
+            record.docId,
+          );
+
+          // serialNumber フィールドを更新
+          await updateDoc(recordRef, { serialNumber: i });
+        }
+        console.log('Order updated successfully in Firestore');
+      } catch (error) {
+        console.error('Error updating order in Firestore:', error);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <Center height='100vh'>
@@ -307,7 +343,12 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         </Box>
 
         {/* 記録 */}
-        <RecordList singleRecordData={singleRecordData} goToRecordEditPage={goToRecordEditPage} />
+        <RecordList
+          singleRecordData={singleRecordData}
+          goToRecordEditPage={goToRecordEditPage}
+          setSingleRecordData={setSingleRecordData} // ここでデータ更新関数を渡す
+          handleDragEnd={handleDragEnd} // 並べ替えの終了をハンドリング
+        />
 
         <Flex mt='2'>
           <Button colorScheme='teal' size='sm' onClick={returnList}>
