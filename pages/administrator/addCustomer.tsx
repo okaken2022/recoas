@@ -34,7 +34,6 @@ import {
 import { v4 as uuidv4 } from 'uuid';
 import { useState, useContext, useEffect, ChangeEvent } from 'react';
 import Link from 'next/link';
-import { Todo, firestoreTodo } from '@/types/todo';
 import { AddIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
 import type { AddCustomer, ServiceType } from '@/types/customer';

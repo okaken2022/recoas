@@ -15,11 +15,16 @@ const RecordHeader: React.FC<RecordHeaderProps> = ({
   onAuthorChange,
   authorError,
 }) => {
-  const { register, setValue } = useForm(); // useForm フックを使用
+  const { register, setValue, reset } = useForm<{ author: string }>({
+    defaultValues: {
+      author: authorValue,
+    },
+  });
+
   // フォームの初期化時に setValue を使用して初期値を設定
   useEffect(() => {
-    setValue('author', authorValue);
-  }, [authorValue, setValue]);
+    reset({ author: authorValue }); // 新しいページに移動したときにフォームをリセット
+  }, [authorValue, reset]);
 
   return (
     <Box bg='color.mainTransparent1' p={2}>
