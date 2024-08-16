@@ -19,9 +19,9 @@ const MealAmountBox: React.FC<MealAmountBoxProps> = ({ mealAmountValue, onChange
   }, [mealAmountValue, setValue]);
 
   return (
-    <Box p={2}>
+    <Box bg='white' p={2} borderBottom='1px solid #ddd'>
       <Flex alignItems='center' justify='space-between'>
-        <Text>昼食：</Text>
+        <Text>昼食</Text>
         <Select
           size={{ base: 'sm', md: 'md' }}
           width='40%'
