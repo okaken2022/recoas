@@ -39,6 +39,7 @@ import ActivityBox from '@/components/record_conponents/ActivityBox';
 import RecordHeader from '@/components/record_conponents/RecordHeader';
 import RecordList from '@/components/record_conponents/RecordList';
 import TimeAdjustmentBox from '@/components/record_conponents/TimeAdjustmentBox';
+import MealAmountBox from '@/components/record_conponents/MealAmountBox';
 
 interface BasicInfoOfRecord {
   author: string;
@@ -50,6 +51,7 @@ interface BasicInfoOfRecord {
     pmStartTime: Timestamp;
     pmFinishTime: Timestamp;
   };
+  mealAmount: number;
 }
 
 const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
@@ -71,6 +73,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         pmStartTime: Timestamp.fromDate(new Date(1970, 0, 1, 13, 30)),
         pmFinishTime: Timestamp.fromDate(new Date(1970, 0, 1, 15, 45)),
       },
+      mealAmount: 10,
     },
   });
   const [isCustomTime, setIsCustomTime] = useState(false);
@@ -114,6 +117,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
         pmStartTime: Timestamp.fromDate(new Date(1970, 0, 1, 13, 30)),
         pmFinishTime: Timestamp.fromDate(new Date(1970, 0, 1, 15, 45)),
       },
+      mealAmount: 10,
     });
   }, [date, reset]);
 
@@ -151,6 +155,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       amWork: data.amWork,
       pmWork: data.pmWork,
       timeAdjustment: timeAdjustment,
+      mealAmount: data.mealAmount, // 新しく追加
     };
 
     console.log('Sending data to Firestore:', docData);
@@ -187,6 +192,7 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
       setValue('amWork', data.amWork);
       setValue('pmWork', data.pmWork);
       setValue('timeAdjustment', data.timeAdjustment);
+      setValue('mealAmount', data.mealAmount); // 新しく追加
     } else {
       reset(); // データがない場合はフォームをリセット
     }
@@ -287,6 +293,10 @@ const RecordPage: NextPage<{ formattedDateJa: string }> = () => {
               setValue('timeAdjustment', newTimeAdjustment);
               // 変更内容をサーバーに保存するロジックをここに追加
             }}
+          />
+          <MealAmountBox
+            mealAmountValue={watch('mealAmount')}
+            onChangeMealAmount={(value) => setValue('mealAmount', value)}
           />
           {/* ボタン */}
           <Flex bg='white' p={2} borderBottom='1px' justifyContent='right'>
