@@ -1,33 +1,68 @@
-import { BasicInfoOfRecord } from '@/types/record';
 import { Box, Flex, Input, Spacer, Text, Wrap } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Timestamp } from 'firebase/firestore';
+import dayjs from 'dayjs';
+
+interface BasicInfoOfRecord {
+  author: string;
+  amWork: string;
+  pmWork: string;
+  timeAdjustment: {
+    amStartTime: Timestamp;
+    amFinishTime: Timestamp;
+    pmStartTime: Timestamp;
+    pmFinishTime: Timestamp;
+  };
+}
 
 export interface TimeAdjustmentBoxProps {
   onChangeTimeAdjustment: (value: BasicInfoOfRecord['timeAdjustment']) => void;
-  timeAdjustmentValue?: BasicInfoOfRecord['timeAdjustment'];
+  timeAdjustment?: BasicInfoOfRecord['timeAdjustment'];
 }
 
 const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
   onChangeTimeAdjustment,
-  timeAdjustmentValue,
+  timeAdjustment,
 }) => {
-  const { register, setValue, getValues } = useForm(); // useForm フックを使用
+  const { register, setValue } = useForm();
+  const [amStartTime, setAmStartTime] = useState<string>('09:15');
+  const [amFinishTime, setAmFinishTime] = useState<string>('12:00');
+  const [pmStartTime, setPmStartTime] = useState<string>('13:30');
+  const [pmFinishTime, setPmFinishTime] = useState<string>('15:45');
 
-  // フォームの初期化時に setValue を使用して初期値を設定
   useEffect(() => {
-    setValue('timeAdjustment', timeAdjustmentValue);
-  }, [timeAdjustmentValue, setValue]);
+    if (timeAdjustment) {
+      setAmStartTime(formatTimestampToTime(timeAdjustment.amStartTime) || '09:15');
+      setAmFinishTime(formatTimestampToTime(timeAdjustment.amFinishTime) || '12:00');
+      setPmStartTime(formatTimestampToTime(timeAdjustment.pmStartTime) || '13:30');
+      setPmFinishTime(formatTimestampToTime(timeAdjustment.pmFinishTime) || '15:45');
+    } else {
+      // timeAdjustmentがない場合のデフォルト値を設定
+      setAmStartTime('09:15');
+      setAmFinishTime('12:00');
+      setPmStartTime('13:30');
+      setPmFinishTime('15:45');
+    }
+  }, [timeAdjustment]);
 
-  // 各Inputの値が変更されるたびにonChangeTimeAdjustmentを呼ぶ
-  const handleInputChange = async (key: string, value: string) => {
-    // 文字列から数値へ変換
-    const numericValue = value !== '' ? parseInt(value, 10) : 0;
-    // setValueをawaitで実行して非同期処理が完了するまで待つ
-    await setValue(`timeAdjustment.${key}`, numericValue);
-    // timeAdjustmentの最新の値を取得してonChangeTimeAdjustmentに渡す
-    const updatedTimeAdjustment = getValues('timeAdjustment');
+  const handleInputChange = (key: keyof BasicInfoOfRecord['timeAdjustment'], value: string) => {
+    const [hours, minutes] = value.split(':').map(Number);
+    const newTimestamp = Timestamp.fromDate(new Date(1970, 0, 1, hours, minutes));
+
+    const updatedTimeAdjustment = {
+      ...timeAdjustment,
+      [key]: newTimestamp,
+    } as BasicInfoOfRecord['timeAdjustment'];
+
+    setValue(`timeAdjustment.${key}`, newTimestamp);
     onChangeTimeAdjustment(updatedTimeAdjustment);
+  };
+
+  const formatTimestampToTime = (timestamp?: Timestamp): string => {
+    if (!timestamp) return '';
+    const date = timestamp.toDate();
+    return dayjs(date).format('HH:mm');
   };
 
   return (
@@ -40,96 +75,56 @@ const TimeAdjustmentBox: React.FC<TimeAdjustmentBoxProps> = ({
             <Text>午前：</Text>
             <Input
               size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
+              width={{ base: '80px', md: '108px' }}
               bg='white'
-              type='text'
-              id='amStartTimeHours'
-              defaultValue='9'
-              {...register('timeAdjustment.amStartTimeHours')}
-              // onChange={(e) => onChangeTimeAdjustment({
-              //   ...timeAdjustmentValue,
-              //   amStartTimeHours: parseInt(e.target.value, 10) // 文字列から数値へ変換
-              // })}
-              onChange={(e) => handleInputChange('amStartTimeHours', e.target.value)}
-            />
-            <Text>：</Text>
-            <Input
-              size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
-              bg='white'
-              type='text'
-              id='amStartTimeMinutes'
-              defaultValue='30'
-              {...register('timeAdjustment.amStartTimeMinutes')}
-              onChange={(e) => handleInputChange('amStartTimeMinutes', e.target.value)}
+              type='time'
+              id='amStartTime'
+              value={amStartTime}
+              onChange={(e) => {
+                setAmStartTime(e.target.value);
+                handleInputChange('amStartTime', e.target.value);
+              }}
             />
             <Text>〜</Text>
             <Input
               size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
+              width={{ base: '80px', md: '108px' }}
               bg='white'
-              type='text'
-              id='amFinishTimeHours'
-              defaultValue='12'
-              {...register('timeAdjustment.amFinishTimeHours')}
-              onChange={(e) => handleInputChange('amFinishTimeHours', e.target.value)}
-            />
-            <Text>：</Text>
-            <Input
-              size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
-              bg='white'
-              type='text'
-              id='amFinishTimeMinutes'
-              defaultValue='0'
-              {...register('timeAdjustment.amFinishTimeMinutes')}
-              onChange={(e) => handleInputChange('amFinishTimeMinutes', e.target.value)}
+              type='time'
+              id='amFinishTime'
+              value={amFinishTime}
+              onChange={(e) => {
+                setAmFinishTime(e.target.value);
+                handleInputChange('amFinishTime', e.target.value);
+              }}
             />
           </Flex>
           <Flex alignItems='center' justify='right'>
             <Text ml={{ base: '0px', md: '20px' }}>午後：</Text>
             <Input
               size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
+              width={{ base: '80px', md: '108px' }}
               bg='white'
-              type='text'
-              id='pmStartTimeHours'
-              defaultValue='13'
-              {...register('timeAdjustment.pmStartTimeHours')}
-              onChange={(e) => handleInputChange('pmStartTimeHours', e.target.value)}
-            />
-            <Text>：</Text>
-            <Input
-              size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
-              bg='white'
-              type='text'
-              id='pmStartTimeMinutes'
-              defaultValue='30'
-              {...register('timeAdjustment.pmStartTimeMinutes')}
-              onChange={(e) => handleInputChange('pmStartTimeMinutes', e.target.value)}
+              type='time'
+              id='pmStartTime'
+              value={pmStartTime}
+              onChange={(e) => {
+                setPmStartTime(e.target.value);
+                handleInputChange('pmStartTime', e.target.value);
+              }}
             />
             <Text>〜</Text>
             <Input
               size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
+              width={{ base: '80px', md: '108px' }}
               bg='white'
-              type='text'
-              id='pmFinishTimeHours'
-              defaultValue='15'
-              {...register('timeAdjustment.pmFinishTimeHours')}
-              onChange={(e) => handleInputChange('pmFinishTimeHours', e.target.value)}
-            />
-            <Text>：</Text>
-            <Input
-              size={{ base: 'sm', md: 'md' }}
-              width={{ base: '40px', md: '54px' }}
-              bg='white'
-              type='text'
-              id='pmFinishTimeMinutes'
-              defaultValue='15'
-              {...register('timeAdjustment.pmFinishTimeMinutes')}
-              onChange={(e) => handleInputChange('pmFinishTimeMinutes', e.target.value)}
+              type='time'
+              id='pmFinishTime'
+              value={pmFinishTime}
+              onChange={(e) => {
+                setPmFinishTime(e.target.value);
+                handleInputChange('pmFinishTime', e.target.value);
+              }}
             />
           </Flex>
         </Wrap>

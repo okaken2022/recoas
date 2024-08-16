@@ -15,13 +15,19 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
   onChangeAmWork,
   onChangePmWork,
 }) => {
-  const { register, setValue } = useForm(); // useForm フックを使用
+  const { register, setValue, reset } = useForm<{ amWork: string; pmWork: string }>({
+    defaultValues: {
+      amWork: amWorkValue,
+      pmWork: pmWorkValue,
+    },
+  });
 
-  // フォームの初期化時に setValue を使用して初期値を設定
   useEffect(() => {
-    setValue('amWork', amWorkValue);
-    setValue('pmWork', pmWorkValue);
-  }, [amWorkValue, pmWorkValue, setValue]);
+    reset({
+      amWork: amWorkValue,
+      pmWork: pmWorkValue,
+    });
+  }, [amWorkValue, pmWorkValue, reset]);
 
   return (
     <Box bg='white' p={2} borderBottom='1px solid #ddd'>
@@ -38,7 +44,6 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
               width='60%'
               bg='white'
               type='text'
-              id='amWork'
               {...register('amWork')} // フォームフィールドをバインド
               onChange={(e) => onChangeAmWork(e.target.value)}
             />
@@ -50,7 +55,6 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
               width='60%'
               bg='white'
               type='text'
-              id='pmWork'
               {...register('pmWork')} // フォームフィールドをバインド
               onChange={(e) => onChangePmWork(e.target.value)}
             />
