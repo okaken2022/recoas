@@ -1,7 +1,6 @@
 import type React from 'react';
-import { Box, Flex, ListItem, Badge, Spacer, UnorderedList, Button, IconButton } from '@chakra-ui/react';
-import { EditIcon } from '@chakra-ui/icons'; // Chakra UIのアイコンを利用
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { Box, Flex, ListItem, Badge, Spacer, UnorderedList, Icon } from '@chakra-ui/react';
+import { DndContext, closestCenter, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
@@ -10,6 +9,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { DragHandleIcon } from '@chakra-ui/icons';
 import type { DragEndEvent } from '@dnd-kit/core';
 
 import type { SingleRecord } from '@/types/record';
@@ -21,7 +21,7 @@ interface RecordHeaderProps {
   }[];
   goToRecordEditPage: (value: string) => void;
   setSingleRecordData: (data: { docId: string; data: SingleRecord }[]) => void;
-  handleDragEnd: (event: DragEndEvent) => void; // DragEndのハンドラーを追加
+  handleDragEnd: (event: DragEndEvent) => void;
 }
 
 const RecordList: React.FC<RecordHeaderProps> = ({
@@ -30,13 +30,20 @@ const RecordList: React.FC<RecordHeaderProps> = ({
   setSingleRecordData,
   handleDragEnd,
 }) => {
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, { // タッチセンサーを追加
+      activationConstraint: {
+        distance: 10, // 10px以上ドラッグされたときに反応
+      },
+    })
+  );
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd} // 並べ替えの終了をハンドリング
+      onDragEnd={handleDragEnd}
     >
       <SortableContext
         items={singleRecordData.map((record) => record.docId)}
@@ -45,24 +52,24 @@ const RecordList: React.FC<RecordHeaderProps> = ({
         <Flex>
           {/* 記録 */}
           <Box
-            bg='white'
-            alignItems='center'
-            textAlign='center'
-            borderLeft='1px'
-            borderRight='1px'
-            width='50%'
+            bg="white"
+            alignItems="center"
+            textAlign="center"
+            borderLeft="1px"
+            borderRight="1px"
+            width="50%"
           >
             ご本人の様子
           </Box>
-          <Box bg='white' alignItems='center' textAlign='center' borderRight='1px' width='50%'>
+          <Box bg="white" alignItems="center" textAlign="center" borderRight="1px" width="50%">
             支援、考察
           </Box>
         </Flex>
         <UnorderedList
-          listStyleType='none'
-          ml='0'
-          border='1px'
-          borderBottomRadius='md'
+          listStyleType="none"
+          ml="0"
+          border="1px"
+          borderBottomRadius="md"
           fontSize={{ base: 'sm', md: 'md' }}
         >
           {singleRecordData.map((record, index) => (
@@ -89,9 +96,15 @@ const SortableItem: React.FC<{
 }> = ({ record, goToRecordEditPage, index }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: record.docId,
+    transition: {
+      duration: 250,
+      easing: 'ease',
+    },
+    strategy: verticalListSortingStrategy,
   });
+
   const { situation, support, good, notice } = record.data;
-  const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white'; // 背景色を交互に設定
+  const backgroundColor = index % 2 === 0 ? 'gray.100' : 'white';
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -103,43 +116,37 @@ const SortableItem: React.FC<{
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
-      className='record'
+      className="record"
       backgroundColor={backgroundColor}
-      whiteSpace='pre-line'
+      whiteSpace="pre-line"
     >
-      <Flex pt='2' pr='2'>
-        <Badge ml='2' variant='outline' style={{height: 'fit-content'}}>
+      <Flex pt="2" pr="2" onClick={() => goToRecordEditPage(record.docId)}>
+        <Icon
+          as={DragHandleIcon}
+          cursor="grab"
+          {...listeners}
+          mr="4"
+        />
+        <Badge ml="2" variant="outline">
           {record.data.editor}
         </Badge>
         <Spacer />
         {good && (
-          <Badge ml='2' colorScheme='teal' style={{height: 'fit-content'}}>
+          <Badge ml="2" colorScheme="teal">
             Good
           </Badge>
         )}
         {notice && (
-          <Badge ml='2' colorScheme='red' style={{height: 'fit-content'}}>
+          <Badge ml="2" colorScheme="red">
             特記事項
           </Badge>
         )}
-        <Spacer />
-        <IconButton
-          aria-label="Edit record"
-          icon={<EditIcon />}
-          size="sm"
-          variant="outline"
-          onClick={(e) => {
-            e.stopPropagation(); // バブルアップを防止してドラッグ操作を妨げないようにする
-            goToRecordEditPage(record.docId);
-          }}
-        />
       </Flex>
       <Flex>
-        <Box p='2' w='50%' borderRight='1px'>
+        <Box p="2" w="50%" borderRight="1px">
           {situation}
         </Box>
-        <Box p='2' w='50%'>
+        <Box p="2" w="50%">
           {support}
         </Box>
       </Flex>
