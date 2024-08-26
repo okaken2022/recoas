@@ -58,8 +58,6 @@ export default function RecordMonthPage() {
   const fetchData = async () => {
     if (Array.isArray(customerId) || Array.isArray(formattedMonth)) return;
     try {
-      // dailyRecordsコレクション内のドキュメントを取得
-      // as string はできるだけ使わない。関数で型ガードするのがベター？if文使うか、
       const dailyRecordsCollectionRef = collection(
         db,
         'customers',

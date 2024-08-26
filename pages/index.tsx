@@ -4,7 +4,7 @@ import { type NextRouter, useRouter } from 'next/router';
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 
 import { useState, useContext, useEffect } from 'react';
-import { AddIcon, CalendarIcon } from '@chakra-ui/icons';
+import { AddIcon, CalendarIcon, EditIcon } from '@chakra-ui/icons';
 import Layout from '@/components/Layout';
 import type { CustomersByService, ServiceType } from '@/types/customer';
 import CustomerList from '@/components/CustomerList';
@@ -67,6 +67,10 @@ export default function Home() {
     router.push('/administrator/editCustomer');
   };
 
+  const goToClosedDays = () => {
+    router.push('/administrator/closedDays');
+  };
+
   return (
     <>
       <Layout>
@@ -106,13 +110,14 @@ export default function Home() {
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
               <Button onClick={goToEditCustomer} w='100%'>
+                <EditIcon mr='2' />
                 利用者の編集、削除
               </Button>
             </WrapItem>
             <WrapItem w={{ base: '100%', md: '30%' }}>
-              <Button isDisabled={true} w='100%'>
+              <Button onClick={goToClosedDays} w='100%'>
                 <CalendarIcon mr='2' />
-                カレンダー設定
+                休業日設定（テスト中）
               </Button>
             </WrapItem>
           </Wrap>
