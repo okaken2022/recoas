@@ -1,9 +1,6 @@
 import { Wrap, WrapItem, Select } from '@chakra-ui/react';
-import { CustomersByService, Customer } from '@/types/customer';
+import type { CustomersByService, Customer } from '@/types/customer';
 
-{
-  /* ServiceList component */
-}
 interface ServiceListProps {
   service: keyof CustomersByService;
   customers: Customer[];
@@ -29,9 +26,6 @@ const ServiceList: React.FC<ServiceListProps> = ({ service, customers, handleCus
   );
 };
 
-{
-  /* CustomerList component */
-}
 interface CustomerListProps {
   allCustomersByService: CustomersByService;
   handleCustomerClick: (customerId: string | undefined) => void;
@@ -42,7 +36,7 @@ const CustomerList: React.FC<CustomerListProps> = ({
   handleCustomerClick,
 }) => {
   return (
-    <Wrap mt='4' spacing='3%' justify='center'>
+    <Wrap mt='4' spacing='8px' justify='center'>
       {Object.entries(allCustomersByService).map(([service, customers]) => (
         <ServiceList
           service={service as keyof CustomersByService}
@@ -55,9 +49,6 @@ const CustomerList: React.FC<CustomerListProps> = ({
   );
 };
 
-{
-  /* サービスごとに異なる背景色をあてる */
-}
 function getServiceBackgroundColor(service: string) {
   switch (service) {
     case '生活介護':

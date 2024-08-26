@@ -96,7 +96,7 @@ export default function Home() {
           <Text className='head' fontSize='2xl'>
             管理者メニュー
           </Text>
-          <Wrap mt='4' spacing='3%' justify='center'>
+          <Wrap mt='4' spacing='8px' justify='center'>
             <WrapItem w={{ base: '100%', md: '30%' }}>
               <Button onClick={goToAddCustomer} w='100%'>
                 <AddIcon mr='2' />
