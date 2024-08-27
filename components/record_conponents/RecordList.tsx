@@ -119,8 +119,9 @@ const SortableItem: React.FC<{
       className="record"
       backgroundColor={backgroundColor}
       whiteSpace="pre-line"
+      onClick={() => goToRecordEditPage(record.docId)}
     >
-      <Flex pt="2" pr="2" onClick={() => goToRecordEditPage(record.docId)}>
+      <Flex pt="2" pr="2">
         <Icon
           as={DragHandleIcon}
           cursor="grab"
