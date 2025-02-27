@@ -69,7 +69,7 @@ export default function Customer() {
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         const holidays = response.data.items.map((item: any) =>
       dayjs(item.start.date).format('YYYY-MM-DD'))
-      .filter((date: string) => date !== dayjs().set('month', 10).set('date', 15).format('YYYY-MM-DD')); // 11月15日を除外。
+      .filter((date: string) => date !== dayjs().set('month', 3).set('date', 3).format('YYYY-MM-DD')); // 3月3日を除外。
       // Todo：休業日の設定方法を変更
     console.log(holidays);
     // 土日と祝日を除いた日付の配列を作成
