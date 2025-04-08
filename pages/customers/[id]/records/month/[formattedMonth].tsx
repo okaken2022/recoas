@@ -25,6 +25,11 @@ dayjs.locale('ja');
 
 import { CustomerInfoType } from '@/types/customerInfo';
 import { fetchCustomer } from '@/utils/fetchCustomer';
+import TimeAdjustmentBox from '@/components/record_conponents/TimeAdjustmentBox';
+import MealAmountBox from '@/components/record_conponents/MealAmountBox';
+import { useForm } from 'react-hook-form';
+import { Timestamp } from 'firebase/firestore';
+import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 
 export default function RecordMonthPage() {
   {
@@ -54,6 +59,18 @@ export default function RecordMonthPage() {
     singleRecord: DocumentData[];
   };
   const [allRecordData, setAllRecordData] = useState<DailyRecordData[]>([]);
+
+  const { watch, setValue } = useForm({
+    defaultValues: {
+      timeAdjustment: {
+        amStartTime: Timestamp.fromDate(new Date(1970, 0, 1, 9, 15)),
+        amFinishTime: Timestamp.fromDate(new Date(1970, 0, 1, 12, 0)),
+        pmStartTime: Timestamp.fromDate(new Date(1970, 0, 1, 13, 30)),
+        pmFinishTime: Timestamp.fromDate(new Date(1970, 0, 1, 15, 45)),
+      },
+      mealAmount: 10,
+    },
+  });
 
   const fetchData = async () => {
     if (Array.isArray(customerId) || Array.isArray(formattedMonth)) return;
@@ -129,9 +146,41 @@ export default function RecordMonthPage() {
   return (
     <>
       <Layout>
-        <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
-          {customer?.customerName}さん
-        </Heading>
+ 
+          <Heading color='color.sub' as='h2' mb='4' size='xl' noOfLines={1}>
+            {customer?.customerName}さん
+          </Heading>
+          <Flex alignItems='center' mb={4} fontSize={{ base: 'md', md: 'xl' }}>
+            <Flex
+              alignItems='center'
+              onClick={() => {
+                const prevMonth = dayjs(formattedMonth as string)
+                  .subtract(1, 'month')
+                  .format('YYYY-MM');
+                router.push(`/customers/${customerId}/records/month/${prevMonth}`);
+              }}
+              cursor='pointer'
+            >
+              <ArrowBackIcon mr='1' />
+              <Text>前月</Text>
+            </Flex>
+            <Spacer />
+            <Text fontSize='xl'>{dayjs(formattedMonth as string).format('YYYY年M月')}</Text>
+            <Spacer />
+            <Flex
+              alignItems='center'
+              onClick={() => {
+                const nextMonth = dayjs(formattedMonth as string)
+                  .add(1, 'month')
+                  .format('YYYY-MM');
+                router.push(`/customers/${customerId}/records/month/${nextMonth}`);
+              }}
+              cursor='pointer'
+            >
+              <Text>次月</Text>
+              <ArrowForwardIcon ml='1' />
+            </Flex>
+          </Flex>
         {allRecordData.map((dailyRecord, index) => (
           <Flex
             key={index}
@@ -152,7 +201,7 @@ export default function RecordMonthPage() {
               borderTopRadius='md'
             >
               {/* 日付 */}
-              <GridItem rowSpan={2} colSpan={2} bg='color.mainTransparent1' p={2}>
+              <GridItem rowSpan={4} colSpan={2} bg='color.mainTransparent1' p={2}>
                 <Flex alignItems='center'>
                   <Text mr='8' fontSize={{ base: 'sm', md: 'xl' }}>
                     {dayjs(dailyRecord.id).format('YYYY年M月D日(ddd)')}
@@ -181,6 +230,20 @@ export default function RecordMonthPage() {
                     </Box>
                   </Flex>
                 </Flex>
+              </GridItem>
+              <GridItem rowSpan={2} colSpan={2}>
+                <TimeAdjustmentBox
+                  timeAdjustment={watch('timeAdjustment')}
+                  onChangeTimeAdjustment={(newTimeAdjustment) => {
+                    setValue('timeAdjustment', newTimeAdjustment);
+                  }}
+                />
+              </GridItem>
+              <GridItem rowSpan={2} colSpan={2}>
+                <MealAmountBox
+                  mealAmountValue={watch('mealAmount')}
+                  onChangeMealAmount={(value) => setValue('mealAmount', value)}
+                />
               </GridItem>
               {/* 記録 */}
               <GridItem

@@ -214,7 +214,7 @@ export default function Customer() {
         <Tabs size='md' variant='enclosed'>
           <TabList>
             <Tab>カレンダー</Tab>
-            <Tab>工賃表</Tab>
+            <Tab isDisabled>工賃表</Tab>
             <Tab>記録月別リスト</Tab>
           </TabList>
           <TabPanels>
